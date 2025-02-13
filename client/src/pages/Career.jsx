@@ -62,7 +62,7 @@ const Careers = () => {
                                         <li key={idx} className="text-gray-600">{req}</li>
                                     ))}
                                 </ul>
-                                <a href={job.link} className="text-blue-700 hover:text-blue-900 font-semibold">
+                                <a href={job.link} className="bg-blue-700 text-white py-2 px-4 rounded-md mx-auto hover:text-blue-900 font-semibold">
                                     Apply Now
                                 </a>
                             </div>

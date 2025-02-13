@@ -28,9 +28,11 @@ const NavBar = () => {
 
       {/* Desktop Right-side links */}
       <div className="hidden md:flex space-x-7 text-white items-center pr-8 cursor-pointer">
-        <a className="border-b-2 border-transparent hover:border-white transition-colors duration-300">
+        <Link to="/doctorPage">
+        <span className="border-b-2 border-transparent hover:border-white transition-colors duration-300">
           For Doctor
-        </a>
+        </span>
+        </Link>
         <a className="border-b-2 border-transparent hover:border-white transition-colors duration-300">
           For Corporate
         </a>
@@ -70,7 +72,11 @@ const NavBar = () => {
           <a href="#">Surgeries</a>
         </div>
         <div className="space-y-2 mt-4 flex border-b  flex-col">
-          <a href="#">For Doctor</a>
+        <Link to="/doctorRegister">
+        <span className="border-b-2 border-transparent hover:border-white transition-colors duration-300">
+          For Doctor
+        </span>
+        </Link>
           <a href="#">For Corporate</a>
           <a href="#">Help</a>
         </div>
