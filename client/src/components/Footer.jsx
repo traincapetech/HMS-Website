@@ -12,7 +12,7 @@ const Footer = () => {
             <li><a href="/Blog" className="hover:underline">Blog</a></li>
             <li><a href="/careers" className="hover:underline">Careers</a></li>
             <li><a href="/careers" className="hover:underline">Press</a></li>
-            <li><a href="/news" className="hover:underline">Contact Us</a></li>
+            <li><a href="/ContactUs" className="hover:underline">Contact Us</a></li>
           </ul>
         </div>
 
@@ -23,7 +23,7 @@ const Footer = () => {
             <li><a href="/SearchForDoctors" className="hover:underline">Search For Doctors</a></li>
             <li><a href="/consulting" className="hover:underline">Search For Clinics</a></li>
             <li><a href="/consulting" className="hover:underline">Search For Hospitals</a></li>
-            <li><a href="/consulting" className="hover:underline">Covid Hospital Listing</a></li>
+            <li><a href="/HospitalList" className="hover:underline">Covid Hospital Listing</a></li>
             <li><a href="/consulting" className="hover:underline">TAMD Care Clinics</a></li>
             <li><a href="/consulting" className="hover:underline">Read Health Articles</a></li>
             <li><a href="/consulting" className="hover:underline">Read About Medicines</a></li>
