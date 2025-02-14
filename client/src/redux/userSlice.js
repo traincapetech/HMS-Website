@@ -8,7 +8,7 @@ const initialState  = {
         email: "",
         phone: "",
         password: "",
-        confirmPassword: "",
+        // confirmPassword: "",
         dateOfBirth: "",
         gender: "",
         country: "",

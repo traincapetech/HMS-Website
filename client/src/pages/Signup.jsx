@@ -27,10 +27,10 @@ const Signup = () => {
   const handleSubmit = (e) => {
     e.preventDefault();
     
-    if (formData.password !== formData.confirmPassword) {
-      alert("Passwords do not match!");
-      return;
-    }
+    // if (formData.password !== formData.confirmPassword) {
+    //   alert("Passwords do not match!");
+    //   return;
+    // }
     // Handle the form submission here (e.g., send data to backend)
     console.log("Form submitted with data:", formData);
   };
@@ -147,7 +147,7 @@ const Signup = () => {
               </div>
 
               {/* Confirm Password */}
-              <div>
+              {/* <div>
                 <label htmlFor="confirmPassword" className="block text-lg text-gray-700 mb-2">
                   Confirm Password
                 </label>
@@ -161,7 +161,7 @@ const Signup = () => {
                   placeholder="Confirm your password"
                   required
                 />
-              </div>
+              </div> */}
 
               {/* Step 1 Button */}
               <div className="flex w-full">

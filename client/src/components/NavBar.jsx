@@ -33,9 +33,11 @@ const NavBar = () => {
           For Doctor
         </span>
         </Link>
-        <a className="border-b-2 border-transparent hover:border-white transition-colors duration-300">
+        <Link to="/corporate">
+        <span className="border-b-2 border-transparent hover:border-white transition-colors duration-300">
           For Corporate
-        </a>
+        </span>
+        </Link>
         <a className="border-b-2 border-transparent hover:border-white transition-discrete duration-300">
           Help
         </a>
