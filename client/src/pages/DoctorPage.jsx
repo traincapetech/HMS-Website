@@ -5,7 +5,11 @@ import {
   FaBaby,
   FaBrain,
   FaStethoscope,
-} from "react-icons/fa";
+  FaRegSmile,
+  FaFemale,
+  FaShieldAlt,
+  FaMicroscope, // Adding a new icon for Endocrinologist
+} from "react-icons/fa"; // Importing additional icons
 import { Link } from "react-router-dom";
 
 const DoctorPage = () => {
@@ -39,6 +43,30 @@ const DoctorPage = () => {
       name: "General Physician",
       icon: <FaStethoscope className="w-16 h-16 text-green-500" />,
       description: "Primary care for overall health.",
+    },
+    {
+      id: 6,
+      name: "Dermatologist",
+      icon: <FaShieldAlt className="w-16 h-16 text-yellow-500" />,
+      description: "Experts in skin, hair, and nails health.",
+    },
+    {
+      id: 7,
+      name: "Pediatrician",
+      icon: <FaFemale className="w-16 h-16 text-teal-500" />,
+      description: "Specialists in children's health and care.",
+    },
+    {
+      id: 8,
+      name: "Psychiatrist",
+      icon: <FaRegSmile className="w-16 h-16 text-indigo-500" />,
+      description: "Experts in mental health and emotional well-being.",
+    },
+    {
+      id: 9,
+      name: "Endocrinologist", // New specialist added
+      icon: <FaMicroscope className="w-16 h-16 text-orange-500" />, // New icon for Endocrinologist
+      description: "Specialists in hormone-related issues, such as diabetes and thyroid problems.",
     },
   ];
 

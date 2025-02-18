@@ -23,17 +23,17 @@ const Corporate = () => {
           <h1 className="text-4xl lg:text-6xl font-bold mb-4">
             Welcome to Our Hospital
           </h1>
-          <p className="text-lg lg:text-xl font-semibold text-black lg:text-white">
+          <p className="text-lg lg:text-xl font-semibold text-white">
             Your Health is Our Priority. Book a Demo Now to Learn More About Our Services.
           </p>
         </div>
 
         {/* Right Section (Form) */}
-        <div className="relative z-10 bg-black text-white bg-opacity-60 p-8 rounded-lg max-w-sm w-full">
-          <h2 className="text-2xl text-yellow-400 mb-6 text-center">Schedule a Demo</h2>
+        <div className="relative z-10 text-black bg-slate-100 bg-opacity-60 p-8 rounded-lg max-w-sm w-full">
+          <h2 className="text-2xl text-red-600 mb-6 text-center">Schedule a Demo</h2>
           <form action="submit_form.php" method="POST">
             <div className="mb-4">
-              <label htmlFor="name" className="text-yellow-400">Full Name:</label>
+              <label htmlFor="name" className="text-red-600">Full Name:</label>
               <input
                 type="text"
                 id="name"
@@ -43,7 +43,7 @@ const Corporate = () => {
               />
             </div>
             <div className="mb-4">
-              <label htmlFor="email" className="text-yellow-400">Email Address:</label>
+              <label htmlFor="email" className="text-red-600">Email Address:</label>
               <input
                 type="email"
                 id="email"
@@ -53,7 +53,7 @@ const Corporate = () => {
               />
             </div>
             <div className="mb-4">
-              <label htmlFor="phone" className="text-yellow-400">Phone Number:</label>
+              <label htmlFor="phone" className="text-red-600">Phone Number:</label>
               <input
                 type="tel"
                 id="phone"
@@ -63,7 +63,7 @@ const Corporate = () => {
               />
             </div>
             <div className="mb-6">
-              <label htmlFor="date" className="text-yellow-400">Preferred Demo Date:</label>
+              <label htmlFor="date" className="text-red-600">Preferred Demo Date:</label>
               <input
                 type="date"
                 id="date"
@@ -74,7 +74,7 @@ const Corporate = () => {
             </div>
             <button
               type="submit"
-              className="w-full p-3 bg-yellow-400 text-white rounded-lg hover:bg-yellow-500"
+              className="w-full p-3 bg-red-600 text-white rounded-lg hover:bg-yellow-500"
             >
               Submit
             </button>

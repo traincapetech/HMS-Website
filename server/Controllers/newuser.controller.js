@@ -42,33 +42,53 @@ const registerNewuser = async (req, res) => {
 
 //login a user
 const loginNewuser = async (req, res) => {
-    try{
-        const {Email, Password} = req.body;
+    try {
+        const { Email, Password } = req.body;
 
-        //check if the user exists
-        const user = await Newuser.findOne({Email});
-        if(!user) {
-            return res.status(404).json({message: "User not found"});
-        } 
-        //compare the password with the store hashed password
+        // Check if the user exists
+        const user = await Newuser.findOne({ Email });
+        if (!user) {
+            return res.status(404).json({ message: "User not found" });
+        }
+
+        // Compare the password with the stored hashed password
         const isMatch = await bcrypt.compare(Password, user.Password);
-        if(!isMatch){
-            return res.status(401).json({message: "Invalid Password"});
-        } 
-        
-        //generate a JWT token 
+        if (!isMatch) {
+            return res.status(401).json({ message: "Invalid Password" });
+        }
+
+        // Generate a JWT token 
         const token = jwt.sign(
-            {userId: user._id, Email: user.Email},
+            { userId: user._id, Email: user.Email },
             process.env.JWT_SECRET,
-            {expiresIn: "1h"}
+            { expiresIn: "1h" }
         );
 
-        res.status(200).json({ message: "Login successful", token });
-    }catch(error){
+        // Respond with both the token and user details
+        res.status(200).json({
+            message: "Login successful",
+            token,
+            user: {
+                UserName: user.UserName,
+                FirstName: user.FirstName,
+                LastName: user.LastName,
+                Email: user.Email,
+                Phone: user.Phone,
+                DOB: user.DOB,
+                Gender: user.Gender,
+                Country: user.Country,
+                State: user.State,
+                City: user.City,
+                Address: user.Address,
+            }
+        });
+
+    } catch (error) {
         console.error(error);
-        res.status(500).json({ message: "An error occured during login"});
+        res.status(500).json({ message: "An error occurred during login" });
     }
 };
+
 
 //get all newuser's data
 const getnewUser = async (req, res) => {
