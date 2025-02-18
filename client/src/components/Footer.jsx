@@ -23,12 +23,12 @@ const Footer = () => {
             <li><a href="/SearchForDoctors" className="hover:underline">Search For Doctors</a></li>
             <li><a href="/consulting" className="hover:underline">Search For Clinics</a></li>
             <li><a href="/consulting" className="hover:underline">Search For Hospitals</a></li>
-            <li><a href="/HospitalList" className="hover:underline">Covid Hospital Listing</a></li>
-            <li><a href="/consulting" className="hover:underline">TAMD Care Clinics</a></li>
-            <li><a href="/consulting" className="hover:underline">Read Health Articles</a></li>
-            <li><a href="/consulting" className="hover:underline">Read About Medicines</a></li>
-            <li><a href="/development" className="hover:underline">TAMD Drive</a></li>
-            <li><a href="/support" className="hover:underline">Health App</a></li>
+            <li><a href="/CovidHospitalListing" className="hover:underline">Covid Hospital Listing</a></li>
+            <li><a href="/TAMDCareClinics" className="hover:underline">TAMD Care Clinics</a></li>
+            <li><a href="/ReadHealthArticles" className="hover:underline">Read Health Articles</a></li>
+            <li><a href="/ReadAboutMedicines" className="hover:underline">Read About Medicines</a></li>
+            <li><a href="/TAMDDrive" className="hover:underline">TAMD Drive</a></li>
+            {/* <li><a href="/support" className="hover:underline">Health App</a></li> */}
           </ul>
         </div>
 
@@ -37,6 +37,7 @@ const Footer = () => {
           <h3 className="text-lg font-semibold mb-2">For Doctors</h3>
           <ul className="space-y-1">
             <li><a href="/blog" className="hover:underline">TAMD Profile</a></li>
+            <li><a href="/PractoHealthFeed" className="hover:underline">TAMD Health Feed</a></li>
           </ul>
           <h3 className="text-lg font-semibold mb-2">For Corporates</h3>
           <ul className="space-y-1">
