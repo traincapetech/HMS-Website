@@ -63,7 +63,21 @@ const loginNewuser = async (req, res) => {
             {expiresIn: "1h"}
         );
 
-        res.status(200).json({ message: "Login successful", token });
+        res.status(200).json({ message: "Login successful", token,
+            user: {
+                UserName: user.UserName,
+                FirstName: user.FirstName,
+                LastName: user.LastName,
+                Email: user.Email,
+                Phone: user.Phone,
+                DOB: user.DOB,
+                Gender: user.Gender,
+                Country: user.Country,
+                State: user.State,
+                City: user.City,
+                Address: user.Address,
+            }
+        });
     }catch(error){
         console.error(error);
         res.status(500).json({ message: "An error occured during login"});
@@ -87,13 +101,13 @@ const getnewUserById = async (req, res) => {
     try{
         const newuser = await Newuser.findById(req.params.id);
         if(!newuser){
-            return res.status(404).json({message: "newuser not found"});
+            return res.status(404).json({message: "User not found"});
     }
     res.status(200).json({newuser});
 }
     catch (error){
         console.error(error);
-        res.status(500).json({message: "An error occurred while fetching new user data"});
+        res.status(500).json({message: "An error occurred while fetching User data"});
     }
 };
 
