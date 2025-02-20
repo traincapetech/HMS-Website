@@ -111,4 +111,4 @@ const getnewUserById = async (req, res) => {
     }
 };
 
-export {registerNewuser, loginNewuser, getnewUser, getnewUserById};
+export {registerNewuser, loginNewuser, getnewUser, getnewUserById, };

@@ -29,7 +29,10 @@ const doctorSchema = new mongoose.Schema({
     Speciality: {type: String, required: true},
     Experience: {type: String, required: true},
     Hospital: {type: String, required: true},
-    ConsultType: {type: String, required: true},
+    ConsultType: {type: String,
+        required: true,
+        enum: ['Video', 'InClinic', 'Both'],
+    },
     Fees: {type: Number, required: true},
     Address: {type: String, required: true},
     document: {
