@@ -10,6 +10,8 @@ import SearchForDoctors from '../pages/SearchForDoctors'
 import DoctorRegister from '../components/DoctorRegister'
 import DoctorPage from '../pages/DoctorPage'
 import Corporate from '../pages/Corporate'
+import VideoConsult from '../pages/VideoConsult'
+import ConsultationDetail from '../pages/ConsultationDetail'
 const AllRoutes = () => {
   return (
     <Routes>
@@ -23,6 +25,8 @@ const AllRoutes = () => {
       <Route path='/doctorRegister' element={<DoctorRegister/>}/>
       <Route path='/doctorPage' element={<DoctorPage/>}/>
       <Route path='/corporate' element={<Corporate/>}/>
+      <Route path='/video' element={<VideoConsult/>}/>
+      <Route path="/consultation/:id" element={<ConsultationDetail />} />
     </Routes>
   )
 }

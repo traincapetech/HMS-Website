@@ -47,9 +47,11 @@ const NavBar = () => {
               Find Doctor
             </span>
           </Link>
-          <a className="border-b-2 border-transparent hover:border-white transition-colors duration-300">
+          <Link to="/video">
+          <span className="border-b-2 border-transparent hover:border-white transition-colors duration-300">
             Video Consult
-          </a>
+          </span>
+          </Link>
           <a className="border-b-2 border-transparent hover:border-white transition-colors duration-300">
             Surgeries
           </a>

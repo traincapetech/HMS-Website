@@ -14,7 +14,7 @@ const Banner = () => {
   };
 
   return (
-    <div className="relative bg-cover bg-center h-[60vh] sm:h-[70vh] md:h-[80vh] lg:h-[90vh] flex items-center justify-center text-black">
+    <div className="relative bg-cover bg-center h-[50vh] flex items-center justify-center text-black">
       {/* Background Image */}
       {/* <div className="absolute inset-0 bg-black opacity-40"></div> */}
 

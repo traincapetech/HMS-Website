@@ -1,27 +1,34 @@
 import React, { useState } from "react";
 import validator from "validator";
-
+import { useDispatch, useSelector } from "react-redux";
+import { registerDoctor, clearError } from "../redux/doctorSlice.js";
+import { useNavigate } from "react-router-dom";
 
 const DoctorRegister = () => {
+  const dispatch = useDispatch();
+  const navigate = useNavigate();
+  const { loading, error } = useSelector((state) => state.doctor);
+
   const [formData, setFormData] = useState({
-    name: "",
-    email: "",
-    phone: "",
+    Name: "",
+    Email: "",
+    Password: "",
+    Phone: "",
     countryCode: "US",
-    dob: "",
-    expertise: "",
-    speciality: "",
-    experience: "",
-    hospital: "",
-    consultationType: "",
-    fee: "",
-    gender: "Male",
-    city: "",
-    state: "",
-    country: "",
-    address: "",
-    documentpdf: null,
-    imagejpg: null,
+    DOB: "",
+    Expertise: "",
+    Speciality: "",
+    Experience: "",
+    Hospital: "",
+    ConsultType: "",
+    Fees: "",
+    Gender: "Male",
+    City: "",
+    State: "",
+    Country: "",
+    Address: "",
+    document: null,
+    image: null,
   });
 
   const [currentStep, setCurrentStep] = useState(1);
@@ -32,7 +39,7 @@ const DoctorRegister = () => {
     if (type === "file") {
       setFormData({
         ...formData,
-        [name]: files[0],
+        [name]: files[0], // Store the file object
       });
     } else {
       setFormData({
@@ -51,13 +58,13 @@ const DoctorRegister = () => {
 
   const validateStep1 = () => {
     const newErrors = {};
-    if (!formData.name) newErrors.name = "Name is required";
-    if (!formData.email || !validator.isEmail(formData.email))
-      newErrors.email = "Please enter a valid email";
-    if (!formData.phone || !validator.isMobilePhone(formData.phone))
-      newErrors.phone = "Please enter a valid phone number";
-    if (!formData.dob) newErrors.dob = "Date of Birth is required";
-    if (!formData.city) newErrors.city = "City is required";
+    if (!formData.Name) newErrors.Name = "Name is required";
+    if (!formData.Email || !validator.isEmail(formData.Email))
+      newErrors.Email = "Please enter a valid email";
+    if (!formData.Phone || !validator.isMobilePhone(formData.Phone))
+      newErrors.Phone = "Please enter a valid Phone number";
+    if (!formData.DOB) newErrors.DOB = "Date of Birth is required";
+    if (!formData.City) newErrors.City = "City is required";
 
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
@@ -77,12 +84,30 @@ const DoctorRegister = () => {
   const handleSubmit = (e) => {
     e.preventDefault();
 
+    dispatch(clearError());
+
     if (!validateStep1()) {
       return;
     }
 
-    console.log("Form Submitted:", formData);
-    // Handle form submission logic (e.g., send data to API)
+    // Create FormData object for file uploads
+    const data = new FormData();
+    Object.keys(formData).forEach((key) => {
+      data.append(key, formData[key]);
+    });
+
+    // Dispatch the registerDoctor action
+    dispatch(registerDoctor(data))
+    .unwrap()  // We use unwrap to handle success/failure
+    .then((result) => {
+      // Display success message and navigate to homepage
+      alert("Doctor successfully registered!");
+      navigate("/");  // Navigate to home page after successful registration
+    })
+    .catch((err) => {
+      // Handle error case if any
+      console.error("Registration failed:", err);
+    });
   };
 
   return (
@@ -91,6 +116,12 @@ const DoctorRegister = () => {
         <h2 className="text-3xl font-bold text-center text-gray-700 mb-6">
           Doctor Registration
         </h2>
+
+        {error && (
+          <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded mb-4">
+            {error}
+          </div>
+        )}
 
         <form onSubmit={handleSubmit} className="space-y-4">
           {/* Step 1: Personal Information */}
@@ -103,14 +134,14 @@ const DoctorRegister = () => {
                 </label>
                 <input
                   type="text"
-                  name="name"
-                  value={formData.name}
+                  name="Name"
+                  value={formData.Name}
                   onChange={handleChange}
                   className="mt-1 block w-full px-4 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-red-600"
                   required
                 />
-                {errors.name && (
-                  <p className="text-red-500 text-sm mt-1">{errors.name}</p>
+                {errors.Name && (
+                  <p className="text-red-500 text-sm mt-1">{errors.Name}</p>
                 )}
               </div>
 
@@ -121,15 +152,29 @@ const DoctorRegister = () => {
                 </label>
                 <input
                   type="email"
-                  name="email"
-                  value={formData.email}
+                  name="Email"
+                  value={formData.Email}
                   onChange={handleChange}
                   className="mt-1 block w-full px-4 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-red-600"
                   required
                 />
-                {errors.email && (
-                  <p className="text-red-500 text-sm mt-1">{errors.email}</p>
+                {errors.Email && (
+                  <p className="text-red-500 text-sm mt-1">{errors.Email}</p>
                 )}
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium text-gray-700">
+                  Password
+                </label>
+                <input
+                  type="password"
+                  name="Password"
+                  value={formData.Password}
+                  onChange={handleChange}
+                  className="mt-1 block w-full px-4 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-red-600"
+                  required
+                />
               </div>
 
               {/* Phone */}
@@ -139,14 +184,14 @@ const DoctorRegister = () => {
                 </label>
                 <input
                   type="tel"
-                  name="phone"
-                  value={formData.phone}
+                  name="Phone"
+                  value={formData.Phone}
                   onChange={handleChange}
                   className="mt-1 block w-full px-4 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-red-600"
                   required
                 />
-                {errors.phone && (
-                  <p className="text-red-500 text-sm mt-1">{errors.phone}</p>
+                {errors.Phone && (
+                  <p className="text-red-500 text-sm mt-1">{errors.Phone}</p>
                 )}
               </div>
 
@@ -157,14 +202,15 @@ const DoctorRegister = () => {
                 </label>
                 <input
                   type="date"
-                  name="dob"
-                  value={formData.dob}
+                  name="DOB"
+                  value={formData.DOB}
                   onChange={handleChange}
                   className="mt-1 block w-full px-4 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-red-600"
                   required
+                  max={new Date().toISOString().split("T")[0]}
                 />
-                {errors.dob && (
-                  <p className="text-red-500 text-sm mt-1">{errors.dob}</p>
+                {errors.DOB && (
+                  <p className="text-red-500 text-sm mt-1">{errors.DOB}</p>
                 )}
               </div>
 
@@ -174,8 +220,8 @@ const DoctorRegister = () => {
                   Gender
                 </label>
                 <select
-                  name="gender"
-                  value={formData.gender}
+                  name="Gender"
+                  value={formData.Gender}
                   onChange={handleChange}
                   className="mt-1 block w-full px-4 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-red-600"
                   required
@@ -199,6 +245,7 @@ const DoctorRegister = () => {
                   className="mt-1 block w-full px-4 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-red-600"
                 />
               </div>
+
               {/* Country */}
               <div>
                 <label className="block text-sm font-medium text-gray-700">
@@ -206,8 +253,8 @@ const DoctorRegister = () => {
                 </label>
                 <input
                   type="text"
-                  name="country"
-                  value={formData.country}
+                  name="Country"
+                  value={formData.Country}
                   onChange={handleChange}
                   className="mt-1 block w-full px-4 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-red-600"
                   required
@@ -221,14 +268,14 @@ const DoctorRegister = () => {
                 </label>
                 <input
                   type="text"
-                  name="city"
-                  value={formData.city}
+                  name="City"
+                  value={formData.City}
                   onChange={handleChange}
                   className="mt-1 block w-full px-4 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-red-600"
                   required
                 />
-                {errors.city && (
-                  <p className="text-red-500 text-sm mt-1">{errors.city}</p>
+                {errors.City && (
+                  <p className="text-red-500 text-sm mt-1">{errors.City}</p>
                 )}
               </div>
 
@@ -239,8 +286,22 @@ const DoctorRegister = () => {
                 </label>
                 <input
                   type="text"
-                  name="state"
-                  value={formData.state}
+                  name="State"
+                  value={formData.State}
+                  onChange={handleChange}
+                  className="mt-1 block w-full px-4 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-red-600"
+                  required
+                />
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium text-gray-700">
+                  Address
+                </label>
+                <input
+                  type="text"
+                  name="Address"
+                  value={formData.Address}
                   onChange={handleChange}
                   className="mt-1 block w-full px-4 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-red-600"
                   required
@@ -270,8 +331,8 @@ const DoctorRegister = () => {
                 </label>
                 <input
                   type="text"
-                  name="expertise"
-                  value={formData.expertise}
+                  name="Expertise"
+                  value={formData.Expertise}
                   onChange={handleChange}
                   className="mt-1 block w-full px-4 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-red-600"
                   required
@@ -285,8 +346,8 @@ const DoctorRegister = () => {
                 </label>
                 <input
                   type="text"
-                  name="speciality"
-                  value={formData.speciality}
+                  name="Speciality"
+                  value={formData.Speciality}
                   onChange={handleChange}
                   className="mt-1 block w-full px-4 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-red-600"
                   required
@@ -300,8 +361,8 @@ const DoctorRegister = () => {
                 </label>
                 <input
                   type="number"
-                  name="experience"
-                  value={formData.experience}
+                  name="Experience"
+                  value={formData.Experience}
                   onChange={handleChange}
                   className="mt-1 block w-full px-4 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-red-600"
                   required
@@ -315,8 +376,8 @@ const DoctorRegister = () => {
                 </label>
                 <input
                   type="text"
-                  name="hospital"
-                  value={formData.hospital}
+                  name="Hospital"
+                  value={formData.Hospital}
                   onChange={handleChange}
                   className="mt-1 block w-full px-4 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-red-600"
                   required
@@ -328,17 +389,17 @@ const DoctorRegister = () => {
                 <label className="block text-sm font-medium text-gray-700">
                   Consultation Type
                 </label>
-                <select 
-                    name="consultationType"
-                    value={formData.consultationType}
-                    onChange={handleChange}
-                    className="mt-1 block w-full px-4 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-red-600"
-                    required>
+                <select
+                  name="ConsultType"
+                  value={formData.ConsultType}
+                  onChange={handleChange}
+                  className="mt-1 block w-full px-4 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-red-600"
+                  required
+                >
                   <option value="">Select</option>
                   <option value="Video">Video Consult</option>
                   <option value="InClinic">In Clinic</option>
-                  <option value="both">Both</option>
-              
+                  <option value="Both">Both</option>
                 </select>
               </div>
 
@@ -349,23 +410,8 @@ const DoctorRegister = () => {
                 </label>
                 <input
                   type="number"
-                  name="fee"
-                  value={formData.fee}
-                  onChange={handleChange}
-                  className="mt-1 block w-full px-4 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-red-600"
-                  required
-                />
-              </div>
-
-              {/* Address */}
-              <div>
-                <label className="block text-sm font-medium text-gray-700">
-                  Address
-                </label>
-                <input
-                  type="text"
-                  name="address"
-                  value={formData.address}
+                  name="Fees"
+                  value={formData.Fees}
                   onChange={handleChange}
                   className="mt-1 block w-full px-4 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-red-600"
                   required
@@ -379,7 +425,7 @@ const DoctorRegister = () => {
                 </label>
                 <input
                   type="file"
-                  name="documentpdf"
+                  name="document"
                   accept=".pdf"
                   onChange={handleChange}
                   className="mt-1 block w-full px-4 py-2 border border-gray-300 rounded-md shadow-sm"
@@ -389,35 +435,31 @@ const DoctorRegister = () => {
               {/* Upload Image JPG */}
               <div>
                 <label className="block text-sm font-medium text-gray-700">
-                  Upload Image (JPG)
+                  Upload Image (JPEG)
                 </label>
                 <input
                   type="file"
-                  name="imagejpg"
-                  accept=".jpg,.jpeg"
+                  name="image"
+                  accept=".jpeg"
                   onChange={handleChange}
                   className="mt-1 block w-full px-4 py-2 border border-gray-300 rounded-md shadow-sm"
                 />
               </div>
 
-              {/* Submit Button */}
-              <div className="flex justify-center">
+              {/* Previous/Submit */}
+              <div className="flex flex-col w-full gap-2 justify-between mt-4">
+                <button
+                  type="button"
+                  onClick={prevStep}
+                  className="w-full bg-gray-300 py-2 px-4 rounded-md hover:bg-gray-200"
+                >
+                  Previous
+                </button>
                 <button
                   type="submit"
                   className="w-full bg-red-800 text-white py-2 px-4 rounded-md hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-red-600"
                 >
-                  Register
-                </button>
-              </div>
-
-              {/* Previous Step Button */}
-              <div className="flex justify-center mt-4">
-                <button
-                  type="button"
-                  onClick={prevStep}
-                  className="w-full bg-gray-500 text-white py-2 px-4 rounded-md hover:bg-gray-400 focus:outline-none focus:ring-2 focus:ring-gray-800"
-                >
-                  Previous Step
+                  Submit
                 </button>
               </div>
             </>
