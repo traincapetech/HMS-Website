@@ -6,6 +6,7 @@ import { GiScalpel } from "react-icons/gi";
 import { FaUserDoctor } from "react-icons/fa6";
 import AutoPlay from "../components/AutoPlay";
 import { Link } from "react-router-dom";
+import Specialties from "../components/Specialties";
 
 const Home = () => {
   const services = [
@@ -85,7 +86,7 @@ const Home = () => {
           </Link>
         ))}
       </div>
-
+        <Specialties />
       <ConsultTopDoctors />
       {/* Pass the reviews array to AutoPlay */}
       <div className="w-full py-6">

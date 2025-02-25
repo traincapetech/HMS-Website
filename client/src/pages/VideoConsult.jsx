@@ -129,7 +129,7 @@ const VideoConsult = () => {
         <div className="relative flex-1 md:pl-24 text-white z-10">
           <span className="text-6xl font-bold mb-2">Skip the travel!</span>
           <br />
-          <span className="text-4xl font-bold mb-2">
+          <span className="text-4xl leading-14 font-bold mb-2">
             Take Online Doctor Consultation
           </span>
           <p className="text-lg mb-4 w-1/2">
@@ -137,7 +137,7 @@ const VideoConsult = () => {
             consultation with our professionals and receive personalized
             guidance.
           </p>
-          <button className="bg-white text-blue-500 font-semibold py-2 px-6 rounded-md hover:bg-blue-600 hover:text-white transition transform hover:scale-105">
+          <button className="text-white bg-blue-500 font-semibold py-2 px-6 rounded-md hover:bg-blue-600 hover:text-white transition transform hover:scale-105">
             Book a Session
           </button>
           <div className="flex flex-col md:flex-row gap-4 mt-8">

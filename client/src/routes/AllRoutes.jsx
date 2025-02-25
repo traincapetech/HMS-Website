@@ -12,6 +12,10 @@ import DoctorPage from '../pages/DoctorPage'
 import Corporate from '../pages/Corporate'
 import VideoConsult from '../pages/VideoConsult'
 import ConsultationDetail from '../pages/ConsultationDetail'
+import SpecialtyDetail from '../pages/SpecialtyDetail'
+import Specialties from '../components/Specialties'
+
+
 const AllRoutes = () => {
   return (
     <Routes>
@@ -27,6 +31,8 @@ const AllRoutes = () => {
       <Route path='/corporate' element={<Corporate/>}/>
       <Route path='/video' element={<VideoConsult/>}/>
       <Route path="/consultation/:id" element={<ConsultationDetail />} />
+      <Route path="/specialties" element={<Specialties />} />
+      <Route path="/specialty/:id" component={<SpecialtyDetail />} />
     </Routes>
   )
 }
