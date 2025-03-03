@@ -3,7 +3,7 @@ import { io } from "socket.io-client";
 import axios from "axios";
 import { useParams } from "react-router-dom";
 
-const socket = io("http://localhost:5000");
+const socket = io("http://localhost:8080");
 
 const VideoCall = () => {
   const { appointmentId } = useParams();
@@ -18,7 +18,7 @@ const VideoCall = () => {
 
     // Fetch doctor ID from API
     axios
-      .get(`http://localhost:5000/api/appointments/${appointmentId}`)
+      .get(`http://localhost:8080/api/appointments/${appointmentId}`)
       .then((res) => {
         if (res.data && res.data.doctorId) {
           console.log("Doctor ID from API:", res.data.doctorId);
@@ -42,7 +42,7 @@ const VideoCall = () => {
 
     // Fetch session ID from API
     axios
-      .get(`http://localhost:5000/api/appointment/session/${appointmentId}`)
+      .get(`http://localhost:8080/api/appointment/session/${appointmentId}`)
       .then((res) => {
         console.log("Session ID from API:", res.data.sessionId);
         setSessionId(res.data.sessionId);

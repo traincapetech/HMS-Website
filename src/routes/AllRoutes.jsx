@@ -13,9 +13,10 @@ import HospitalList from '../pages/HospitalList';
 import Appointment from '../components/appointment';
 import VideoConsult from '../pages/VideoConsult';
 import ConsultationDetail from '../pages/ConsultationDetail';
-import VideoCall from '../components/Videocall'; // Added VideoCall Component
-import SpecialtyDetail from '../pages/SpecialtyDetail'
-import Specialties from '../components/Specialties'
+import VideoCall from '../components/Videocall';
+import SpecialtyDetail from '../pages/SpecialtyDetail';
+import Specialties from '../components/Specialties';
+import DoctorPage from '../pages/DoctorPage';
 
 const AllRoutes = () => {
   return (
@@ -34,9 +35,10 @@ const AllRoutes = () => {
       <Route path='/appointments' element={<Appointment />} />
       <Route path='/video' element={<VideoConsult />} />
       <Route path='/consultation/:id' element={<ConsultationDetail />} />
-      <Route path='/videocall' element={<VideoCall />} /> {/* Added VideoCall Route */}
-      <Route path="/specialties" element={<Specialties />} />
-      <Route path="/specialty/:id" component={<SpecialtyDetail />} />
+      <Route path='/videocall' element={<VideoCall />} />
+      <Route path='/specialties' element={<Specialties />} />
+      <Route path='/specialty/:id' element={<SpecialtyDetail />} />
+      <Route path='/doctor/:id' element={<DoctorPage />} /> {/* Added DoctorPage Route */}
     </Routes>
   );
 };

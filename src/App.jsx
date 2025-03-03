@@ -3,33 +3,36 @@ import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 import NavBar from "./components/NavBar";
 import Footer from "./components/Footer";
 import AllRoutes from "./routes/AllRoutes";
-import Home from "./pages/Home"; // ✅ Import Home Page
+import Home from "./pages/Home"; 
 import VideocallHome from "./pages/videocallhome";
 import VideocallRoom from "./pages/videocallroom";
 import Dashboard from "./pages/videocall.dashboard";
 import VideoCall from "./components/VideoCall";
+import MyAppointments from "./pages/MyAppointments"; 
+import MyTests from "./pages/MyTests"; 
+import MyMedicalRecords from "./pages/MyMedicalRecords"; 
+import MyOnlineConsultations from "./pages/MyOnlineConsultations";
+import MyFeedback from "./pages/MyFeedback";
+import Profile from "./pages/Profile";
+import Payments from "./pages/Payments";  
 
 function App() {
   return (
     <Router>
       <NavBar />
       <Routes>
-        {/* ✅ Set Home.jsx as the Default Page */}
         <Route path="/" element={<Home />} />
-
-        {/* Video Call Home */}
         <Route path="/videocall-home" element={<VideocallHome />} />
-
-        {/* Video Call Room */}
         <Route path="/room/:channelName" element={<VideocallRoom />} />
-
-        {/* Dashboard */}
         <Route path="/dashboard" element={<Dashboard />} />
-
-        {/* Video Call Page for Appointments */}
         <Route path="/video-call/:appointmentId" element={<VideoCall />} />
-
-        {/* Catch-All for Other Routes */}
+        <Route path="/my-appointments" element={<MyAppointments />} />
+        <Route path="/my-tests" element={<MyTests />} />
+        <Route path="/my-medical-records" element={<MyMedicalRecords />} />
+        <Route path="/my-online-consultations" element={<MyOnlineConsultations />} />
+        <Route path="/my-feedback" element={<MyFeedback />} />
+        <Route path="/profile" element={<Profile />} />
+        <Route path="/payments" element={<Payments />} />  
         <Route path="/*" element={<AllRoutes />} />
       </Routes>
       <Footer />

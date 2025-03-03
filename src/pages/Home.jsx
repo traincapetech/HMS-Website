@@ -17,7 +17,6 @@ const Home = () => {
         "Consult with experienced doctors from the comfort of your home.",
       icon: <FaVideo className="text-5xl text-blue-500 mb-4 mx-auto" />,
       buttonText: "Book a Session",
-      buttonColor: "bg-blue-500 hover:bg-blue-600",
       url: "/video",
     },
     {
@@ -27,7 +26,7 @@ const Home = () => {
         "Search for doctors near you and book an appointment quickly.",
       icon: <FaUserDoctor className="text-5xl text-green-500 mb-4 mx-auto" />,
       buttonText: "Find a Doctor",
-      buttonColor: "bg-green-500 hover:bg-green-600",
+      url: "/doctor", // Updated URL to DoctorPage
     },
     {
       id: 3,
@@ -36,7 +35,7 @@ const Home = () => {
         "Explore a wide range of surgical treatments with top specialists.",
       icon: <GiScalpel className="text-5xl text-red-500 mb-4 mx-auto" />,
       buttonText: "Explore Surgeries",
-      buttonColor: "bg-red-500 hover:bg-red-600",
+      url: "/surgeries",
     },
   ];
 
@@ -68,13 +67,9 @@ const Home = () => {
     <>
       <Banner />
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8 max-w-6xl mx-auto px-4 my-10">
-        {/* Mapping through the services array to create cards dynamically */}
         {services.map((service) => (
-          <Link to={service.url}>
-            <div
-              key={service.id}
-              className="bg-white p-6 rounded-lg shadow-lg hover:shadow-2xl hover:scale-105 transition-all duration-300 ease-in-out transform"
-            >
+          <Link to={service.url} key={service.id}>
+            <div className="bg-white p-6 rounded-lg shadow-lg hover:shadow-2xl hover:scale-105 transition-all duration-300 ease-in-out transform">
               <div className="text-center mx-auto">
                 {service.icon}
                 <h3 className="text-xl font-semibold text-gray-800 mb-4">
@@ -86,9 +81,8 @@ const Home = () => {
           </Link>
         ))}
       </div>
-        <Specialties />
+      <Specialties />
       <ConsultTopDoctors />
-      {/* Pass the reviews array to AutoPlay */}
       <div className="w-full py-6">
         <div className="text-4xl font-semibold text-gray-800 mb-4 w-full text-center">
           What Our Patients Say
