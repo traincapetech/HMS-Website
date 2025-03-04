@@ -33,31 +33,34 @@ const NavBar = () => {
 
   return (
     <nav className="flex justify-between items-center bg-red-800 p-4">
-      <div className="text-white flex items-center space-x-1">
+      {/* Left Side - Logo & Navigation */}
+      <div className="text-white flex items-center space-x-6">
         <Link to="/" className="font-extrabold text-white text-4xl py-4 md:px-20">
           TAMD.
         </Link>
-        <div className="hidden md:flex text-white space-x-6 text-lg cursor-pointer">
-          <Link to="/doctorPage">Find Doctor</Link>
-          <Link to="/video">Video Consult</Link>
-          <span>Surgeries</span>
+        <div className="hidden md:flex text-white space-x-6 text-lg">
+          <Link to="/doctor" className="nav-link">Find Doctor</Link>
+          <Link to="/video" className="nav-link">Video Consult</Link>
+          <span className="nav-link">Surgeries</span>
         </div>
       </div>
 
-      <div className="hidden md:flex space-x-7 text-white items-center pr-8 cursor-pointer">
-        <Link to="/doctorPage">For Doctor</Link>
-        <Link to="/corporate">For Corporate</Link>
-        <span>Help</span>
+      {/* Right Side - User Actions */}
+      <div className="hidden md:flex space-x-7 text-white items-center pr-8">
+        <Link to="/doctor" className="nav-link">For Doctor</Link>
+        <Link to="/corporate" className="nav-link">For Corporate</Link>
+        <span className="nav-link">Help</span>
 
         {token ? (
           <div className="relative" ref={profileRef}>
             <button
               ref={profileButtonRef}
               onClick={toggleProfile}
-              className="text-white border px-4 py-1 rounded-2xl hover:bg-white hover:text-red-700"
+              className="nav-button"
             >
               {user?.UserName || "Profile"}
             </button>
+
             {isProfileOpen && (
               <div className="absolute right-0 mt-2 w-56 bg-white text-red-800 rounded-lg shadow-lg z-10">
                 <div className="flex items-center border-b p-4">
@@ -73,13 +76,13 @@ const NavBar = () => {
                 </div>
 
                 {/* Dropdown Menu Links */}
-                <Link to="/my-appointments" className="block px-4 py-2 hover:bg-gray-100">My Appointments</Link>
-                <Link to="/my-tests" className="block px-4 py-2 hover:bg-gray-100">My Tests</Link>
-                <Link to="/my-medical-records" className="block px-4 py-2 hover:bg-gray-100">My Medical Records</Link>
-                <Link to="/my-online-consultations" className="block px-4 py-2 hover:bg-gray-100">My Online Consultations</Link>
-                <Link to="/my-feedback" className="block px-4 py-2 hover:bg-gray-100">My Feedback</Link>
-                <Link to="/profile" className="block px-4 py-2 hover:bg-gray-100">View / Update Profile</Link>
-                <Link to="/payments" className="block px-4 py-2 hover:bg-gray-100">Payments & Balance</Link>
+                <Link to="/my-appointments" className="dropdown-link">My Appointments</Link>
+                <Link to="/my-tests" className="dropdown-link">My Tests</Link>
+                <Link to="/my-medical-records" className="dropdown-link">My Medical Records</Link>
+                <Link to="/my-online-consultations" className="dropdown-link">My Online Consultations</Link>
+                <Link to="/my-feedback" className="dropdown-link">My Feedback</Link>
+                <Link to="/profile" className="dropdown-link">View / Update Profile</Link>
+                <Link to="/payments" className="dropdown-link">Payments & Balance</Link>
                 <button
                   onClick={handleLogout}
                   className="block w-full text-left px-4 py-2 text-red-500 hover:bg-gray-100"
@@ -92,14 +95,10 @@ const NavBar = () => {
         ) : (
           <>
             <Link to="/login">
-              <button className="text-white border px-4 py-1 rounded-2xl hover:bg-white hover:text-red-700">
-                Login
-              </button>
+              <button className="nav-button">Login</button>
             </Link>
             <Link to="/signup">
-              <button className="text-white border px-4 py-1 rounded-2xl hover:bg-white hover:text-red-700">
-                Sign Up
-              </button>
+              <button className="nav-button">Sign Up</button>
             </Link>
           </>
         )}

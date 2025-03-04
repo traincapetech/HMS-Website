@@ -8,13 +8,15 @@ const Appointments = () => {
   const [selectedSpeciality, setSelectedSpeciality] = useState("");
   const [selectedDoctor, setSelectedDoctor] = useState("");
   const [patientName, setPatientName] = useState("");
+  const [email, setEmail] = useState("");
   const [appointmentDate, setAppointmentDate] = useState("");
   const [appointmentTime, setAppointmentTime] = useState("");
+  const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
 
   useEffect(() => {
     axios
-      .get("http://localhost:5000/api/doctors/all")
+      .get("http://localhost:8080/api/doctor/all")
       .then((response) => {
         if (response.data && Array.isArray(response.data.doctor)) {
           setDoctors(response.data.doctor);
@@ -31,30 +33,57 @@ const Appointments = () => {
       });
   }, []);
 
+  // Get today's date in YYYY-MM-DD format
+  const getTodayDate = () => {
+    return new Date().toISOString().split("T")[0];
+  };
+
   const handleSubmit = async (e) => {
     e.preventDefault();
-    if (!selectedDoctor || !patientName || !appointmentDate || !appointmentTime) {
+
+    if (!selectedDoctor || !patientName || !email || !appointmentDate || !appointmentTime) {
       alert("Please fill in all fields.");
       return;
     }
 
-    const sessionId = `session_${selectedDoctor}_${Date.now()}`;
+    // Email validation
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!emailRegex.test(email)) {
+      alert("Please enter a valid email address.");
+      return;
+    }
+
+    // Prevent booking on past dates
+    if (appointmentDate < getTodayDate()) {
+      alert("You cannot book an appointment for a past date.");
+      return;
+    }
+
     const appointmentData = {
       doctorId: selectedDoctor,
       patientName,
+      email,
       date: appointmentDate,
       time: appointmentTime,
-      sessionId,
     };
 
+    setLoading(true);
+
     try {
-      await axios.post("http://localhost:5000/api/appointments/book", appointmentData);
+      const response = await axios.post("http://localhost:8080/api/appointments/book", appointmentData);
+
+      if (response.status === 201 || response.status === 200) {
+        alert("Appointment booked successfully!");
+        navigate("/appointments"); // Redirect to appointments list
+      } else {
+        throw new Error("Failed to book appointment");
+      }
     } catch (error) {
-      const storedAppointments = JSON.parse(localStorage.getItem("appointments")) || [];
-      storedAppointments.push(appointmentData);
-      localStorage.setItem("appointments", JSON.stringify(storedAppointments));
+      alert("Error booking appointment. Please try again.");
+      console.error("Appointment Booking Error:", error);
+    } finally {
+      setLoading(false);
     }
-    navigate(`/Videocall?sessionId=${sessionId}`);
   };
 
   return (
@@ -104,6 +133,17 @@ const Appointments = () => {
           />
         </div>
         <div>
+          <label className="block font-semibold">Your Email:</label>
+          <input
+            type="email"
+            value={email}
+            onChange={(e) => setEmail(e.target.value)}
+            className="w-full p-2 border rounded"
+            placeholder="Enter your email"
+            required
+          />
+        </div>
+        <div>
           <label className="block font-semibold">Appointment Date:</label>
           <input
             type="date"
@@ -111,6 +151,7 @@ const Appointments = () => {
             onChange={(e) => setAppointmentDate(e.target.value)}
             className="w-full p-2 border rounded"
             required
+            min={getTodayDate()} // Disable past dates
           />
         </div>
         <div>
@@ -126,8 +167,9 @@ const Appointments = () => {
         <button
           type="submit"
           className="w-full bg-red-700 text-white py-2 rounded hover:bg-red-800 transition duration-300"
+          disabled={loading}
         >
-          Book Appointment
+          {loading ? "Booking..." : "Book Appointment"}
         </button>
       </form>
     </div>

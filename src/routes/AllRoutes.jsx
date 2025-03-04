@@ -10,13 +10,14 @@ import SearchForDoctors from '../pages/SearchForDoctors';
 import ContactUs from '../pages/ContactUs';
 import CovidHospitalListing from '../pages/CovidHospitalListing';
 import HospitalList from '../pages/HospitalList';
-import Appointment from '../components/appointment';
+import Appointment from '../components/Appointment';
 import VideoConsult from '../pages/VideoConsult';
 import ConsultationDetail from '../pages/ConsultationDetail';
 import VideoCall from '../components/Videocall';
 import SpecialtyDetail from '../pages/SpecialtyDetail';
 import Specialties from '../components/Specialties';
 import DoctorPage from '../pages/DoctorPage';
+import Corporate from '../pages/Corporate';  
 
 const AllRoutes = () => {
   return (
@@ -38,7 +39,8 @@ const AllRoutes = () => {
       <Route path='/videocall' element={<VideoCall />} />
       <Route path='/specialties' element={<Specialties />} />
       <Route path='/specialty/:id' element={<SpecialtyDetail />} />
-      <Route path='/doctor/:id' element={<DoctorPage />} /> {/* Added DoctorPage Route */}
+      <Route path='/doctor/:id' element={<DoctorPage />} /> 
+      <Route path='/corporate' element={<Corporate />} /> 
     </Routes>
   );
 };

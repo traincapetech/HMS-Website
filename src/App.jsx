@@ -7,7 +7,7 @@ import Home from "./pages/Home";
 import VideocallHome from "./pages/videocallhome";
 import VideocallRoom from "./pages/videocallroom";
 import Dashboard from "./pages/videocall.dashboard";
-import VideoCall from "./components/VideoCall";
+import VideoCall from "./components/Videocall";
 import MyAppointments from "./pages/MyAppointments"; 
 import MyTests from "./pages/MyTests"; 
 import MyMedicalRecords from "./pages/MyMedicalRecords"; 
@@ -15,6 +15,8 @@ import MyOnlineConsultations from "./pages/MyOnlineConsultations";
 import MyFeedback from "./pages/MyFeedback";
 import Profile from "./pages/Profile";
 import Payments from "./pages/Payments";  
+import DoctorPage from "./pages/DoctorPage";
+import Corporate from "./pages/Corporate";  // ✅ Import Corporate Page
 
 function App() {
   return (
@@ -33,6 +35,8 @@ function App() {
         <Route path="/my-feedback" element={<MyFeedback />} />
         <Route path="/profile" element={<Profile />} />
         <Route path="/payments" element={<Payments />} />  
+        <Route path="/doctor" element={<DoctorPage />} />  
+        <Route path="/corporate" element={<Corporate />} />  
         <Route path="/*" element={<AllRoutes />} />
       </Routes>
       <Footer />
