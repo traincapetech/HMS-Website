@@ -17,7 +17,8 @@ import VideoCall from '../components/Videocall';
 import SpecialtyDetail from '../pages/SpecialtyDetail';
 import Specialties from '../components/Specialties';
 import DoctorPage from '../pages/DoctorPage';
-import Corporate from '../pages/Corporate';  
+import Corporate from '../pages/Corporate';
+import DoctorRegister from '../components/DoctorRegister';  
 
 const AllRoutes = () => {
   return (
@@ -25,14 +26,14 @@ const AllRoutes = () => {
       <Route path='/' element={<Home />} />
       <Route path='/login' element={<Login />} />
       <Route path='/signup' element={<Signup />} />
-      <Route path='/About' element={<About />} />
-      <Route path='/Blog' element={<Blog />} />
-      <Route path='/Careers' element={<Careers />} />
-      <Route path='/SearchForDoctors' element={<SearchForDoctors />} />
-      <Route path='/ContactUs' element={<ContactUs />} />
-      <Route path='/CovidHospitalListing' element={<CovidHospitalListing />} />
-      <Route path='/HospitalList' element={<HospitalList />} />
-      <Route path='/hospitals/NewYork' element={<HospitalList />} />
+      <Route path='/about' element={<About />} />
+      <Route path='/blog' element={<Blog />} />
+      <Route path='/careers' element={<Careers />} />
+      <Route path='/search-for-doctors' element={<SearchForDoctors />} />
+      <Route path='/contact-us' element={<ContactUs />} />
+      <Route path='/covid-hospital-listing' element={<CovidHospitalListing />} />
+      <Route path='/hospital-list' element={<HospitalList />} />
+      <Route path='/hospitals/new-york' element={<HospitalList />} />
       <Route path='/appointments' element={<Appointment />} />
       <Route path='/video' element={<VideoConsult />} />
       <Route path='/consultation/:id' element={<ConsultationDetail />} />
@@ -41,6 +42,7 @@ const AllRoutes = () => {
       <Route path='/specialty/:id' element={<SpecialtyDetail />} />
       <Route path='/doctor/:id' element={<DoctorPage />} /> 
       <Route path='/corporate' element={<Corporate />} /> 
+      <Route path='/doctor-register' element={<DoctorRegister />} />  
     </Routes>
   );
 };

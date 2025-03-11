@@ -16,7 +16,9 @@ import MyFeedback from "./pages/MyFeedback";
 import Profile from "./pages/Profile";
 import Payments from "./pages/Payments";  
 import DoctorPage from "./pages/DoctorPage";
-import Corporate from "./pages/Corporate";  // ✅ Import Corporate Page
+import Corporate from "./pages/Corporate";  
+import DoctorRegister from "./components/DoctorRegister"; 
+import ContactUs from "./pages/ContactUs";  
 
 function App() {
   return (
@@ -37,6 +39,8 @@ function App() {
         <Route path="/payments" element={<Payments />} />  
         <Route path="/doctor" element={<DoctorPage />} />  
         <Route path="/corporate" element={<Corporate />} />  
+        <Route path="/doctor-register" element={<DoctorRegister />} />  
+        <Route path="/contact" element={<ContactUs />} />  
         <Route path="/*" element={<AllRoutes />} />
       </Routes>
       <Footer />

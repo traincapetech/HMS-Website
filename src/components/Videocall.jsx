@@ -7,7 +7,6 @@ const socket = io("http://localhost:8080");
 
 const VideoCall = () => {
   const { appointmentId } = useParams();
-  const [sessionId, setSessionId] = useState(null);
   const [doctorId, setDoctorId] = useState(null);
   const localVideoRef = useRef(null);
   const remoteVideoRef = useRef(null);
@@ -23,41 +22,10 @@ const VideoCall = () => {
         if (res.data && res.data.doctorId) {
           console.log("Doctor ID from API:", res.data.doctorId);
           setDoctorId(res.data.doctorId);
-          localStorage.setItem("doctorId", res.data.doctorId);
         }
       })
       .catch((error) => {
         console.error("Error fetching doctor ID from API:", error);
-
-        // Fetch doctor ID from local storage if API fails
-        const storedAppointment = localStorage.getItem(`appointment_${appointmentId}`);
-        if (storedAppointment) {
-          const { doctorId } = JSON.parse(storedAppointment);
-          console.log("Doctor ID from Local Storage:", doctorId);
-          setDoctorId(doctorId);
-        } else {
-          console.error("No doctor ID found in API or local storage.");
-        }
-      });
-
-    // Fetch session ID from API
-    axios
-      .get(`http://localhost:8080/api/appointment/session/${appointmentId}`)
-      .then((res) => {
-        console.log("Session ID from API:", res.data.sessionId);
-        setSessionId(res.data.sessionId);
-        socket.emit("join-room", res.data.sessionId);
-      })
-      .catch((error) => {
-        console.error("Error fetching session ID:", error);
-
-        // Fetch session ID from local storage if API fails
-        const storedSessionId = localStorage.getItem(`session_${appointmentId}`);
-        if (storedSessionId) {
-          console.log("Session ID from Local Storage:", storedSessionId);
-          setSessionId(storedSessionId);
-          socket.emit("join-room", storedSessionId);
-        }
       });
 
     return () => {
@@ -83,11 +51,8 @@ const VideoCall = () => {
     localVideoRef.current.srcObject = stream;
     stream.getTracks().forEach((track) => peerConnection.current.addTrack(track, stream));
 
-    if (sessionId) {
-      const offer = await peerConnection.current.createOffer();
-      await peerConnection.current.setLocalDescription(offer);
-      socket.emit("offer", { target: sessionId, sdp: offer });
-    }
+    // No session ID required for starting the call
+    socket.emit("start-call", { doctorId, appointmentId });
   };
 
   return (

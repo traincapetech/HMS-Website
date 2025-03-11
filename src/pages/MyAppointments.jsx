@@ -18,11 +18,19 @@ const MyAppointments = () => {
   // Fetch appointment history
   const fetchAppointments = async () => {
     try {
-      const response = await axios.get("http://localhost:8080/api/appointments");
-      setAppointments(response.data.appointments);
-      setLoading(false);
+      const response = await axios.get("http://localhost:8080/api/appoint/all");
+      console.log("Fetched Appointments:", response.data);
+      
+      if (Array.isArray(response.data)) {
+        setAppointments(response.data);
+      } else {
+        setAppointments([]);
+        setError("Unexpected data format received.");
+      }
     } catch (err) {
-      setError("Error fetching appointment data");
+      console.error("Error fetching appointments:", err);
+      setError("Failed to load appointments.");
+    } finally {
       setLoading(false);
     }
   };
@@ -66,25 +74,27 @@ const MyAppointments = () => {
             <p>Loading appointments...</p>
           ) : error ? (
             <p className="text-red-500">{error}</p>
+          ) : appointments.length === 0 ? (
+            <p className="text-gray-600">No appointments found.</p>
           ) : (
             <table className="w-full border-collapse border border-gray-300">
               <thead>
                 <tr className="bg-gray-200">
                   <th className="border border-gray-300 p-2">Date</th>
+                  <th className="border border-gray-300 p-2">Time</th>
                   <th className="border border-gray-300 p-2">Doctor</th>
-                  <th className="border border-gray-300 p-2">Specialization</th>
+                  <th className="border border-gray-300 p-2">Speciality</th>
                   <th className="border border-gray-300 p-2">Status</th>
                 </tr>
               </thead>
               <tbody>
                 {appointments.map((appointment, index) => (
                   <tr key={index} className="text-center">
-                    <td className="border border-gray-300 p-2">{new Date(appointment.date).toLocaleDateString()}</td>
-                    <td className="border border-gray-300 p-2">{appointment.doctorName}</td>
-                    <td className="border border-gray-300 p-2">{appointment.specialization}</td>
-                    <td className={`border border-gray-300 p-2 ${appointment.status === "Completed" ? "text-green-600" : "text-yellow-600"}`}>
-                      {appointment.status}
-                    </td>
+                    <td className="border border-gray-300 p-2">{new Date(appointment.AppointDate).toLocaleDateString()}</td>
+                    <td className="border border-gray-300 p-2">{appointment.AppointTime}</td>
+                    <td className="border border-gray-300 p-2">{appointment.Doctor}</td>
+                    <td className="border border-gray-300 p-2">{appointment.Speciality}</td>
+                    <td className="border border-gray-300 p-2 text-yellow-600">Pending</td>
                   </tr>
                 ))}
               </tbody>

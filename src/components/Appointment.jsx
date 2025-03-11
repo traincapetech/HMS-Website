@@ -20,67 +20,69 @@ const Appointments = () => {
       .then((response) => {
         if (response.data && Array.isArray(response.data.doctor)) {
           setDoctors(response.data.doctor);
-          const uniqueSpecialities = [
-            ...new Set(response.data.doctor.map((doc) => doc.Speciality)),
-          ];
+          const uniqueSpecialities = [...new Set(response.data.doctor.map((doc) => doc.Speciality))];
           setSpecialities(uniqueSpecialities);
         } else {
           setDoctors([]);
         }
       })
-      .catch(() => {
+      .catch((error) => {
+        console.error("Error fetching doctors:", error);
         setDoctors([]);
       });
   }, []);
 
-  // Get today's date in YYYY-MM-DD format
-  const getTodayDate = () => {
-    return new Date().toISOString().split("T")[0];
-  };
+  const getTodayDate = () => new Date().toISOString().split("T")[0];
 
   const handleSubmit = async (e) => {
     e.preventDefault();
 
-    if (!selectedDoctor || !patientName || !email || !appointmentDate || !appointmentTime) {
+    if (!selectedSpeciality || !selectedDoctor || !patientName || !email || !appointmentDate || !appointmentTime) {
       alert("Please fill in all fields.");
       return;
     }
 
-    // Email validation
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     if (!emailRegex.test(email)) {
       alert("Please enter a valid email address.");
       return;
     }
 
-    // Prevent booking on past dates
     if (appointmentDate < getTodayDate()) {
       alert("You cannot book an appointment for a past date.");
       return;
     }
 
+    const doctorDetails = doctors.find((doc) => doc._id === selectedDoctor);
+    const doctorName = doctorDetails ? doctorDetails.Name : "";
+
     const appointmentData = {
-      doctorId: selectedDoctor,
-      patientName,
-      email,
-      date: appointmentDate,
-      time: appointmentTime,
+      Speciality: selectedSpeciality,
+      Doctor: doctorName, 
+      Name: patientName,
+      Email: email,
+      AppointDate: appointmentDate,
+      AppointTime: appointmentTime,
     };
+
+    console.log("Sending appointment data:", appointmentData);
 
     setLoading(true);
 
     try {
-      const response = await axios.post("http://localhost:8080/api/appointments/book", appointmentData);
+      const response = await axios.post("http://localhost:8080/api/appoint/create", appointmentData, {
+        headers: { "Content-Type": "application/json" },
+      });
 
       if (response.status === 201 || response.status === 200) {
         alert("Appointment booked successfully!");
-        navigate("/appointments"); // Redirect to appointments list
+        navigate("/appointments");
       } else {
         throw new Error("Failed to book appointment");
       }
     } catch (error) {
-      alert("Error booking appointment. Please try again.");
-      console.error("Appointment Booking Error:", error);
+      console.error("Appointment Booking Error:", error.response?.data || error);
+      alert("Error booking appointment: " + (error.response?.data?.message || "Please try again."));
     } finally {
       setLoading(false);
     }
@@ -151,7 +153,7 @@ const Appointments = () => {
             onChange={(e) => setAppointmentDate(e.target.value)}
             className="w-full p-2 border rounded"
             required
-            min={getTodayDate()} // Disable past dates
+            min={getTodayDate()} // Prevent past date selection
           />
         </div>
         <div>

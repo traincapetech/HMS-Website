@@ -20,18 +20,10 @@ const Dashboard = ({ user }) => {
     fetchAppointments();
   }, [user]);
 
-  // Function to start a video call
-  const startVideoCall = async (appointmentId) => {
-    try {
-      // Request session ID for the video call
-      const response = await axios.post(`/api/appointments/start-call`, { appointmentId });
-      const { sessionId } = response.data;
-
-      // Redirect to the video call page
-      navigate(`/video-call/${sessionId}`);
-    } catch (error) {
-      console.error("Error starting video call:", error);
-    }
+  // Function to start a video call without session ID
+  const startVideoCall = (appointmentId) => {
+    // Redirect to a general video call page
+    navigate(`/video-call`);
   };
 
   return (
@@ -48,25 +40,20 @@ const Dashboard = ({ user }) => {
             {appointments.map((appointment) => (
               <li key={appointment._id} className="p-4 border-b flex justify-between items-center">
                 <div>
-                  <p className="text-lg font-semibold">{appointment.patientName} with {appointment.doctorName}</p>
-                  <p className="text-gray-500">Date: {new Date(appointment.date).toLocaleString()}</p>
+                  <p className="text-lg font-semibold">
+                    {appointment.patientName} with {appointment.doctorName}
+                  </p>
+                  <p className="text-gray-500">
+                    Date: {new Date(appointment.date).toLocaleString()}
+                  </p>
                 </div>
 
-                {appointment.sessionId ? (
-                  <button
-                    className="px-4 py-2 bg-green-500 text-white rounded-lg"
-                    onClick={() => navigate(`/video-call/${appointment.sessionId}`)}
-                  >
-                    Join Call
-                  </button>
-                ) : (
-                  <button
-                    className="px-4 py-2 bg-blue-500 text-white rounded-lg"
-                    onClick={() => startVideoCall(appointment._id)}
-                  >
-                    Start Call
-                  </button>
-                )}
+                <button
+                  className="px-4 py-2 bg-blue-500 text-white rounded-lg"
+                  onClick={() => startVideoCall(appointment._id)}
+                >
+                  Start Call
+                </button>
               </li>
             ))}
           </ul>

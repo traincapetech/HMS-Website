@@ -6,54 +6,52 @@ export const loginUser = createAsyncThunk(
   "user/login",
   async (userData, { rejectWithValue }) => {
     try {
-      const response = await axios.post(
-        "http://localhost:5000/api/newuser/login",
-        {
-          Email: userData.email, // Match the backend's expected key
-          Password: userData.password, // Match the backend's expected key
-        }
-      );
+      const response = await axios.post("http://localhost:8080/api/newuser/login", {
+        Email: userData.email, // Match the backend's expected key
+        Password: userData.password, // Match the backend's expected key
+      });
 
-      const {token, user} = response.data;
+      const { token, user } = response.data;
+
+      // Save token and user info in local storage
       localStorage.setItem("token", token);
       localStorage.setItem("user", JSON.stringify(user));
 
-      return response.data; // Assuming the backend returns { message, token }
+      return response.data; // Assuming the backend returns { token, user }
     } catch (error) {
-      return rejectWithValue(error.response.data);
+      return rejectWithValue(error.response?.data || "Login failed");
     }
   }
 );
 
-// Async Thunk for User Registration
+// Async Thunk for Registration
 export const registerUser = createAsyncThunk(
   "user/register",
   async (formData, { rejectWithValue }) => {
     try {
-      const response = await axios.post(
-        "http://localhost:5000/api/newuser/register",
-        {
-          UserName: formData.userName,
-          FirstName: formData.firstName,
-          LastName: formData.lastName,
-          Email: formData.email,
-          Phone: formData.phone,
-          Password: formData.password,
-          DOB: formData.dateOfBirth,
-          Gender: formData.gender,
-          Country: formData.country,
-          State: formData.state,
-          City: formData.city,
-          Address: formData.address,
-        }
-      );
+      const response = await axios.post("http://localhost:8080/api/newuser/register", {
+        UserName: formData.userName,
+        FirstName: formData.firstName,
+        LastName: formData.lastName,
+        Email: formData.email,
+        Phone: formData.phone,
+        Password: formData.password,
+        DOB: formData.dateOfBirth,
+        Gender: formData.gender,
+        Country: formData.country,
+        State: formData.state,
+        City: formData.city,
+        Address: formData.address,
+      });
+
       return response.data; // Assuming the backend returns { message, newuser }
     } catch (error) {
-      return rejectWithValue(error.response.data);
+      return rejectWithValue(error.response?.data || "Registration failed");
     }
   }
 );
 
+// Create Redux Slice
 const userSlice = createSlice({
   name: "user",
   initialState: {
@@ -69,9 +67,10 @@ const userSlice = createSlice({
     logoutUser: (state) => {
       state.user = null;
       state.token = null;
+
+      // Remove from local storage
       localStorage.removeItem("token");
       localStorage.removeItem("user");
-
     },
   },
   extraReducers: (builder) => {
@@ -89,6 +88,19 @@ const userSlice = createSlice({
       .addCase(loginUser.rejected, (state, action) => {
         state.loading = false;
         state.error = action.payload?.message || "Login failed";
+      })
+
+      // Register User
+      .addCase(registerUser.pending, (state) => {
+        state.loading = true;
+        state.error = null;
+      })
+      .addCase(registerUser.fulfilled, (state) => {
+        state.loading = false;
+      })
+      .addCase(registerUser.rejected, (state, action) => {
+        state.loading = false;
+        state.error = action.payload?.message || "Registration failed";
       });
   },
 });

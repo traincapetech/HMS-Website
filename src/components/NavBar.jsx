@@ -1,12 +1,14 @@
 import React, { useState, useRef, useEffect } from "react";
 import { Link, useNavigate } from "react-router-dom";
-import { useSelector } from "react-redux";
+import { useSelector, useDispatch } from "react-redux";
+import { logoutUser } from "../redux/userSlice"; // ✅ Correct import
 
 const NavBar = () => {
   const [isProfileOpen, setIsProfileOpen] = useState(false);
   const profileRef = useRef(null);
   const profileButtonRef = useRef(null);
   const navigate = useNavigate();
+  const dispatch = useDispatch();
   const { user, token } = useSelector((state) => state.user);
 
   const toggleProfile = () => setIsProfileOpen(!isProfileOpen);
@@ -27,8 +29,8 @@ const NavBar = () => {
   }, []);
 
   const handleLogout = () => {
-    console.log("User logged out");
-    navigate("/login");
+    dispatch(logoutUser()); // ✅ Dispatch Redux action to clear user state
+    navigate("/login"); // ✅ Redirect to login page
   };
 
   return (
@@ -97,9 +99,9 @@ const NavBar = () => {
             <Link to="/login">
               <button className="nav-button">Login</button>
             </Link>
-            <Link to="/signup">
-              <button className="nav-button">Sign Up</button>
-            </Link>
+            {/* <Link to="/signup"> */}
+              {/* <button className="nav-button">Sign Up</button> */}
+            {/* </Link> */}
           </>
         )}
       </div>
