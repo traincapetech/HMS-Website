@@ -1,6 +1,7 @@
 //appoint.controller.js
 import Appoint from "../Models/appoint.model.js";
 import { validationResult } from "express-validator";
+import { generateZoomMeeting } from "../zoom.service.js";
 
 const createAppoint = async (req, res) => {
     try{
@@ -16,11 +17,32 @@ const createAppoint = async (req, res) => {
         const newAppoint = new Appoint({
              Speciality, Doctor, Name, Email, AppointDate, AppointTime });
         await newAppoint.save();
+
+        //call the zoom meeting generation with the patient Email
+        await generateZoomMeeting(Email);
+
         res.status(201).json(newAppoint);
     } catch (error){
         res.status(400).json({ message: error.message });
     }
 };
+
+
+
+
+// //Generate a zoom meeting with patient
+// const zoomMeeting  = await generateZoomMeeting({
+//     patientEmail: Email,
+//     startTime: AppointTime,
+//     topic: 'Appointment Meeting'
+// });
+
+// //Add the zoom meeting link to the appointment 
+// newAppoint.zoomMeetingLink = zoomMeeting.join_url;
+// await newAppoint.save();
+ 
+// res.status(201).json({ appointment: newAppoint, zoomMeeting });
+// ////
 
 //get all appointment 
 const getAppointment = async(req, res) => {

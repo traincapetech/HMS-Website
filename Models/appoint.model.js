@@ -10,9 +10,10 @@ const appointSchema = new mongoose.Schema({
     Email: {
         type: String,
         required: true,
-        vaidate: [validator.isEmail, "Please enter a valid Email "],
+        validate: [validator.isEmail, "Please enter a valid Email "],
     },
     AppointDate: {type: Date, required: true},
+    
     AppointTime: {type: String, required: true},
 });
 

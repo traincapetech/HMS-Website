@@ -22,10 +22,18 @@ const newuserSchema = new mongoose.Schema({
         enum: ['Male', 'Female', 'Other'],
         required: true
     },
+    BloodGroup: {type: String},
     Country: {type: String, required: true},
     State: {type: String, required: true},
     City: {type: String, required: true},
     Address: {type: String, required: true},
+    Pincode: {type: Number},
+    ExtraPhone: {type: Number},
+    Language: {type: String},
+    image: {
+        data: Buffer,
+        contentType: String
+    },
 },
 {
     timestamps: true,
@@ -36,3 +44,6 @@ const newuserSchema = new mongoose.Schema({
 const Newuser = mongoose.model('newuser', newuserSchema);
 
 export default Newuser;
+
+/////////////////////////////////////////////////
+// name, phone, email, gender, dob, bloodgroup, timezone, address, city, state, country, pincode, extraPhone, language, profilePhoto
