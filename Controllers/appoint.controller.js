@@ -1,7 +1,7 @@
 //appoint.controller.js
 import Appoint from "../Models/appoint.model.js";
 import { validationResult } from "express-validator";
-import { generateZoomMeeting } from "../zoom.service.js";
+// import { generateZoomMeeting } from "../zoom.service.js";
 
 const createAppoint = async (req, res) => {
     try{
@@ -18,8 +18,8 @@ const createAppoint = async (req, res) => {
              Speciality, Doctor, Name, Email, AppointDate, AppointTime });
         await newAppoint.save();
 
-        //call the zoom meeting generation with the patient Email
-        await generateZoomMeeting(Email);
+        // //call the zoom meeting generation with the patient Email
+        // await generateZoomMeeting(Email);
 
         res.status(201).json(newAppoint);
     } catch (error){

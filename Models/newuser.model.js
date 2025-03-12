@@ -30,10 +30,10 @@ const newuserSchema = new mongoose.Schema({
     Pincode: {type: Number},
     ExtraPhone: {type: Number},
     Language: {type: String},
-    image: {
-        data: Buffer,
-        contentType: String
-    },
+    // image: {
+    //     data: Buffer,
+    //     contentType: String
+    // },
 },
 {
     timestamps: true,
@@ -44,6 +44,3 @@ const newuserSchema = new mongoose.Schema({
 const Newuser = mongoose.model('newuser', newuserSchema);
 
 export default Newuser;
-
-/////////////////////////////////////////////////
-// name, phone, email, gender, dob, bloodgroup, timezone, address, city, state, country, pincode, extraPhone, language, profilePhoto

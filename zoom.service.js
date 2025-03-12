@@ -1,3 +1,6 @@
+// Host email will be only one since it has credentials but we can add multiple invites and that can be changed dynamically and we are gonna add both doctor and patient email in that and it will automatically fetch after creating the appointment and the link to the meeting will be send to both of their mails as well
+
+
 //zoom.service.js
 import fetch from "node-fetch";
 import base64 from "base-64";
@@ -38,7 +41,7 @@ const generateZoomAccessToken = async() => {
     }
 };
 
-const generateZoomMeeting = async(patientEmail) => {
+const generateZoomMeeting = async() => {
     try {
         const zoomAccessToken = await generateZoomAccessToken();
         const response = await fetch(
@@ -80,10 +83,11 @@ const generateZoomMeeting = async(patientEmail) => {
                     focus_mode: true,
                   //  global_dial_in_countries: ['US'], 
                     host_video: true,
-                    join_before_host: false,
+                    join_before_host: true,
                     meeting_authentication: true,
                     meeting_invitees: [{
-                        email: patientEmail, //invites the patient 
+                        email: 'sumitjain8061@gmail.com', //invites are going to be both doctor and patient email 
+                        email : 'tarannumf1996@gmail.com',
                       },],
                       mute_upon_entry: true,
                       participant_video: true,
@@ -94,8 +98,7 @@ const generateZoomMeeting = async(patientEmail) => {
                         enable: true,
                       },
                     },
-                    // start_time: new Date().toLocaleDateString(),
-                    start_time: new Date().toISOString(), // Use ISO string for date format
+                    start_time: new Date().toLocaleDateString(),
                     timezone: 'Asia/Delhi',
                     topic: 'TAMD Appointment Meeting',
                     type: 2 //1 for instant meeting, 2 for scheduled meeting
@@ -110,10 +113,7 @@ const generateZoomMeeting = async(patientEmail) => {
         console.log("genrateZoomMeeting Error --> ", error);
         throw error;
     }
-};
-
-
-export {generateZoomMeeting};
+}
 
 //generateZoomAccessToken();
-//generateZoomMeeting();
+generateZoomMeeting();

@@ -163,7 +163,7 @@ const getDoctorDocument = async (req, res) => {
 //serve the doctor's image
 const getDoctorImage = async(req, res) => {
     try {
-        const doctor = await Doctor.findById(req.params.id);
+        const doctor = await Doctor.findById(req.params.id); 
         if(!doctor || !doctor.image.data) {
             return res.status(404).json({ message: 'Image not found'});
         }

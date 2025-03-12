@@ -15,34 +15,37 @@ const registerNewuser = async (req, res) => {
             UserName, FirstName, LastName, Email, Phone, Password, DOB, Gender, BloodGroup,Country, State, City, Address, Pincode, ExtraPhone, Language
         } = req.body;   
 
+        //log the password
+        console.log('Request body:', req.body);
+        console.log('Password:', Password);
+
         //check if the Email is already in use
         const existingnewuser = await Newuser.findOne({Email});
         if(existingnewuser){
             return res.status(400).json({message: "Email is already in use"});
         }
 
-         //Log the files to see their content 
-         console.log('uploaded Image:', req.files['image']);
+        //  //Log the files to see their content 
+        //  console.log('uploaded Image:', req.files['image']);
 
-         //Ensure files are uploaded and exists in req.files
-        const image = req.files['image'] && req.files['image'][0];
+        //  //Ensure files are uploaded and exists in req.files
+        // const image = req.files['image'] && req.files['image'][0];
 
-        if(!image){
-            return res.status(400).json({message: "Image are required"});
-        }
+        // if(!image){
+        //     return res.status(400).json({message: "Image are required"});
+        // }
 
+        
         //hashing the password
         const hashedPassword = await bcrypt.hash(Password, 10);
 
         //create new user
         const newUser = new Newuser({
-            UserName, FirstName, LastName, Email, Phone, Password: hashedPassword, DOB, Gender, BloodGroup,Country, State, City, Address, Pincode, ExtraPhone, Language,
-            image: {
-                data: image.buffer,
-                contentType: image.mimetype,
-            },
-        
-        });
+            UserName, FirstName, LastName, Email, Phone, Password: hashedPassword, DOB, Gender, BloodGroup,Country, State, City, Address, Pincode, ExtraPhone, Language});
+            // image: {
+            //     data: image.buffer,
+            //     contentType: image.mimetype,
+            // },
 
         //save the new user
         await newUser.save();
@@ -131,24 +134,24 @@ const getnewUserById = async (req, res) => {
 };
 
 
-//serve the newuser's image
-const getNewuserImage = async(req, res) => {
-    try {
-        const doctor = await Newuser.findById(req.params.id);
-        if(!newuser || !newuser.image.data) {
-            return res.status(404).json({ message: 'Image not found'});
-        }
+// //serve the newuser's image
+// const getNewuserImage = async(req, res) => {
+//     try {
+//         const doctor = await Newuser.findById(req.params.id);
+//         if(!newuser || !newuser.image.data) {
+//             return res.status(404).json({ message: 'Image not found'});
+//         }
         
-        //set headers for image
-        res.setHeader('Content-Type', newuser.image.contentType);
-        res.setHeader('Content-Disposition', 'inline; filename = "doctor-image.png"');
+//         //set headers for image
+//         res.setHeader('Content-Type', newuser.image.contentType);
+//         res.setHeader('Content-Disposition', 'inline; filename = "doctor-image.png"');
 
-        //send the buffer as response
-        res.send(newuser.image.data);
-    }catch (error){
-        console.error(error);
-        res.status(500).json({ message: "An error occurred while fetching the image "});
-    }
-};
+//         //send the buffer as response
+//         res.send(newuser.image.data);
+//     }catch (error){
+//         console.error(error);
+//         res.status(500).json({ message: "An error occurred while fetching the image "});
+//     }
+//};
 
-export {registerNewuser, loginNewuser, getnewUser, getnewUserById, getNewuserImage};
+export {registerNewuser, loginNewuser, getnewUser, getnewUserById};
