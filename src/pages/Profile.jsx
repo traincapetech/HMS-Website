@@ -22,14 +22,84 @@ const Profile = () => {
     profilePhoto: user?.photo || "https://via.placeholder.com/150",
   });
 
+  const [selectedFile, setSelectedFile] = useState(null);
+  const [isUploading, setIsUploading] = useState(false);
+
+  // Handle input changes
   const handleChange = (e) => {
     const { name, value } = e.target;
     setFormData({ ...formData, [name]: value });
   };
 
-  const handleSave = () => {
-    console.log("Updated Profile Data:", formData);
-    alert("Profile Updated Successfully!");
+  // Handle profile photo selection
+  const handleFileChange = (e) => {
+    const file = e.target.files[0];
+    if (file) {
+      setSelectedFile(file);
+      setFormData({ ...formData, profilePhoto: URL.createObjectURL(file) });
+    }
+  };
+
+  // Upload image to backend
+  const uploadImage = async () => {
+    if (!selectedFile) return formData.profilePhoto;
+
+    setIsUploading(true);
+    const formDataImage = new FormData();
+    formDataImage.append("image", selectedFile);
+
+    try {
+      const response = await fetch("http://localhost:8080/api/newuser/register", {
+        method: "POST",
+        body: formDataImage,
+      });
+
+      const data = await response.json();
+      setIsUploading(false);
+
+      if (response.ok) {
+        return data.imageUrl; // Assuming backend returns { imageUrl: "uploaded_url" }
+      } else {
+        alert("Image upload failed");
+        return formData.profilePhoto;
+      }
+    } catch (error) {
+      console.error("Image upload error:", error);
+      setIsUploading(false);
+      alert("Error uploading image");
+      return formData.profilePhoto;
+    }
+  };
+
+  // Save profile data
+  const handleSave = async () => {
+    const uploadedImageUrl = await uploadImage();
+
+    const updatedProfile = {
+      ...formData,
+      profilePhoto: uploadedImageUrl,
+      password: formData.password || "defaultPassword123",
+    };
+
+    try {
+      const response = await fetch("http://localhost:8080/api/newuser/register", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer your-auth-token`,
+        },
+        body: JSON.stringify(updatedProfile),
+      });
+
+      if (response.ok) {
+        alert("Profile updated successfully!");
+      } else {
+        alert("Failed to update profile");
+      }
+    } catch (error) {
+      console.error("Profile update error:", error);
+      alert("Error updating profile");
+    }
   };
 
   return (
@@ -234,5 +304,4 @@ const Profile = () => {
     </div>
   );
 };
-
 export default Profile;
