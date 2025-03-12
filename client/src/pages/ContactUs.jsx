@@ -31,8 +31,8 @@ const ContactUs = () => {
       from_name: name,
       from_email: email,
       from_subject: subject,
-      to_name: "Parichay singh Rana",
-      message: `Name - ${name}\nEmail - ${email}\nCountry Name - ${location}\nWhatsapp-Number - ${phoneNumber}\nService Required - ${subject}\nMessage - ${message}`,
+      to_name: "Total Access MD",
+      message: `Name - ${name}\nEmail - ${email}\nEmail - ${email}\nCountry Name - ${location}\nWhatsapp-Number - ${phoneNumber}\nService Required - ${subject}\nMessage - ${message}`,
     };
 
     // Send the Email using EmailJS
@@ -82,7 +82,7 @@ const ContactUs = () => {
                       <div>
                         <h4 className="md:text-3xl text-lg font-bold text-white">Office Address</h4>
                         <p className="text-sm md:text-lg text-slate-300">
-                          India, USA, Nigeria
+                          California, U.S
                         </p>
                       </div>
                       <div>
@@ -93,20 +93,20 @@ const ContactUs = () => {
                           <FaWhatsapp className="" />
                           <Link
 
-                            to="https://wa.me/+916280281505"
+                            to="https://wa.me/+17879493280"
                             target="_blank"
                           >
-                            +91 6280281505
+                              +1 (787) 949-3280
                           </Link>
                         </p>
                         <p className="text-sm md:text-base flex items-center gap-2 text-slate-300">
                           <IoMailOutline className="" />
                           <Link
 
-                            to="mailto:sales@traincapetech.info"
+                            to="mailto:support@totalaccessmd.net"
                             target="_blank"
                           >
-                            sales@traincapetech.info
+                            support@totalaccessmd.net
                           </Link>
                         </p>
                       </div>
@@ -114,16 +114,16 @@ const ContactUs = () => {
                       <div>
                         <h4 className="text-lg md:text-2xl font-bold text-white">Our Address</h4>
                         <p className="text-sm md:text-base text-slate-200">
-                          Khandolia Plaza, 118\C, Dabri - Palam Rd, Vaishali, Vaishali {" "}
+                          California {" "}
                           <br />
-                          Colony, Dashrath Puri, New Delhi, Delhi, 110045
+                          {/* Colony, Dashrath Puri, New Delhi, Delhi, 110045 */}
                         </p>
                       </div>
                       <div>
                         <h4 className="text-lg md:text-2xl font-bold text-white">Timings</h4>
                         <p className="text-sm md:text-base text-slate-200">
-                          11:00 AM - 07:00 PM IST <br />
-                          Monday to Saturday
+                          24 hours <br />
+                          Monday to Sunday
                         </p>
                       </div>
                     </div>
@@ -178,6 +178,21 @@ const ContactUs = () => {
                 {/* Country Name */}
                 <div>
                   <label htmlFor="location" className="block text-gray-600">
+                    State Name
+                  </label>
+                  <input
+                    type="text"
+                    name="location"
+                    value={payoload.location}
+                    onChange={handleChange}
+                    placeholder="Your State"
+                    required
+                    className="w-full px-4 py-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-[#152B54]"
+                  />
+                </div>
+                {/* Country Name */}
+                <div>
+                  <label htmlFor="location" className="block text-gray-600">
                     Country Name
                   </label>
                   <input
@@ -222,9 +237,15 @@ const ContactUs = () => {
                     <option value="" disabled>
                       Select Service
                     </option>
-                    <option value="Cloud Computing">Cloud Computing</option>
-                    <option value="Cyber Security">Cyber Security</option>
-                    <option value="Project Management">Project Management</option>
+                    <option value="Cloud Computing">Dental</option>
+                    <option value="Cyber Security">Bones & Joints</option>
+                    <option value="Project Management">General Physician</option>
+                    <option value="Project Management">Dermatologist</option>
+                    <option value="Project Management">Cardiologist</option>
+                    <option value="Project Management">Orthopedics</option>
+                    <option value="Project Management">Ulcer</option>
+                    <option value="Project Management">CoronaVirus</option>
+                    <option value="Project Management">Eyes</option>
                   </select>
                 </div>
 

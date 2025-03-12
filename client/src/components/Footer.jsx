@@ -13,6 +13,7 @@ const Footer = () => {
             <li><a href="/careers" className="hover:underline">Careers</a></li>
             <li><a href="/careers" className="hover:underline">Press</a></li>
             <li><a href="/ContactUs" className="hover:underline">Contact Us</a></li>
+            <li><a href="/FAQPage" className="hover:underline">FAQ</a></li>
           </ul>
         </div>
 
@@ -20,9 +21,9 @@ const Footer = () => {
         <div>
           <h3 className="text-lg font-semibold mb-2">For Patients</h3>
           <ul className="space-y-1">
-            <li><a href="/SearchForDoctors" className="hover:underline">Search For Doctors</a></li>
-            <li><a href="/consulting" className="hover:underline">Search For Clinics</a></li>
-            <li><a href="/consulting" className="hover:underline">Search For Hospitals</a></li>
+            <li><a href="/ShowDoctors" className="hover:underline">Search For Doctors</a></li>
+            <li><a href="/SearchClinics" className="hover:underline">Search For Clinics</a></li>
+            <li><a href="/SearchHospitals" className="hover:underline">Search For Hospitals</a></li>
             <li><a href="/CovidHospitalListing" className="hover:underline">Covid Hospital Listing</a></li>
             <li><a href="/TAMDCareClinics" className="hover:underline">TAMD Care Clinics</a></li>
             <li><a href="/ReadHealthArticles" className="hover:underline">Read Health Articles</a></li>
@@ -36,12 +37,12 @@ const Footer = () => {
         <div>
           <h3 className="text-lg font-semibold mb-2">For Doctors</h3>
           <ul className="space-y-1">
-            <li><a href="/blog" className="hover:underline">TAMD Profile</a></li>
+            <li><a href="/ProfilePage" className="hover:underline">TAMD Profile</a></li>
             <li><a href="/PractoHealthFeed" className="hover:underline">TAMD Health Feed</a></li>
           </ul>
           <h3 className="text-lg font-semibold mb-2">For Corporates</h3>
           <ul className="space-y-1">
-            <li><a href="/blog" className="hover:underline">Wellness Plans</a></li>
+            <li><a href="/WellnessPlans" className="hover:underline">Wellness Plans</a></li>
           </ul>
         </div>
 
@@ -49,11 +50,11 @@ const Footer = () => {
         <div>
           <h3 className="text-lg font-semibold mb-2">For Hospitals</h3>
           <ul className="space-y-1">
-            <li><a href="/privacy-policy" className="hover:underline">Insta by TAMD</a></li>
+            <li><a href="/InstaByTAMD" className="hover:underline">Insta by TAMD</a></li>
             <li><a href="/privacy-policy" className="hover:underline">Qikwell by TAMD</a></li>
-            <li><a href="/privacy-policy" className="hover:underline">TAMD Profile</a></li>
-            <li><a href="/terms-of-service" className="hover:underline">TAMD Reach</a></li>
-            <li><a href="/cookies-policy" className="hover:underline">TAMD Drive</a></li>
+            <li><a href="/ProfilePage" className="hover:underline">TAMD Profile</a></li>
+            <li><a href="/TAMDReachPage" className="hover:underline">TAMD Reach</a></li>
+            <li><a href="/TAMDDrive" className="hover:underline">TAMD Drive</a></li>
           </ul>
         </div>
 
@@ -61,12 +62,12 @@ const Footer = () => {
         <div>
           <h3 className="text-lg font-semibold mb-2">More</h3>
           <ul className="space-y-1">
-            <li><a href="/contact" className="hover:underline">Help</a></li>
-            <li><a href="/help-center" className="hover:underline">Developers</a></li>
-            <li><a href="/help-center" className="hover:underline">Privacy Policy</a></li>
-            <li><a href="/help-center" className="hover:underline">Terms and Conditions</a></li>
-            <li><a href="/help-center" className="hover:underline">HealthCare Directory</a></li>
-            <li><a href="/community" className="hover:underline">TAMD Health Wiki</a></li>
+            <li><a href="/HelpPage" className="hover:underline">Help</a></li>
+            {/* <li><a href="/help-center" className="hover:underline">Developers</a></li> */}
+            <li><a href="/PrivacyPolicy" className="hover:underline">Privacy Policy</a></li>
+            <li><a href="/TermsAndConditions" className="hover:underline">Terms and Conditions</a></li>
+            {/* <li><a href="/help-center" className="hover:underline">HealthCare Directory</a></li> */}
+            {/* <li><a href="/community" className="hover:underline">TAMD Health Wiki</a></li> */}
           </ul>
         </div>
 

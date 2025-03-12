@@ -1,38 +1,61 @@
 import React, { useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { decrementStep, incremetStep, updateFormData } from "../redux/userSlice";
+import { registerUser, clearError } from "../redux/userSlice.js"; // Import Redux actions
+import { useNavigate } from "react-router-dom"; // For navigation after registration
 
 const Signup = () => {
+  const [currentStep, setCurrentStep] = useState(1);
+  const [formData, setFormData] = useState({
+    userName: "",
+    firstName: "",
+    lastName: "",
+    email: "",
+    phone: "",
+    password: "",
+    dateOfBirth: "",
+    gender: "",
+    country: "",
+    state: "",
+    city: "",
+    address: "",
+  });
 
   const dispatch = useDispatch();
+  const navigate = useNavigate();
 
-  const {formData, currentStep} = useSelector((state) => state.user);
+  // Access loading and error states from Redux store
+  const { loading, error } = useSelector((state) => state.user);
 
-
+  // Handle form field changes
   const handleChange = (e) => {
     const { name, value } = e.target;
-   dispatch(updateFormData({name, value}))
+    setFormData({
+      ...formData,
+      [name]: value,
+    });
   };
 
-  const handleNextStep = (e) => {
-    e.preventDefault();
-    dispatch(incremetStep())
+  // Handle next step in the form
+  const handleNextStep = () => {
+    setCurrentStep(2);
   };
 
-  const handlePrevStep = (e) => {
-    e.preventDefault();
-    dispatch(decrementStep())
+  // Handle previous step in the form
+  const handlePrevStep = () => {
+    setCurrentStep(1);
   };
 
-  const handleSubmit = (e) => {
+  // Handle form submission
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    
-    if (formData.password !== formData.confirmPassword) {
-      alert("Passwords do not match!");
-      return;
+
+    // Dispatch the registerUser action with form data
+    const resultAction = await dispatch(registerUser(formData));
+
+    // If registration is successful, navigate to the login page
+    if (registerUser.fulfilled.match(resultAction)) {
+      navigate("/login"); // Redirect to login page
     }
-    // Handle the form submission here (e.g., send data to backend)
-    console.log("Form submitted with data:", formData);
   };
 
   return (
@@ -146,29 +169,12 @@ const Signup = () => {
                 />
               </div>
 
-              {/* Confirm Password */}
-              <div>
-                <label htmlFor="confirmPassword" className="block text-lg text-gray-700 mb-2">
-                  Confirm Password
-                </label>
-                <input
-                  type="password"
-                  id="confirmPassword"
-                  name="confirmPassword"
-                  value={formData.confirmPassword}
-                  onChange={handleChange}
-                  className="w-full p-3 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-red-500"
-                  placeholder="Confirm your password"
-                  required
-                />
-              </div>
-
               {/* Step 1 Button */}
               <div className="flex w-full">
                 <button
                   type="button"
                   onClick={handleNextStep}
-                  className="w-full  py-3 px-8 bg-red-800 text-white rounded-md hover:bg-red-700 transition duration-300"
+                  className="w-full py-3 px-8 bg-red-800 text-white rounded-md hover:bg-red-700 transition duration-300"
                 >
                   Next
                 </button>
@@ -209,9 +215,9 @@ const Signup = () => {
                   required
                 >
                   <option value="">Select Gender</option>
-                  <option value="male">Male</option>
-                  <option value="female">Female</option>
-                  <option value="other">Other</option>
+                  <option value="Male">Male</option>
+                  <option value="Female">Female</option>
+                  <option value="Other">Other</option>
                 </select>
               </div>
 
@@ -295,13 +301,17 @@ const Signup = () => {
                 <button
                   type="submit"
                   className="w-full sm:w-auto py-3 px-8 bg-red-800 text-white rounded-md hover:bg-red-700 transition duration-300"
+                  disabled={loading}
                 >
-                  Submit
+                  {loading ? "Submitting..." : "Submit"}
                 </button>
               </div>
             </>
           )}
         </form>
+
+        {/* Display error message if registration fails */}
+        {error && <div className="mt-4 text-center text-red-600">{error}</div>}
       </div>
     </div>
   );

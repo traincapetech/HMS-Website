@@ -2,7 +2,7 @@ import React, { useEffect, useState } from "react";
 import axios from "axios";
 
 const ShowDoctors = () => {
-    const [doctors, setDoctors] = useState([]);
+    const [doctors, setDoctors] = useState([]); // Initial state is an empty array
     const [sortOption, setSortOption] = useState("Name");
     const [filter, setFilter] = useState({
         gender: "",
@@ -18,11 +18,66 @@ const ShowDoctors = () => {
                 setDoctors(response.data);
             } catch (error) {
                 console.error("Error fetching doctors:", error);
+                // If there's an error fetching from the backend, use static data
+                setDoctors(staticDoctors);
             }
         };
 
         fetchDoctors();
     }, []);
+
+    const staticDoctors = [
+        {
+            Name: "Dr. John Smith",
+            Email: "john.smith@example.com",
+            Phone: "123-456-7890",
+            Speciality: ["Cardiology"],
+            Experience: 10,
+            Fee: 150,
+            Gender: "Male",
+            ConsultationType: "In-Person"
+        },
+        {
+            Name: "Dr. Jane Doe",
+            Email: "jane.doe@example.com",
+            Phone: "098-765-4321",
+            Speciality: ["Pediatrics"],
+            Experience: 8,
+            Fee: 120,
+            Gender: "Female",
+            ConsultationType: "Online"
+        },
+        {
+            Name: "Dr. Emily Johnson",
+            Email: "emily.johnson@example.com",
+            Phone: "555-555-5555",
+            Speciality: ["Dermatology"],
+            Experience: 5,
+            Fee: 100,
+            Gender: "Female",
+            ConsultationType: "In-Person"
+        },
+        {
+            Name: "Dr. Michael Brown",
+            Email: "michael.brown@example.com",
+            Phone: "444-444-4444",
+            Speciality: ["Orthopedics"],
+            Experience: 12,
+            Fee: 200,
+            Gender: "Male",
+            ConsultationType: "Online"
+        },
+        {
+            Name: "Dr. Sarah Wilson",
+            Email: "sarah.wilson@example.com",
+            Phone: "333-333-3333",
+            Speciality: ["Neurology"],
+            Experience: 7,
+            Fee: 180,
+            Gender: "Female",
+            ConsultationType: "In-Person"
+        }
+    ];
 
     const handleSortChange = (e) => {
         setSortOption(e.target.value);
@@ -33,26 +88,30 @@ const ShowDoctors = () => {
         setFilter((prev) => ({ ...prev, [name]: value }));
     };
 
-    const filteredDoctors = doctors
+    // Debugging: Check the type of doctors
+    console.log("Doctors:", doctors);
+    console.log("Is doctors an array?", Array.isArray(doctors));
+
+    const filteredDoctors = Array.isArray(doctors) ? doctors
         .filter((doctor) => {
             return (
                 (filter.gender ? doctor.Gender === filter.gender : true) &&
-                (filter.experience ? doctor.Experience >= filter.experience : true) &&
-                (filter.fees ? doctor.Fee <= filter.fees : true) &&
+                (filter.experience ? doctor.Experience >= parseInt(filter.experience) : true) &&
+                (filter.fees ? doctor.Fee <= parseInt(filter.fees) : true) &&
                 (filter.specialty ? doctor.Speciality.includes(filter.specialty) : true)
             );
         })
         .sort((a, b) => {
             if (sortOption === "Experience") {
-                return a.Experience - b.Experience;
+                return a.Experience - b.Experience; // Sort by Experience
             } else if (sortOption === "Fee") {
-                return a.Fee - b.Fee;
+                return a.Fee - b.Fee; // Sort by Fee
             } else if (sortOption === "Name") {
-                return a.Name.localeCompare(b.Name);
+                return a.Name.localeCompare(b.Name); // Sort by Name
             } else {
-                return 0;
+                return 0; // Default case
             }
-        });
+        }) : []; // Fallback to an empty array if doctors is not an array
 
     return (
         <div className="bg-gray-50 min-h-screen p-6">
@@ -116,7 +175,6 @@ const ShowDoctors = () => {
                 {filteredDoctors.length > 0 ? (
                     filteredDoctors.map((doctor) => (
                         <div key={doctor.Email} className="bg-white rounded-lg shadow-lg p-6">
-                            <img src={doctor.Image} alt={doctor.Name} className="w-full h-48 object-cover rounded mb-4" />
                             <h2 className="text-2xl font-bold text-gray-900 mb-2">{doctor.Name}</h2>
                             <p className="text-gray-500 mb-1">Email: {doctor.Email}</p>
                             <p className="text-gray-500 mb-1">Phone: {doctor.Phone}</p>

@@ -14,14 +14,14 @@ const Banner = () => {
   };
 
   return (
-    <div className="relative bg-cover bg-center h-[60vh] sm:h-[70vh] md:h-[80vh] lg:h-[90vh] flex items-center justify-center text-black">
+    <div className="relative bg-cover bg-center h-[50vh] flex items-center justify-center text-black">
       {/* Background Image */}
       {/* <div className="absolute inset-0 bg-black opacity-40"></div> */}
 
       <div className="relative z-10 text-center px-6 sm:px-12">
         {/* Banner Text */}
         <h1 className="text-4xl sm:text-5xl lg:text-6xl font-bold mb-4">
-          Welcome to Our Healthcare Portal
+          Welcome to TAMD Portal
         </h1>
         <p className="text-lg sm:text-xl mb-6">
           Find the best doctors, clinics, and hospitals near you
