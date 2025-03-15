@@ -1,13 +1,41 @@
-// Host email will be only one since it has credentials but we can add multiple invites and that can be changed dynamically and we are gonna add both doctor and patient email in that and it will automatically fetch after creating the appointment and the link to the meeting will be send to both of their mails as well
-
-
 //zoom.service.js
 import fetch from "node-fetch";
 import base64 from "base-64";
+import nodemailer from "nodemailer";
 
 const ZoomAccountId = "dYnaii3oR4K7Z2ddvdHn9w";
 const ZoomClientId = "ZAbcvuI5S7CnaXV77UgC0Q";
 const ZoomClientSecret = "KqC5kk5Et4I0r13i076VrBjp2XJ86ISq";
+
+
+//create a transporter object using your email service 
+const transporter = nodemailer.createTransport({
+//    host: "smtp.mailtrap.io",
+//    port: 2525,
+    service: "gmail",
+    auth: {
+        user: "blacksaura2@gmail.com",
+        //pass: "kumar737498@Saurav",
+        pass: "tbxq zjye tbjf rrvn",
+    },
+});
+
+//function to send email
+const sendEmail = async(to, subject, text) =>{
+    try{
+        const mailOptions ={
+            from: "blacksaura2@gmail.com",
+            to: to,
+            subject: subject,
+            text: text,
+        };
+
+        const info = await transporter.sendMail(mailOptions);
+        console.log("Email sent to: ", to,"Response: ",info.response);
+    } catch (error){
+        console.log("Error sending email: ",to,"Error:", error);
+    }
+};
 
 const getAuthHeaders = () => {
     return {
@@ -85,10 +113,11 @@ const generateZoomMeeting = async() => {
                     host_video: true,
                     join_before_host: true,
                     meeting_authentication: true,
-                    meeting_invitees: [{
-                        email: 'sumitjain8061@gmail.com', //invites are going to be both doctor and patient email 
-                        email : 'tarannumf1996@gmail.com',
-                      },],
+                    meeting_invitees: [
+                        // {email: 'naureen.130613@gmail.com'}, //invites are going to be both doctor and patient email 
+                         {email : 'naureen.130613@gmail.com'},
+                         {email: 'sumitjain8061@gmail.com'},
+                    ],
                       mute_upon_entry: true,
                       participant_video: true,
                       private_meeting: true,
@@ -108,6 +137,34 @@ const generateZoomMeeting = async() => {
 
         const jsonResponse = await response.json();
 
+        if(jsonResponse.id){
+            console.log('Meeting created successfully. Meeting id: ', jsonResponse.id);
+            console.log('Join URL: ', jsonResponse.join_url);
+            console.log('Password: ',jsonResponse.password);
+
+            //define the invitees
+            const invitees = [
+                {email: 'naureen.130613@gmail.com'},
+                {email: 'sumitjain8061@gmail.com'},
+            ];
+
+
+            //email content
+            const subject ="Invitation : zoom meeting";
+            const text = `you are invited to zoom meeting.
+            Meeting ID: ${jsonResponse.id}
+            Join URL: ${jsonResponse.join_url}
+            Password: ${jsonResponse.password}`;
+
+            //send emails to each invitees
+            for(const invitee of invitees){
+                console.log('Sending email to: ', invitee.email);
+                await sendEmail(invitee.email, subject, text);
+            }
+        }else{
+            console.log('Failed to create meeting', jsonResponse);
+        }
+
         console.log("generateZoomMeeting jsonResponse -->", jsonResponse);
     } catch (error) {
         console.log("genrateZoomMeeting Error --> ", error);
@@ -116,4 +173,4 @@ const generateZoomMeeting = async() => {
 }
 
 //generateZoomAccessToken();
-generateZoomMeeting();
+export {generateZoomMeeting};
