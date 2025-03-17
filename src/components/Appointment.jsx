@@ -66,7 +66,6 @@ const Appointments = () => {
     };
 
     console.log("Sending appointment data:", appointmentData);
-
     setLoading(true);
 
     try {
@@ -76,7 +75,19 @@ const Appointments = () => {
 
       if (response.status === 201 || response.status === 200) {
         alert("Appointment booked successfully!");
-        navigate("/appointments");
+
+        // Fetch Zoom meeting details
+        const zoomResponse = await axios.post("http://localhost:8080/api/zoom/ZoomMeeting", { email });
+
+        if (zoomResponse.status === 200) {
+          const { meetingLink } = zoomResponse.data;
+
+          // Redirect to VideoCall page with meeting details
+          navigate("/videocall", { state: { email, meetingLink } });
+        } else {
+          alert("Zoom meeting creation failed, but appointment is booked.");
+          navigate("/videocall", { state: { email, meetingLink: null } });
+        }
       } else {
         throw new Error("Failed to book appointment");
       }

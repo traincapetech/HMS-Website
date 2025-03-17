@@ -1,26 +1,39 @@
 import React, { useState, useRef, useEffect } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { useSelector, useDispatch } from "react-redux";
-import { logoutUser } from "../redux/userSlice"; // ✅ Correct import
+import { logoutUser } from "../redux/userSlice";
 
 const NavBar = () => {
   const [isProfileOpen, setIsProfileOpen] = useState(false);
+  const [isMenuOpen, setIsMenuOpen] = useState(false);
   const profileRef = useRef(null);
   const profileButtonRef = useRef(null);
+  const menuRef = useRef(null);
   const navigate = useNavigate();
   const dispatch = useDispatch();
   const { user, token } = useSelector((state) => state.user);
 
-  const toggleProfile = () => setIsProfileOpen(!isProfileOpen);
+  const toggleProfile = () => setIsProfileOpen((prev) => !prev);
+  const toggleMenu = () => setIsMenuOpen((prev) => !prev);
 
   useEffect(() => {
     const handleClickOutside = (event) => {
+      // Close the profile dropdown if clicked outside
       if (
         profileRef.current &&
         !profileRef.current.contains(event.target) &&
         !profileButtonRef.current.contains(event.target)
       ) {
         setIsProfileOpen(false);
+      }
+
+      // Close the mobile menu if clicked outside
+      if (
+        menuRef.current &&
+        !menuRef.current.contains(event.target) &&
+        !event.target.closest(".hamburger-button") // Ensure the hamburger button is not clicked
+      ) {
+        setIsMenuOpen(false);
       }
     };
 
@@ -29,8 +42,8 @@ const NavBar = () => {
   }, []);
 
   const handleLogout = () => {
-    dispatch(logoutUser()); // ✅ Dispatch Redux action to clear user state
-    navigate("/login"); // ✅ Redirect to login page
+    dispatch(logoutUser());
+    navigate("/login");
   };
 
   return (
@@ -47,7 +60,47 @@ const NavBar = () => {
         </div>
       </div>
 
-      {/* Right Side - User Actions */}
+      {/* Hamburger Menu for Mobile */}
+      <div className="md:hidden">
+        <button
+          onClick={toggleMenu}
+          className="text-white focus:outline-none hamburger-button"
+        >
+          <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M4 6h16M4 12h16m-7 6h7"></path>
+          </svg>
+        </button>
+      </div>
+
+      {/* Mobile Menu */}
+      {isMenuOpen && (
+        <div ref={menuRef} className="md:hidden absolute top-16 right-0 bg-red-800 w-full text-white z-10">
+          <div className="flex flex-col space-y-4 p-4">
+            <Link to="/doctor" className="nav-link">Find Doctor</Link>
+            <Link to="/video" className="nav-link">Video Consult</Link>
+            <span className="nav-link">Surgeries</span>
+            <Link to="/doctor" className="nav-link">For Doctor</Link>
+            <Link to="/corporate" className="nav-link">For Corporate</Link>
+            <span className="nav-link">Help</span>
+            {token ? (
+              <>
+                <Link to="/my-appointments" className="nav-link">My Appointments</Link>
+                <Link to="/my-tests" className="nav-link">My Tests</Link>
+                <Link to="/my-medical-records" className="nav-link">My Medical Records</Link>
+                <Link to="/my-online-consultations" className="nav-link">My Online Consultations</Link>
+                <Link to="/my-feedback" className="nav-link">My Feedback</Link>
+                <Link to="/profile" className="nav-link">View / Update Profile</Link>
+                <Link to="/payments" className="nav-link">Payments & Balance</Link>
+                <button onClick={handleLogout} className="nav-link text-red-500">Logout</button>
+              </>
+            ) : (
+              <Link to="/login" className="nav-link">Login</Link>
+            )}
+          </div>
+        </div>
+      )}
+
+      {/* Right Side - User Actions (Desktop) */}
       <div className="hidden md:flex space-x-7 text-white items-center pr-8">
         <Link to="/doctor" className="nav-link">For Doctor</Link>
         <Link to="/corporate" className="nav-link">For Corporate</Link>
@@ -99,9 +152,6 @@ const NavBar = () => {
             <Link to="/login">
               <button className="nav-button">Login</button>
             </Link>
-            {/* <Link to="/signup"> */}
-              {/* <button className="nav-button">Sign Up</button> */}
-            {/* </Link> */}
           </>
         )}
       </div>
