@@ -1,35 +1,36 @@
 import React, { useState, useEffect } from "react";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
+import { useSelector } from "react-redux";
 
 const Appointments = () => {
   const [doctors, setDoctors] = useState([]);
   const [specialities, setSpecialities] = useState([]);
   const [selectedSpeciality, setSelectedSpeciality] = useState("");
   const [selectedDoctor, setSelectedDoctor] = useState("");
-  const [patientName, setPatientName] = useState("");
-  const [email, setEmail] = useState("");
   const [appointmentDate, setAppointmentDate] = useState("");
   const [appointmentTime, setAppointmentTime] = useState("");
   const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
 
+  const { user, token } = useSelector((state) => state.user); // Get logged-in user
+
   useEffect(() => {
-    axios
-      .get("http://localhost:8080/api/doctor/all")
+    if (!token) {
+      navigate("/login"); // Redirect if not logged in
+    }
+  }, [token, navigate]);
+
+  useEffect(() => {
+    axios.get("http://localhost:8080/api/doctor/all")
       .then((response) => {
         if (response.data && Array.isArray(response.data.doctor)) {
           setDoctors(response.data.doctor);
           const uniqueSpecialities = [...new Set(response.data.doctor.map((doc) => doc.Speciality))];
           setSpecialities(uniqueSpecialities);
-        } else {
-          setDoctors([]);
         }
       })
-      .catch((error) => {
-        console.error("Error fetching doctors:", error);
-        setDoctors([]);
-      });
+      .catch((error) => console.error("Error fetching doctors:", error));
   }, []);
 
   const getTodayDate = () => new Date().toISOString().split("T")[0];
@@ -37,14 +38,8 @@ const Appointments = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
 
-    if (!selectedSpeciality || !selectedDoctor || !patientName || !email || !appointmentDate || !appointmentTime) {
+    if (!selectedSpeciality || !selectedDoctor || !appointmentDate || !appointmentTime) {
       alert("Please fill in all fields.");
-      return;
-    }
-
-    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-    if (!emailRegex.test(email)) {
-      alert("Please enter a valid email address.");
       return;
     }
 
@@ -58,14 +53,13 @@ const Appointments = () => {
 
     const appointmentData = {
       Speciality: selectedSpeciality,
-      Doctor: doctorName, 
-      Name: patientName,
-      Email: email,
+      Doctor: doctorName,
+      Name: user?.UserName, // Auto-fill logged-in user name
+      Email: user?.Email, // Auto-fill logged-in user email
       AppointDate: appointmentDate,
       AppointTime: appointmentTime,
     };
 
-    console.log("Sending appointment data:", appointmentData);
     setLoading(true);
 
     try {
@@ -77,16 +71,16 @@ const Appointments = () => {
         alert("Appointment booked successfully!");
 
         // Fetch Zoom meeting details
-        const zoomResponse = await axios.post("http://localhost:8080/api/zoom/ZoomMeeting", { email });
+        const zoomResponse = await axios.post("http://localhost:8080/api/zoom/ZoomMeeting", { email: user?.Email });
 
         if (zoomResponse.status === 200) {
           const { meetingLink } = zoomResponse.data;
 
           // Redirect to VideoCall page with meeting details
-          navigate("/videocall", { state: { email, meetingLink } });
+          navigate("/videocall", { state: { email: user?.Email, meetingLink } });
         } else {
           alert("Zoom meeting creation failed, but appointment is booked.");
-          navigate("/videocall", { state: { email, meetingLink: null } });
+          navigate("/videocall", { state: { email: user?.Email, meetingLink: null } });
         }
       } else {
         throw new Error("Failed to book appointment");
@@ -138,22 +132,18 @@ const Appointments = () => {
           <label className="block font-semibold">Your Name:</label>
           <input
             type="text"
-            value={patientName}
-            onChange={(e) => setPatientName(e.target.value)}
-            className="w-full p-2 border rounded"
-            placeholder="Enter your name"
-            required
+            value={user?.UserName || ""}
+            className="w-full p-2 border rounded bg-gray-100"
+            readOnly
           />
         </div>
         <div>
           <label className="block font-semibold">Your Email:</label>
           <input
             type="email"
-            value={email}
-            onChange={(e) => setEmail(e.target.value)}
-            className="w-full p-2 border rounded"
-            placeholder="Enter your email"
-            required
+            value={user?.Email || ""}
+            className="w-full p-2 border rounded bg-gray-100"
+            readOnly
           />
         </div>
         <div>

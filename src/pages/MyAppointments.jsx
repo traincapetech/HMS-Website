@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { useSelector } from "react-redux";
 import axios from "axios";
 
@@ -7,22 +7,24 @@ const MyAppointments = () => {
   const [appointments, setAppointments] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
-
-  // Fetch logged-in user details
+  
   const { user } = useSelector((state) => state.user);
+  const navigate = useNavigate();
 
   useEffect(() => {
-    fetchAppointments();
-  }, []);
+    if (user?.Email) {
+      fetchAppointments();
+    }
+  }, [user]);
 
-  // Fetch appointment history
   const fetchAppointments = async () => {
     try {
       const response = await axios.get("http://localhost:8080/api/appoint/all");
-      console.log("Fetched Appointments:", response.data);
-      
       if (Array.isArray(response.data)) {
-        setAppointments(response.data);
+        const userAppointments = response.data.filter(
+          (appointment) => appointment.Email === user.Email
+        );
+        setAppointments(userAppointments);
       } else {
         setAppointments([]);
         setError("Unexpected data format received.");
@@ -33,6 +35,32 @@ const MyAppointments = () => {
     } finally {
       setLoading(false);
     }
+  };
+
+  const handleDelete = async (id) => {
+    if (!window.confirm("Are you sure you want to cancel this appointment?")) {
+      return;
+    }
+
+    try {
+      const response = await axios.delete(`http://localhost:8080/api/appoint/${id}`);
+
+      if (response.status === 200) {
+        setAppointments(appointments.filter((appointment) => appointment._id !== id));
+        alert("Appointment canceled successfully.");
+      } else {
+        alert("Failed to cancel appointment. Please try again.");
+      }
+    } catch (error) {
+      console.error("Error deleting appointment:", error);
+      alert("Failed to cancel appointment. Please try again.");
+    }
+  };
+
+  const handleReschedule = (appointment) => {
+    navigate(
+      `/appointments?speciality=${appointment.Speciality}&doctor=${appointment.Doctor}&date=${appointment.AppointDate}&time=${appointment.AppointTime}`
+    );
   };
 
   return (
@@ -66,7 +94,6 @@ const MyAppointments = () => {
       <div className="w-3/4 p-6">
         <h2 className="text-2xl font-bold mb-4">My Appointments</h2>
 
-        {/* Appointment History */}
         <div className="bg-white p-4 rounded-lg shadow-md">
           <h3 className="text-lg font-semibold mb-4">Appointment History</h3>
 
@@ -80,21 +107,36 @@ const MyAppointments = () => {
             <table className="w-full border-collapse border border-gray-300">
               <thead>
                 <tr className="bg-gray-200">
+                  <th className="border border-gray-300 p-2">Appointment ID</th>
                   <th className="border border-gray-300 p-2">Date</th>
                   <th className="border border-gray-300 p-2">Time</th>
                   <th className="border border-gray-300 p-2">Doctor</th>
                   <th className="border border-gray-300 p-2">Speciality</th>
-                  <th className="border border-gray-300 p-2">Status</th>
+                  <th className="border border-gray-300 p-2">Actions</th>
                 </tr>
               </thead>
               <tbody>
-                {appointments.map((appointment, index) => (
-                  <tr key={index} className="text-center">
+                {appointments.map((appointment) => (
+                  <tr key={appointment._id} className="text-center">
+                    <td className="border border-gray-300 p-2">{appointment._id}</td>
                     <td className="border border-gray-300 p-2">{new Date(appointment.AppointDate).toLocaleDateString()}</td>
                     <td className="border border-gray-300 p-2">{appointment.AppointTime}</td>
                     <td className="border border-gray-300 p-2">{appointment.Doctor}</td>
                     <td className="border border-gray-300 p-2">{appointment.Speciality}</td>
-                    <td className="border border-gray-300 p-2 text-yellow-600">Pending</td>
+                    <td className="border border-gray-300 p-2">
+                      <button
+                        onClick={() => handleReschedule(appointment)}
+                        className="bg-blue-500 text-white px-3 py-1 rounded mr-2"
+                      >
+                        Reschedule
+                      </button>
+                      <button
+                        onClick={() => handleDelete(appointment._id)}
+                        className="bg-red-500 text-white px-3 py-1 rounded"
+                      >
+                        Cancel
+                      </button>
+                    </td>
                   </tr>
                 ))}
               </tbody>
