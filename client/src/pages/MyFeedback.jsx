@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from "react";
-import { Link } from "react-router-dom";
-import { useSelector } from "react-redux";
+import { Link, useNavigate } from "react-router-dom";
+import { useSelector, useDispatch } from "react-redux";
+import { logoutUser } from "../redux/userSlice";
 
 const MyFeedback = () => {
   const { user, token } = useSelector((state) => state.user);
@@ -11,6 +12,8 @@ const MyFeedback = () => {
   const [selectedId, setSelectedId] = useState("");
   const [rating, setRating] = useState(5);
   const [comment, setComment] = useState("");
+  const dispatch = useDispatch();
+  const navigate = useNavigate();
 
   // Fetch existing feedback
   useEffect(() => {
@@ -33,7 +36,7 @@ const MyFeedback = () => {
   useEffect(() => {
     const fetchDoctors = async () => {
       try {
-        const response = await fetch("/api/doctors", {
+        const response = await fetch("https://hms-backend-1-pngp.onrender.com/api/doctors", {
           headers: { Authorization: `Bearer ${token}` },
         });
         const data = await response.json();
@@ -102,6 +105,12 @@ const MyFeedback = () => {
       console.error("Error submitting feedback:", error);
     }
   };
+
+  const handleLogout = () => {
+    dispatch(logoutUser());
+    navigate("/login");
+  };
+
   useEffect(() => {
     window.scrollTo(0, 0);
   }, []);
@@ -121,14 +130,14 @@ const MyFeedback = () => {
           </div>
         </div>
         <ul className="space-y-3">
-          <li><Link to="/my-appointments" className="block py-2 px-3 rounded-lg hover:bg-gray-200">My Appointments</Link></li>
-          <li><Link to="/my-tests" className="block py-2 px-3 rounded-lg hover:bg-gray-200">My Tests</Link></li>
-          <li><Link to="/my-medical-records" className="block py-2 px-3 rounded-lg hover:bg-gray-200">My Medical Records</Link></li>
-          <li><Link to="/my-online-consultations" className="block py-2 px-3 rounded-lg hover:bg-gray-200">My Online Consultations</Link></li>
-          <li><Link to="/my-feedback" className="block py-2 px-3 rounded-lg hover:bg-gray-200 font-bold">My Feedback</Link></li>
-          <li><Link to="/profile" className="block py-2 px-3 rounded-lg hover:bg-gray-200">View / Update Profile</Link></li>
-          <li><Link to="/payments" className="block py-2 px-3 rounded-lg hover:bg-gray-200">Payments</Link></li>
-          <li><button className="w-full text-left py-2 px-3 text-red-500 hover:bg-gray-200">Logout</button></li>
+          <li><Link to="/MyAppointments" className="block py-2 px-3 rounded-lg hover:bg-gray-200">My Appointments</Link></li>
+          <li><Link to="/MyTests" className="block py-2 px-3 rounded-lg hover:bg-gray-200">My Tests</Link></li>
+          <li><Link to="/MyMedicalRecords" className="block py-2 px-3 rounded-lg hover:bg-gray-200">My Medical Records</Link></li>
+          <li><Link to="/OnlineConsultations" className="block py-2 px-3 rounded-lg hover:bg-gray-200">My Online Consultations</Link></li>
+          <li><Link to="/MyFeedback" className="block py-2 px-3 rounded-lg hover:bg-gray-200 font-bold">My Feedback</Link></li>
+          <li><Link to="/Profile" className="block py-2 px-3 rounded-lg hover:bg-gray-200">View / Update Profile</Link></li>
+          <li><Link to="/Payments" className="block py-2 px-3 rounded-lg hover:bg-gray-200">Payments</Link></li>
+          <li><button onClick={handleLogout} className="w-full text-left py-2 px-3 text-red-500 hover:bg-gray-200">Logout</button></li>
         </ul>
       </div>
 

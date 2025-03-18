@@ -1,10 +1,13 @@
 import React, { useEffect, useState } from "react";
-import { Link } from "react-router-dom";
-import { useSelector } from "react-redux";
+import { Link, useNavigate } from "react-router-dom";
+import { useSelector, useDispatch } from "react-redux";
+import { logoutUser } from "../redux/userSlice";
 
 const MyTests = () => {
   const { user, token } = useSelector((state) => state.user);
   const [tests, setTests] = useState([]);
+  const dispatch = useDispatch();
+  const navigate = useNavigate();
 
   useEffect(() => {
     // Simulating API call to fetch user tests
@@ -22,6 +25,12 @@ const MyTests = () => {
 
     if (token) fetchTests();
   }, [token]);
+  
+  const handleLogout = () => {
+    dispatch(logoutUser());
+    navigate("/login");
+  };
+  
   useEffect(() => {
     window.scrollTo(0, 0);
   }, []);
@@ -41,15 +50,14 @@ const MyTests = () => {
           </div>
         </div>
         <ul className="space-y-3">
-          <li><Link to="/my-appointments" className="block py-2 px-3 rounded-lg hover:bg-gray-200">My Appointments</Link></li>
-          <li><Link to="/my-tests" className="block py-2 px-3 rounded-lg hover:bg-gray-200 font-bold">My Tests</Link></li>
-          <li><Link to="/my-medical-records" className="block py-2 px-3 rounded-lg hover:bg-gray-200">My Medical Records</Link></li>
-          <li><Link to="/my-online-consultations" className="block py-2 px-3 rounded-lg hover:bg-gray-200">My Online Consultations</Link></li>
-          <li><Link to="/my-feedback" className="block py-2 px-3 rounded-lg hover:bg-gray-200">My Feedback</Link></li>
-          <li><Link to="/profile" className="block py-2 px-3 rounded-lg hover:bg-gray-200">View / Update Profile</Link></li>
-          <li><Link to="/payments" className="block py-2 px-3 rounded-lg hover:bg-gray-200">Payments</Link></li>
-          <li><Link to="/settings" className="block py-2 px-3 rounded-lg hover:bg-gray-200">Settings</Link></li>
-          <li><button className="w-full text-left py-2 px-3 text-red-500 hover:bg-gray-200">Logout</button></li>
+          <li><Link to="/MyAppointments" className="block py-2 px-3 rounded-lg hover:bg-gray-200">My Appointments</Link></li>
+          <li><Link to="/MyTests" className="block py-2 px-3 rounded-lg hover:bg-gray-200 font-bold">My Tests</Link></li>
+          <li><Link to="/MyMedicalRecords" className="block py-2 px-3 rounded-lg hover:bg-gray-200">My Medical Records</Link></li>
+          <li><Link to="/OnlineConsultations" className="block py-2 px-3 rounded-lg hover:bg-gray-200">My Online Consultations</Link></li>
+          <li><Link to="/MyFeedback" className="block py-2 px-3 rounded-lg hover:bg-gray-200">My Feedback</Link></li>
+          <li><Link to="/Profile" className="block py-2 px-3 rounded-lg hover:bg-gray-200">View / Update Profile</Link></li>
+          <li><Link to="/Payments" className="block py-2 px-3 rounded-lg hover:bg-gray-200">Payments</Link></li>
+          <li><button onClick={handleLogout} className="w-full text-left py-2 px-3 text-red-500 hover:bg-gray-200">Logout</button></li>
         </ul>
       </div>
 

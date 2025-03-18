@@ -90,7 +90,7 @@
 import React, { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { loginUser } from "../redux/userSlice";
-import { useNavigate } from "react-router-dom"; // For navigation after login
+import { Link, useNavigate } from "react-router-dom";
 
 const Login = () => {
   const [email, setEmail] = useState("");
@@ -170,9 +170,9 @@ const Login = () => {
         <div className="mt-6 text-center">
           <p className="text-sm text-gray-600">
             Don't have an account?{" "}
-            <a href="/signup" className="text-red-600 hover:underline">
+            <Link to="/signup" className="text-red-600 hover:underline">
               Sign up
-            </a>
+            </Link>
           </p>
         </div>
       </div>
