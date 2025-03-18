@@ -1,5 +1,5 @@
 import express from "express";
-import { createAppoint, getAppointment, getAppointmentById } from "../Controllers/appoint.controller.js";
+import { createAppoint, getAppointment, getAppointmentById, deleteAppointmentById } from "../Controllers/appoint.controller.js";
 
 const router = express.Router();
 
@@ -7,5 +7,7 @@ const router = express.Router();
 router.post('/create', createAppoint);
 router.get('/all', getAppointment);
 router.get('/:id', getAppointmentById);
+router.delete('/:id', deleteAppointmentById);
+
 
 export default router;

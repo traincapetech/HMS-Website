@@ -1,3 +1,5 @@
 .env    
-node_modules
-    "zoom": "node zoom.service.js"
+node_modules 
+
+//delete appointment api 
+http://localhost:8080/api/appoint/67d91c477cdc12d97b61383e
