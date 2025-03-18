@@ -37,6 +37,7 @@ const Home = () => {
       icon: <GiScalpel className="text-5xl text-red-500 mb-4 mx-auto" />,
       buttonText: "Explore Surgeries",
       buttonColor: "bg-red-500 hover:bg-red-600",
+      url:"/surgeries"
     },
   ];
 
