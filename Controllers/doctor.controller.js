@@ -12,7 +12,7 @@ const registerDoctor = async (req, res)=> {
             return res.status(400).json({errors: errors.array()});
         }
         const{
-            Name, Email, Password, Phone, DOB, Gender, CountryCode, Country, City, State, Expertise, Speciality, Experience, Hospital, ConsultType, Fees, Address
+            Name, Email, Password, Phone, DOB, Gender, CountryCode, Country, City, State, Expertise, Speciality, Experience, Hospital, ConsultType, Fees, Address,LicenseNo,Education
         } = req.body;
 
         //check if the email is already in use
@@ -38,7 +38,7 @@ const registerDoctor = async (req, res)=> {
 
         //create new doctor
         const doctor = new Doctor({
-            Name, Email, Password: hashedPassword, Phone, DOB, Gender, CountryCode, Country, City, State, Expertise, Speciality, Experience, Hospital, ConsultType, Fees, Address,
+            Name, Email, Password: hashedPassword, Phone, DOB, Gender, CountryCode, Country, City, State, Expertise, Speciality, Experience, Hospital, ConsultType, Fees, Address,LicenseNo,Education,
             
             document: {
                 data: document.buffer,
@@ -101,7 +101,9 @@ const loginDoctor = async(req, res) => {
                 Hospital: user.Hospital,
                 ConsultType: user.ConsultType,
                 Fees: user.Fees,
-                Address: user.Address,                                                                   
+                Address: user.Address,    
+                LicenseNo: user.LicenseNo,               
+                Education: user.Education,                                                
             }
         });
     } catch (error){

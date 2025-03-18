@@ -25,15 +25,15 @@ const registerNewuser = async (req, res) => {
             return res.status(400).json({message: "Email is already in use"});
         }
 
-        //  //Log the files to see their content 
-        //  console.log('uploaded Image:', req.files['image']);
+         //Log the files to see their content 
+         console.log('uploaded Image:', req.files['image']);
 
-        //  //Ensure files are uploaded and exists in req.files
-        // const image = req.files['image'] && req.files['image'][0];
+         //Ensure files are uploaded and exists in req.files
+        const image = req.files['image'] && req.files['image'][0];
 
-        // if(!image){
-        //     return res.status(400).json({message: "Image are required"});
-        // }
+        if(!image){
+            return res.status(400).json({message: "Image are required"});
+        }
 
         
         //hashing the password
@@ -41,12 +41,12 @@ const registerNewuser = async (req, res) => {
 
         //create new user
         const newUser = new Newuser({
-            UserName, FirstName, LastName, Email, Phone, Password: hashedPassword, DOB, Gender, BloodGroup,Country, State, City, Address, Pincode, ExtraPhone, Language});
+            UserName, FirstName, LastName, Email, Phone, Password: hashedPassword, DOB, Gender, BloodGroup,Country, State, City, Address, Pincode, ExtraPhone, Language });
             // image: {
             //     data: image.buffer,
             //     contentType: image.mimetype,
             // },
-
+       
         //save the new user
         await newUser.save();
 
@@ -152,6 +152,6 @@ const getnewUserById = async (req, res) => {
 //         console.error(error);
 //         res.status(500).json({ message: "An error occurred while fetching the image "});
 //     }
-//};
+// };
 
 export {registerNewuser, loginNewuser, getnewUser, getnewUserById};
