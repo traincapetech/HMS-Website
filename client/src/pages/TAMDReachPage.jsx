@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 
 const TAMDReachPage = () => {
     const [name, setName] = useState("");
@@ -22,7 +22,9 @@ const TAMDReachPage = () => {
         // Open WhatsApp
         window.open(whatsappUrl, "_blank");
     };
-
+    useEffect(() => {
+        window.scrollTo(0, 0);
+      }, []);
     return (
         <div className="bg-gray-50 min-h-screen p-6">
             <h1 className="text-4xl font-bold text-center mb-8">Make Your Practice Visible to Millions</h1>

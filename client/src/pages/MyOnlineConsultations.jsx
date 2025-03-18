@@ -22,7 +22,9 @@ const OnlineConsultations = () => {
 
     if (token) fetchConsultations();
   }, [token]);
-
+  useEffect(() => {
+    window.scrollTo(0, 0);
+  }, []);
   return (
     <div className="flex h-screen">
       {/* Sidebar */}

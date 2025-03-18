@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { IoIosSearch } from "react-icons/io";
 
 const Banner = () => {
@@ -12,7 +12,9 @@ const Banner = () => {
   const handleDoctorTypeChange = (e) => {
     setDoctorType(e.target.value);
   };
-
+  useEffect(() => {
+    window.scrollTo(0, 0);
+  }, []);
   return (
     <div className="relative bg-cover bg-center h-[50vh] flex items-center justify-center text-black">
       {/* Background Image */}

@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { FaUser, FaPhone, FaClipboardList, FaComments, FaCheckCircle, FaAppStore, FaWhatsapp } from "react-icons/fa";
 
 const ProfilePage = () => {
@@ -11,7 +11,9 @@ const ProfilePage = () => {
         console.log("Name:", name);
         console.log("Phone:", phone);
     };
-
+    useEffect(() => {
+        window.scrollTo(0, 0);
+      }, []);
     return (
         <div className="bg-gray-50 min-h-screen py-12">
             <div className="container mx-auto px-4">

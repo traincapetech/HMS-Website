@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { FaHospital } from "react-icons/fa";
 
@@ -17,7 +17,9 @@ const CovidHospitalListing = () => {
         setSelectedCity(city);
         navigate(`/hospitals/${city}`);
     };
-
+    useEffect(() => {
+        window.scrollTo(0, 0);
+      }, []);
     return (
         <div className="min-h-screen bg-gray-50">
             {/* Hero Section */}

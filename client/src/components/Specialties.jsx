@@ -1,5 +1,5 @@
 // Specialties.jsx
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { Link } from "react-router-dom"; // Import the Link component for routing
 import {
   FaHeartbeat,
@@ -156,7 +156,9 @@ const Specialties = () => {
   };
 
   const specialtiesToDisplay = showAll ? specialties : specialties.slice(0, 6);
-
+  useEffect(() => {
+    window.scrollTo(0, 0);
+  }, []);
   return (
     <div className="container mx-auto px-6 py-8">
       <div className="flex items-center justify-between mb-6">

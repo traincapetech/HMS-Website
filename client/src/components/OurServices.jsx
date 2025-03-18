@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect } from "react";
 import {
   FaHeartbeat,
   FaMedkit,
@@ -62,6 +62,9 @@ const services = [
 ];
 
 const OurServices = () => {
+  useEffect(() => {
+    window.scrollTo(0, 0);
+  }, []);
   return (
     <div className=" mx-auto px-4 lg:px-16 xl:px-36 py-12 bg-gray-50">
       <h2 className="text-3xl md:text-5xl font-bold text-center text-gray-800 mb-10">

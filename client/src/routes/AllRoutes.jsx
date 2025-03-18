@@ -20,7 +20,7 @@ import InstaByTAMD from '../pages/InstaByTAMD'
 import AutoPlay from '../components/AutoPlay'
 import Banner from '../components/Banner'
 import ConsultTopDoctors from '../components/ConsultTopDoctors'
-import DoctorRegister from '../components/DoctorRegister'
+import OldDoctorRegister from '../components/DoctorRegister'
 import DoctorPage from '../pages/DoctorPage'
 import VideoConsult from '../components/VideoConsult'
 import ConsultationDetail from '../pages/ConsultationDetail'
@@ -43,6 +43,14 @@ import SearchHospitals from '../pages/SearchHospitals'
 import ProfilePage from '../pages/ProfilePage'
 import TAMDReachPage from '../pages/TAMDReachPage'
 import HelpPage from '../pages/HelpPage'
+import FindDoctor from '../pages/FindDoctor'
+import Surgeries from '../pages/Surgeries'
+import DoctorDashboard from '../pages/DoctorDashboard'
+import DoctorPrescription from '../components/DoctorPrescription'
+import DoctorConsultation from '../components/DoctorConsultation'
+import DoctorLogin from '../pages/DoctorLogin'
+import DoctorRegister from '../pages/DoctorRegister'
+import ProtectedDoctorRoute from '../components/ProtectedDoctorRoute'
 
 const AllRoutes = () => {
   return (
@@ -53,6 +61,8 @@ const AllRoutes = () => {
       <Route path='/About' element={<About />} />
       <Route path='/Blog' element={<Blog />} />
       <Route path='/Careers' element={<Careers />} />
+      <Route path='/doctor' element={<FindDoctor />} />
+      <Route path='/surgeries' element={<Surgeries />} />
 
       <Route path='/ContactUs' element={<ContactUs />} />
       <Route path='/CovidHospitalListing' element={<CovidHospitalListing />} />
@@ -77,7 +87,7 @@ const AllRoutes = () => {
       <Route path='/InstaByTAMD' element={<InstaByTAMD />} />
       <Route path='/AutoPlay' element={<AutoPlay />} />
       <Route path='/Banner' element={<Banner />} />
-      <Route path='/doctorRegister' element={<DoctorRegister />} />
+      <Route path='/doctorRegister' element={<OldDoctorRegister />} />
       <Route path='/doctorPage' element={<DoctorPage />} />
       {/* <Route path='/consultation' element={<Consultation/>}/> */}
       <Route path='/video' element={<VideoConsult />} />
@@ -103,6 +113,35 @@ const AllRoutes = () => {
       <Route path='/TAMDReachPage' element={<TAMDReachPage />} />
       <Route path='/HelpPage' element={<HelpPage />} />
 
+      {/* Doctor Panel Routes */}
+      <Route
+        path="/doctor/dashboard"
+        element={
+          <ProtectedDoctorRoute>
+            <DoctorDashboard />
+          </ProtectedDoctorRoute>
+        }
+      />
+      <Route
+        path="/doctor/prescriptions/new/:appointmentId?"
+        element={
+          <ProtectedDoctorRoute>
+            <DoctorPrescription />
+          </ProtectedDoctorRoute>
+        }
+      />
+      <Route
+        path="/doctor/consultations/new/:appointmentId?"
+        element={
+          <ProtectedDoctorRoute>
+            <DoctorConsultation />
+          </ProtectedDoctorRoute>
+        }
+      />
+
+      {/* Doctor Authentication Routes */}
+      <Route path="/doctor/login" element={<DoctorLogin />} />
+      <Route path="/doctor/register" element={<DoctorRegister />} />
     </Routes>
   )
 }

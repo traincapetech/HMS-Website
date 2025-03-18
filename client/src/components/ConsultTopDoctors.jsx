@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect } from "react";
 import { FaUserMd, FaHeartbeat, FaBrain, FaStethoscope, FaLaptopMedical } from "react-icons/fa"; // Importing React icons
 
 const ConsultTopDoctors = () => {
@@ -29,7 +29,9 @@ const ConsultTopDoctors = () => {
       icon: <FaLaptopMedical className="w-16 h-16 text-teal-500" />,
     },
   ];
-
+  useEffect(() => {
+    window.scrollTo(0, 0);
+  }, []);
   return (
     <div className="bg-gray-100 py-16 px-4 sm:px-6 lg:px-8">
       <div className="max-w-7xl mx-auto text-center">

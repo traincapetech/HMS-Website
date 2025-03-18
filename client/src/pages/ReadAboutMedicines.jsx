@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect } from "react";
 import { FaPills } from "react-icons/fa";
 import MedicineImage from "../assets/MedicineImage.jpg"; // Replace with your actual image path
 import Paracetamol from "../assets/Paracetamol.jpeg";
@@ -67,7 +67,9 @@ const ReadAboutMedicines = () => {
             image: "path-to-digestive-health-image.jpg",
         }
     ];
-
+    useEffect(() => {
+        window.scrollTo(0, 0);
+      }, []);
     return (
         <div className="min-h-screen bg-gray-50 p-8 font-sans">
             <h1 className="text-5xl font-extrabold text-center text-blue-700 mb-12 drop-shadow-lg">Read About Medicines</h1>

@@ -18,7 +18,7 @@ const MyAppointments = () => {
   // Fetch appointment history
   const fetchAppointments = async () => {
     try {
-      const response = await axios.get("http://localhost:8080/api/appoint/all");
+      const response = await axios.get("https://hms-backend-1-pngp.onrender.com/api/appoint/all");
       console.log("Fetched Appointments:", response.data);
       
       if (Array.isArray(response.data)) {
@@ -34,7 +34,9 @@ const MyAppointments = () => {
       setLoading(false);
     }
   };
-
+  useEffect(() => {
+    window.scrollTo(0, 0);
+  }, []);
   return (
     <div className="flex h-screen bg-gray-100">
       {/* Sidebar */}

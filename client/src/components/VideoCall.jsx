@@ -8,7 +8,7 @@ const VideoCall = () => {
   const [error, setError] = useState(null);
 
   useEffect(() => {
-    fetch(`http://localhost:8080/api/zoom/meeting/${appointmentId}`)
+    fetch(`https://hms-backend-1-pngp.onrender.com/api/zoom/meeting/${appointmentId}`)
       .then((res) => res.json())
       .then((data) => {
         if (data.join_url) {
@@ -28,7 +28,9 @@ const VideoCall = () => {
 
   if (loading) return <p className="text-white">Loading meeting details...</p>;
   if (error) return <p className="text-red-500">{error}</p>;
-
+  useEffect(() => {
+    window.scrollTo(0, 0);
+  }, []);
   return (
     <div className="flex flex-col items-center justify-center min-h-screen bg-gray-900 text-white p-4">
       <h1 className="text-3xl font-bold mb-6">Zoom Video Call</h1>

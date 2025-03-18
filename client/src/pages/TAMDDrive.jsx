@@ -1,6 +1,9 @@
-import React from "react";
+import React, { useEffect } from "react";
 import MedicalRecords from "../assets/MedicalRecords.webp"
 const TAMDDrive = () => {
+    useEffect(() => {
+        window.scrollTo(0, 0);
+      }, []);
     return (
         <div className="bg-gray-50 min-h-screen text-gray-800">
             {/* Hero Section */}

@@ -18,7 +18,7 @@ const Payments = () => {
 
   const fetchPayments = async () => {
     try {
-      const response = await axios.get("http://localhost:8080/api/payments"); // Change URL if needed
+      const response = await axios.get("https://hms-backend-1-pngp.onrender.com/api/payments");
       setPayments(response.data.payments);
       setCustomerBalance(response.data.balance);
       setLoading(false);
@@ -27,7 +27,9 @@ const Payments = () => {
       setLoading(false);
     }
   };
-
+  useEffect(() => {
+    window.scrollTo(0, 0);
+  }, []);
   return (
     <div className="flex bg-gray-100 min-h-screen">
       {/* Sidebar */}

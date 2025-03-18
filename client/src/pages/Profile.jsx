@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { useSelector } from "react-redux";
 
 const Profile = () => {
@@ -31,7 +31,9 @@ const Profile = () => {
     console.log("Updated Profile Data:", formData);
     alert("Profile Updated Successfully!");
   };
-
+  useEffect(() => {
+    window.scrollTo(0, 0);
+  }, []);
   return (
     <div className="flex flex-col md:flex-row items-center md:items-start p-6 min-h-screen bg-gray-100">
       {/* Sidebar */}

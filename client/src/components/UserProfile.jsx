@@ -1,5 +1,5 @@
 // UserProfile.jsx
-import React from 'react';
+import React, { useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { logoutUser } from '../redux/userSlice'; // Import the logout action
 import { useNavigate } from 'react-router-dom'; // Import useNavigate
@@ -14,7 +14,9 @@ const UserProfile = () => {
     dispatch(logoutUser()); // Dispatch logout action
     navigate("/"); // Navigate to home page after logout
   };
-
+  useEffect(() => {
+    window.scrollTo(0, 0);
+  }, []);
   return (
     <div className="p-4 bg-white text-red-800 rounded-lg shadow-lg">
       <p>Name: {user?.FirstName} {user?.LastName}</p>

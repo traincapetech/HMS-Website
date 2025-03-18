@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect } from "react";
 import Slider from "react-slick";
 import { IoIosArrowBack, IoIosArrowForward } from "react-icons/io";
 
@@ -36,7 +36,9 @@ const AutoPlay = ({ slides, settings }) => {
     nextArrow: <NextArrow />, // Custom right arrow
     ...settings, // Merge default settings with custom settings if provided
   };
-
+  useEffect(() => {
+    window.scrollTo(0, 0);
+  }, []);
   return (
     <div className="px-4 mx-10 py-10 relative">
       <Slider {...defaultSettings}>

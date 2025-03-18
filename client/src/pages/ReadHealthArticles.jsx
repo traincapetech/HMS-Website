@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import Yoga from "../assets/Exercises.jpg";
 import Healthy from "../assets/Healthy.webp";
 import Awareness from "../assets/Awareness.webp";
@@ -259,7 +259,9 @@ const articles = [
 
 const ReadHealthArticles = () => {
   const [selectedArticle, setSelectedArticle] = useState(null);
-
+  useEffect(() => {
+    window.scrollTo(0, 0);
+  }, []);
   return (
     <div className="min-h-screen bg-gray-50 text-gray-900 font-sans p-6">
       <h1 className="text-4xl font-bold text-center text-blue-600 mb-8">Read Health Articles</h1>

@@ -1,6 +1,9 @@
-import React from "react";
+import React, { useEffect } from "react";
 
 const VideoCallControls = ({ onLeave }) => {
+    useEffect(() => {
+        window.scrollTo(0, 0);
+      }, []);
     return (
         <div className="flex justify-center mt-4">
             <button 

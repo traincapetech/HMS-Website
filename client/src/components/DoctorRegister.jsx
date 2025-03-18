@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import validator from "validator";
 import { useDispatch, useSelector } from "react-redux";
 import { registerDoctor, clearError } from "../redux/doctorSlice.js";
@@ -109,7 +109,9 @@ const DoctorRegister = () => {
       console.error("Registration failed:", err);
     });
   };
-
+  useEffect(() => {
+    window.scrollTo(0, 0);
+  }, []);
   return (
     <div className="min-h-screen flex items-center justify-center bg-gray-100 p-6">
       <div className="bg-white p-8 rounded-lg shadow-lg w-full max-w-4xl">

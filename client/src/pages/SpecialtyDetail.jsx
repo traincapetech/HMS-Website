@@ -1,5 +1,5 @@
 // SpecialtyDetail.jsx
-import React from 'react';
+import React, { useEffect } from 'react';
 import { useParams } from 'react-router-dom';
 import { specialties } from '../components/Specialties';
 
@@ -10,7 +10,9 @@ const SpecialtyDetail = () => {
     if (!specialty) {
       return <div>Specialty not found</div>;
     }
-  
+    useEffect(() => {
+      window.scrollTo(0, 0);
+    }, []);
     return (
       <div className="container mx-auto px-6 py-8">
         <div className="text-center mb-6">

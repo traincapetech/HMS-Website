@@ -1,7 +1,10 @@
-import React from "react";
+import React, { useEffect } from "react";
 import { FaChartLine, FaUsers, FaClipboardCheck, FaCogs, FaStar, FaQuoteLeft } from "react-icons/fa";
 
 const InstaByTAMD = () => {
+  useEffect(() => {
+    window.scrollTo(0, 0);
+  }, []);
   return (
     <div className="min-h-screen bg-gray-50 text-gray-900">
       {/* Hero Section */}

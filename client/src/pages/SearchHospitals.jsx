@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 
 const SearchHospitals = () => {
     const [searchTerm, setSearchTerm] = useState("");
@@ -49,7 +49,9 @@ const SearchHospitals = () => {
         hospital.location.toLowerCase().includes(searchTerm.toLowerCase()) ||
         hospital.specialty.toLowerCase().includes(searchTerm.toLowerCase())
     );
-
+    useEffect(() => {
+        window.scrollTo(0, 0);
+      }, []);
     return (
         <div className="bg-gray-50 min-h-screen p-6">
             <h1 className="text-4xl font-bold text-center mb-8">Search for Hospitals</h1>

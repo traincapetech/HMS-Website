@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect } from "react";
 import {
   FaUserMd,
   FaHeartbeat,
@@ -31,10 +31,12 @@ const DoctorPage = () => {
   const handleJoinAsDoctor = () => {
     window.scrollTo({ top: document.body.scrollHeight, behavior: "smooth" });
     setTimeout(() => {
-      navigate("/doctorRegister");
+      navigate("/doctor/register");
     }, 500); // Delay to allow scrolling before navigation
   };
-
+  useEffect(() => {
+    window.scrollTo(0, 0);
+  }, []);
   return (
     <div className="min-h-screen bg-gray-100 py-10 px-4 sm:px-6 lg:px-8">
       <div className="max-w-7xl mx-auto">

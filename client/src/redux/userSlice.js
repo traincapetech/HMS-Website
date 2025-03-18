@@ -7,7 +7,7 @@ export const loginUser = createAsyncThunk(
   async (userData, { rejectWithValue }) => {
     try {
       const response = await axios.post(
-        "http://localhost:8080/api/newuser/login",
+        "https://hms-backend-1-pngp.onrender.com/api/newuser/login",
         {
           Email: userData.email, // Match the backend's expected key
           Password: userData.password, // Match the backend's expected key
@@ -48,7 +48,7 @@ export const registerUser = createAsyncThunk(
       console.log("Request Body:", requestBody); // Debugging line
 
       const response = await axios.post(
-        "http://localhost:8080/api/newuser/register",
+        "https://hms-backend-1-pngp.onrender.com/api/newuser/register",
         requestBody
       );
       

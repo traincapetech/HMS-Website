@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect } from "react";
 import Work from "../assets/Work.jpg";
 
 const Careers = () => {
@@ -40,7 +40,9 @@ const Careers = () => {
             link: "#"
         },
     ];
-
+    useEffect(() => {
+        window.scrollTo(0, 0);
+      }, []);
     return (
         <div className="bg-gray-50 min-h-screen">
             <div className="max-w-screen-xl mx-auto px-4 sm:px-6 lg:px-8 py-12">

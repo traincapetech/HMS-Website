@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import Checkup from "../assets/Checkup.jpg";
 import Healthy from "../assets/Healthy.jpg";
 import Mental from "../assets/Mental.jpg";
@@ -58,7 +58,9 @@ const Blog = () => {
         post.title.toLowerCase().includes(search.toLowerCase()) ||
         post.tags.some(tag => tag.toLowerCase().includes(search.toLowerCase()))
     );
-
+    useEffect(() => {
+        window.scrollTo(0, 0);
+      }, []);
     return (
         <div className="bg-gray-100 min-h-screen py-12">
             <div className="max-w-screen-xl mx-auto px-4 sm:px-6 lg:px-8">

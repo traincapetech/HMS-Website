@@ -87,7 +87,7 @@
 
 // export default Login;
 
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { loginUser } from "../redux/userSlice";
 import { useNavigate } from "react-router-dom"; // For navigation after login
@@ -113,7 +113,9 @@ const Login = () => {
       navigate("/"); // Redirect to home page or dashboard
     }
   };
-
+  useEffect(() => {
+    window.scrollTo(0, 0);
+  }, []);
   return (
     <div className="flex items-center justify-center min-h-screen bg-gray-100 p-4">
       <div className="bg-white rounded-lg shadow-xl p-8 max-w-md w-full">

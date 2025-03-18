@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import { useState } from 'react';
 
 const HelpPage = () => {
@@ -68,7 +68,9 @@ const HelpPage = () => {
     // In a real application, you might filter the helpCategories
     // based on the searchTerm here.  For simplicity, we'll
     // display all categories for now.
-
+    useEffect(() => {
+        window.scrollTo(0, 0);
+      }, []);
     return (
         <div className="bg-gray-50 font-sans">
             <div className="container mx-auto py-12 px-4">

@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { registerUser, clearError } from "../redux/userSlice.js"; // Import Redux actions
 import { useNavigate } from "react-router-dom"; // For navigation after registration
@@ -57,7 +57,9 @@ const Signup = () => {
       navigate("/login"); // Redirect to login page
     }
   };
-
+  useEffect(() => {
+    window.scrollTo(0, 0);
+  }, []);
   return (
     <div className="flex justify-center items-center min-h-screen bg-gray-100 p-4">
       <div className="bg-white rounded-lg shadow-xl p-8 w-full sm:w-3xl">

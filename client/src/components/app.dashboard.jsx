@@ -33,7 +33,9 @@ const Dashboard = ({ user }) => {
       console.error("Error starting video call:", error);
     }
   };
-
+  useEffect(() => {
+    window.scrollTo(0, 0);
+  }, []);
   return (
     <div className="min-h-screen bg-gray-100 p-6">
       <h1 className="text-3xl font-bold text-gray-800 mb-6">Dashboard</h1>

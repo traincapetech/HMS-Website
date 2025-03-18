@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { FaPlus, FaMinus } from 'react-icons/fa';
 
 const faqs = [
@@ -18,7 +18,9 @@ const FAQPage = () => {
     const toggleFAQ = (index) => {
         setOpenIndex(openIndex === index ? null : index);
     };
-
+    useEffect(() => {
+        window.scrollTo(0, 0);
+      }, []);
     return (
         <div className="min-h-screen bg-gray-100">
             {/* Hero Section */}

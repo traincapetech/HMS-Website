@@ -16,7 +16,7 @@ const Appointments = () => {
 
   useEffect(() => {
     axios
-      .get("http://localhost:8080/api/doctor/all")
+      .get("https://hms-backend-1-pngp.onrender.com/api/doctor/all")
       .then((response) => {
         if (response.data && Array.isArray(response.data.doctor)) {
           setDoctors(response.data.doctor);
@@ -66,17 +66,28 @@ const Appointments = () => {
     };
 
     console.log("Sending appointment data:", appointmentData);
-
     setLoading(true);
 
     try {
-      const response = await axios.post("http://localhost:8080/api/appoint/create", appointmentData, {
+      const response = await axios.post("https://hms-backend-1-pngp.onrender.com/api/appoint/create", appointmentData, {
         headers: { "Content-Type": "application/json" },
       });
 
       if (response.status === 201 || response.status === 200) {
         alert("Appointment booked successfully!");
-        navigate("/appointments");
+
+        // Fetch Zoom meeting details
+        const zoomResponse = await axios.post("https://hms-backend-1-pngp.onrender.com/api/zoom/ZoomMeeting", { email });
+
+        if (zoomResponse.status === 200) {
+          const { meetingLink } = zoomResponse.data;
+
+          // Redirect to VideoCall page with meeting details
+          navigate("/videocall", { state: { email, meetingLink } });
+        } else {
+          alert("Zoom meeting creation failed, but appointment is booked.");
+          navigate("/videocall", { state: { email, meetingLink: null } });
+        }
       } else {
         throw new Error("Failed to book appointment");
       }
@@ -87,7 +98,9 @@ const Appointments = () => {
       setLoading(false);
     }
   };
-
+  useEffect(() => {
+    window.scrollTo(0, 0);
+  }, []);
   return (
     <div className="max-w-lg mx-auto p-6 bg-white shadow-lg rounded-lg mt-10">
       <h2 className="text-2xl font-bold mb-4 text-center">Book an Appointment</h2>

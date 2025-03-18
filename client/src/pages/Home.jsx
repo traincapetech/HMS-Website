@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect } from "react";
 import Banner from "../components/Banner";
 import ConsultTopDoctors from "../components/ConsultTopDoctors";
 import { FaVideo, FaWhatsapp } from "react-icons/fa";
@@ -63,7 +63,9 @@ const Home = () => {
         "The video consultation service was amazing. I felt like I was in the doctor's office!",
     },
   ];
-
+  useEffect(() => {
+    window.scrollTo(0, 0);
+  }, []);
   return (
     <>
       <Banner />

@@ -1,6 +1,9 @@
-import React from "react";
+import React, { useEffect } from "react";
 
 const TAMDCareClinics = () => {
+    useEffect(() => {
+        window.scrollTo(0, 0);
+      }, []);
     return (
         <div className="min-h-screen bg-gray-50 text-gray-900 font-sans">
             {/* Hero Section */}

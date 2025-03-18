@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { FaCheckCircle, FaUsers, FaBriefcase, FaHeartbeat } from "react-icons/fa";
 import Exercise from "../assets/Exercises.jpg"
 const WellnessPlans = () => {
@@ -19,7 +19,9 @@ const WellnessPlans = () => {
         e.preventDefault();
         console.log(formData);
     };
-
+    useEffect(() => {
+        window.scrollTo(0, 0);
+      }, []);
     return (
         <div className="wellness-plans bg-gray-100">
             {/* First Section */}

@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect } from "react";
 //import WritingImage from "../assets/writing.jpg"; // Replace with actual image path
 import ExpertiseImage from "../assets/expertise.webp";
 import InspireImage from "../assets/inspire.jpg";
@@ -7,6 +7,9 @@ import EditorImage from "../assets/editor.jpg";
 import PractoProImage from "../assets/TAMD.png";
 
 const PractoHealthFeed = () => {
+    useEffect(() => {
+        window.scrollTo(0, 0);
+      }, []);
     return (
         <div className="min-h-screen bg-gray-50">
             {/* Header Section */}

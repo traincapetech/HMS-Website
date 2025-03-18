@@ -1,193 +1,18 @@
-// import React, { useState, useRef, useEffect } from "react";
-// import { Link } from "react-router-dom";
-// import { useSelector } from "react-redux";
-// import UserProfile from "./UserProfile"; // Import UserProfile component
-
-// const NavBar = () => {
-//   const [isMenuOpen, setIsMenuOpen] = useState(false);
-//   const [isProfileOpen, setIsProfileOpen] = useState(false);
-//   const { user, token } = useSelector((state) => state.user);
-//   const profileRef = useRef(null); // Ref for profile button and dropdown
-//   const profileButtonRef = useRef(null); // Ref for the profile button
-
-
-//   const toggleMenu = () => setIsMenuOpen(!isMenuOpen);
-//   const toggleProfile = () => {
-//     setIsProfileOpen(!isProfileOpen);
-//   };
-
-//   // Close the profile dropdown when clicking outside
-//   useEffect(() => {
-//     const handleClickOutside = (event) => {
-//       if (
-//         profileRef.current &&
-//         !profileRef.current.contains(event.target) &&
-//         !profileButtonRef.current.contains(event.target)
-//       ) {
-//         setIsProfileOpen(false);
-//       }
-//     };
-
-//     document.addEventListener("mousedown", handleClickOutside);
-//     return () => {
-//       document.removeEventListener("mousedown", handleClickOutside);
-//     };
-//   }, []);
-
-//   return (
-//     <nav className="flex justify-between items-center bg-red-800 p-4">
-//       {/* Logo */}
-//       <div className="text-white flex items-center space-x-1">
-//         <a href="/" className="font-extrabold text-white text-4xl py-4 md:px-20">
-//           TAMD.
-//         </a>
-//         <div className="hidden md:flex text-white space-x-6 text-lg cursor-pointer ">
-//           <Link to="/doctorPage">
-//             <span className="border-b-2 border-transparent hover:border-white transition-colors duration-300">
-//               Find Doctor
-//             </span>
-//           </Link>
-//           <Link to="/video">
-//           <span className="border-b-2 border-transparent hover:border-white transition-colors duration-300">
-//             Video Consult
-//           </span>
-//           </Link>
-//           <a className="border-b-2 border-transparent hover:border-white transition-colors duration-300">
-//             Surgeries
-//           </a>
-//         </div>
-//       </div>
-
-//       {/* Desktop Right-side links */}
-//       <div className="hidden md:flex space-x-7 text-white items-center pr-8 cursor-pointer">
-//         <Link to="/doctorPage">
-//           <span className="border-b-2 border-transparent hover:border-white transition-colors duration-300">
-//             For Doctor
-//           </span>
-//         </Link>
-//         <Link to="/corporate">
-//           <span className="border-b-2 border-transparent hover:border-white transition-colors duration-300">
-//             For Corporate
-//           </span>
-//         </Link>
-//         <a className="border-b-2 border-transparent hover:border-white transition-discrete duration-300">
-//           Help
-//         </a>
-
-//         {token ? (
-//           <div className="relative" ref={profileRef}>
-//             <button
-//               ref={profileButtonRef} // Attach the ref to the button
-//               onClick={toggleProfile}
-//               className="text-white border px-4 py-1 rounded-2xl hover:bg-white hover:text-red-700"
-//             >
-//               {user?.UserName || "Profile"}
-//             </button>
-//             {isProfileOpen && (
-//               <div className="absolute right-0  mt-2 w-48 bg-white text-red-800 rounded-lg shadow-lg z-10">
-//                 <UserProfile /> {/* Render UserProfile component */}
-//               </div>
-//             )}
-//           </div>
-//         ) : (
-//           <>
-//             <Link to="/login">
-//               <button className="text-white border px-4 py-1 rounded-2xl hover:bg-white hover:text-red-700">
-//                 Login
-//               </button>
-//             </Link>
-//             <Link to="/signup">
-//               <button className="text-white border px-4 py-1 rounded-2xl hover:bg-white hover:text-red-700">
-//                 Sign Up
-//               </button>
-//             </Link>
-//           </>
-//         )}
-//       </div>
-
-//       {/* Hamburger Icon for Mobile */}
-//       <div className="md:hidden flex items-center">
-//         <button onClick={toggleMenu} className="text-white text-2xl">
-//           &#9776;
-//         </button>
-//       </div>
-
-//       {/* Mobile Menu */}
-//       <div
-//         className={`${
-//           isMenuOpen ? "block" : "hidden"
-//         } absolute z-20 top-20 left-0 w-full bg-red-800 h-screen text-white p-6 space-y-4 md:hidden`}
-//       >
-//         <div className="space-y-2 flex-col border-b flex">
-//           <Link to="/doctorPage">
-//             <span className="border-b-2 border-transparent hover:border-white transition-colors duration-300">
-//               Find Doctor
-//             </span>
-//           </Link>
-//           <a href="#">Video Consult</a>
-//           <a href="#">Surgeries</a>
-//         </div>
-//         <div className="space-y-2 mt-4 flex border-b flex-col">
-//           <Link to="/doctorPage">
-//             <span className="border-b-2 border-transparent hover:border-white transition-colors duration-300">
-//               For Doctor
-//             </span>
-//           </Link>
-//           <Link to="/corporate">
-//             <span className="border-b-2 border-transparent hover:border-white transition-colors duration-300">
-//               For Corporate
-//             </span>
-//           </Link>
-//           <a href="#">Help</a>
-//         </div>
-//         <div className="mt-4 flex flex-col space-y-2">
-//           {token ? (
-//             <div className="relative">
-//               <button
-//                 onClick={toggleProfile}
-//                 className="text-white border px-4 py-1 rounded-2xl hover:bg-white hover:text-red-700"
-//               >
-//                 {user?.UserName || "Profile"}
-//               </button>
-//               {isProfileOpen && (
-//                 <div className="absolute   mt-2 w-48 bg-white text-red-800 rounded-lg shadow-lg z-10">
-//                   <UserProfile /> {/* Render UserProfile component */}
-//                 </div>
-//               )}
-//             </div>
-//           ) : (
-//             <>
-//               <Link to="/login">
-//                 <button className="text-white border px-4 py-1 rounded-2xl hover:bg-white hover:text-red-700">
-//                   Login
-//                 </button>
-//               </Link>
-//               <Link to="/signup">
-//                 <button className="text-white border px-4 py-1 rounded-2xl hover:bg-white hover:text-red-700">
-//                   Sign Up
-//                 </button>
-//               </Link>
-//             </>
-//           )}
-//         </div>
-//       </div>
-//     </nav>
-//   );
-// };
-
-// export default NavBar;
 import React, { useState, useRef, useEffect } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { useSelector } from "react-redux";
 
 const NavBar = () => {
     const [isProfileOpen, setIsProfileOpen] = useState(false);
+    const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
     const profileRef = useRef(null);
     const profileButtonRef = useRef(null);
+    const mobileMenuRef = useRef(null);
     const navigate = useNavigate();
     const { user, token } = useSelector((state) => state.user);
 
     const toggleProfile = () => setIsProfileOpen(!isProfileOpen);
+    const toggleMobileMenu = () => setIsMobileMenuOpen(!isMobileMenuOpen);
 
     useEffect(() => {
         const handleClickOutside = (event) => {
@@ -210,41 +35,39 @@ const NavBar = () => {
     };
 
     return (
-        <nav className="flex justify-between items-center bg-red-800 p-4">
+        <nav className="flex justify-between items-center bg-red-800 p-4 relative">
             {/* Left Side - Logo & Navigation */}
             <div className="text-white flex items-center space-x-6">
                 <Link to="/" className="font-extrabold text-white text-4xl py-4 md:px-20">
                     TAMD.
                 </Link>
                 <div className="hidden md:flex text-white space-x-6 text-lg">
-                    <Link to="/doctor" className="nav-link">Find Doctor</Link>
-                    <Link to="/video" className="nav-link">Video Consult</Link>
-                    <span className="nav-link">Surgeries</span>
+                    <Link to="/doctor" className="border-b-2 border-transparent hover:border-white transition-colors duration-300">Find Doctor</Link>
+                    <Link to="/video" className="border-b-2 border-transparent hover:border-white transition-colors duration-300">Video Consult</Link>
+                    <Link to="/surgeries" className="border-b-2 border-transparent hover:border-white transition-colors duration-300">Surgeries</Link>
                 </div>
             </div>
 
             {/* Right Side - User Actions */}
             <div className="hidden md:flex space-x-7 text-white items-center pr-8">
-                <Link to="/doctorPage" className="nav-link">For Doctor</Link>
-                <Link to="/WellnessPlans" className="nav-link">For Corporate</Link>
-                <Link to="/HelpPage" className="nav-link">Help</Link>
+                <Link to="/doctorPage" className="border-b-2 border-transparent hover:border-white transition-colors duration-300">For Doctor</Link>
+                <Link to="/WellnessPlans" className="border-b-2 border-transparent hover:border-white transition-colors duration-300">For Corporate</Link>
+                <Link to="/HelpPage" className="border-b-2 border-transparent hover:border-white transition-colors duration-300">Help</Link>
                 
-
                 {token ? (
                     <div className="relative" ref={profileRef}>
                         <button
                             ref={profileButtonRef}
                             onClick={toggleProfile}
-                            className="nav-button"
+                            className="text-white border px-4 py-1 rounded-2xl hover:bg-white hover:text-red-700"
                         >
                             {user?.UserName || "Profile"}
                         </button>
 
                         {isProfileOpen && (
-                            <div className="absolute right-0 mt-2 w-56 bg-white rounded-lg shadow-md z-10 focus:outline-none"  /* Dropdown container */
-                            >
-                                <div className="py-2"> {/* Padding for the content */}
-                                    <div className="flex items-center px-4 py-3 border-b border-gray-200"> {/* User Info */}
+                            <div className="absolute right-0 mt-2 w-56 bg-white rounded-lg shadow-md z-10 focus:outline-none">
+                                <div className="py-2">
+                                    <div className="flex items-center px-4 py-3 border-b border-gray-200">
                                         <img
                                             src={user?.photo || "https://accounts.practo.com/profile_picture/22269865/medium_thumbnail"}
                                             alt="User"
@@ -277,14 +100,161 @@ const NavBar = () => {
                 ) : (
                     <>
                         <Link to="/login">
-                            <button className="nav-button">Login</button>
+                            <button className="text-white border px-4 py-1 rounded-2xl hover:bg-white hover:text-red-700">Login</button>
                         </Link>
                         <Link to="/signup">
-                            <button className="nav-button">Sign Up</button>
+                            <button className="text-white border px-4 py-1 rounded-2xl hover:bg-white hover:text-red-700">Sign Up</button>
                         </Link>
                     </>
                 )}
             </div>
+
+            {/* Mobile Hamburger Menu Button */}
+            <div className="md:hidden">
+                <button 
+                    className="text-white text-2xl focus:outline-none"
+                    onClick={toggleMobileMenu}
+                    aria-label="Toggle mobile menu"
+                >
+                    {isMobileMenuOpen ? "✕" : "☰"}
+                </button>
+            </div>
+
+            {/* Mobile Sidebar Menu */}
+            <div 
+                ref={mobileMenuRef}
+                className={`fixed top-0 left-0 w-4/5 h-full bg-red-800 z-50 transform transition-transform duration-300 ease-in-out ${
+                    isMobileMenuOpen ? "translate-x-0" : "-translate-x-full"
+                } md:hidden`}
+            >
+                <div className="flex justify-between items-center p-4 border-b border-red-700">
+                    <Link to="/" className="font-extrabold text-white text-3xl">TAMD.</Link>
+                    <button 
+                        onClick={toggleMobileMenu} 
+                        className="text-white text-2xl focus:outline-none"
+                        aria-label="Close menu"
+                    >
+                        ✕
+                    </button>
+                </div>
+                
+                <div className="p-4">
+                    <div className="text-white space-y-4 text-lg">
+                        <Link 
+                            to="/doctor" 
+                            className="block py-2 border-b border-red-700 hover:bg-red-700 transition-colors duration-200"
+                            onClick={toggleMobileMenu}
+                        >
+                            Find Doctor
+                        </Link>
+                        <Link 
+                            to="/video" 
+                            className="block py-2 border-b border-red-700 hover:bg-red-700 transition-colors duration-200"
+                            onClick={toggleMobileMenu}
+                        >
+                            Video Consult
+                        </Link>
+                        <Link 
+                            to="/surgeries" 
+                            className="block py-2 border-b border-red-700 hover:bg-red-700 transition-colors duration-200"
+                            onClick={toggleMobileMenu}
+                        >
+                            Surgeries
+                        </Link>
+                        <Link 
+                            to="/doctorPage" 
+                            className="block py-2 border-b border-red-700 hover:bg-red-700 transition-colors duration-200"
+                            onClick={toggleMobileMenu}
+                        >
+                            For Doctor
+                        </Link>
+                        <Link 
+                            to="/WellnessPlans" 
+                            className="block py-2 border-b border-red-700 hover:bg-red-700 transition-colors duration-200"
+                            onClick={toggleMobileMenu}
+                        >
+                            For Corporate
+                        </Link>
+                        <Link 
+                            to="/HelpPage" 
+                            className="block py-2 border-b border-red-700 hover:bg-red-700 transition-colors duration-200"
+                            onClick={toggleMobileMenu}
+                        >
+                            Help
+                        </Link>
+                    </div>
+
+                    <div className="mt-8">
+                        {token ? (
+                            <div className="text-white">
+                                <div className="flex items-center py-4 border-b border-red-700">
+                                    <img
+                                        src={user?.photo || "https://accounts.practo.com/profile_picture/22269865/medium_thumbnail"}
+                                        alt="User"
+                                        className="w-12 h-12 rounded-full object-cover border-2 border-white"
+                                    />
+                                    <div className="ml-3">
+                                        <p className="font-semibold">{user?.UserName || "User"}</p>
+                                        <p className="text-sm opacity-80">{user?.Mobile || "No Mobile Number"}</p>
+                                    </div>
+                                </div>
+                                <div className="mt-4 space-y-2">
+                                    <Link 
+                                        to="/MyAppointments" 
+                                        className="block py-2 text-white hover:bg-red-700 transition-colors duration-200"
+                                        onClick={toggleMobileMenu}
+                                    >
+                                        My Appointments
+                                    </Link>
+                                    <Link 
+                                        to="/profile" 
+                                        className="block py-2 text-white hover:bg-red-700 transition-colors duration-200"
+                                        onClick={toggleMobileMenu}
+                                    >
+                                        View Profile
+                                    </Link>
+                                    <button
+                                        onClick={() => {
+                                            handleLogout();
+                                            toggleMobileMenu();
+                                        }}
+                                        className="block w-full text-left py-2 text-white hover:bg-red-700 transition-colors duration-200"
+                                    >
+                                        Logout
+                                    </button>
+                                </div>
+                            </div>
+                        ) : (
+                            <div className="space-y-4">
+                                <Link 
+                                    to="/login"
+                                    onClick={toggleMobileMenu}
+                                >
+                                    <button className="w-full bg-white text-red-800 px-4 py-2 rounded-md hover:bg-gray-100 transition-colors duration-200">
+                                        Login
+                                    </button>
+                                </Link>
+                                <Link 
+                                    to="/signup"
+                                    onClick={toggleMobileMenu}
+                                >
+                                    <button className="w-full border border-white text-white px-4 py-2 rounded-md hover:bg-red-700 transition-colors duration-200">
+                                        Sign Up
+                                    </button>
+                                </Link>
+                            </div>
+                        )}
+                    </div>
+                </div>
+            </div>
+
+            {/* Overlay for mobile menu */}
+            {isMobileMenuOpen && (
+                <div 
+                    className="fixed inset-0 bg-black bg-opacity-50 z-40 md:hidden"
+                    onClick={toggleMobileMenu}
+                ></div>
+            )}
         </nav>
     );
 };

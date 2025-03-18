@@ -112,7 +112,9 @@ const ShowDoctors = () => {
                 return 0; // Default case
             }
         }) : []; // Fallback to an empty array if doctors is not an array
-
+        useEffect(() => {
+            window.scrollTo(0, 0);
+          }, []);
     return (
         <div className="bg-gray-50 min-h-screen p-6">
             <h1 className="text-4xl font-bold text-center mb-8">Doctors List</h1>
