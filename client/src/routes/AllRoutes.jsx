@@ -51,6 +51,7 @@ import DoctorConsultation from '../components/DoctorConsultation'
 import DoctorLogin from '../pages/DoctorLogin'
 import DoctorRegister from '../pages/DoctorRegister'
 import ProtectedDoctorRoute from '../components/ProtectedDoctorRoute'
+import SpecialtyDetail from '../pages/SpecialtyDetail'
 
 const AllRoutes = () => {
   return (
@@ -63,6 +64,7 @@ const AllRoutes = () => {
       <Route path='/Careers' element={<Careers />} />
       <Route path='/doctor' element={<FindDoctor />} />
       <Route path='/surgeries' element={<Surgeries />} />
+      <Route path='/specialty/:id' element={<SpecialtyDetail />} />
 
       <Route path='/ContactUs' element={<ContactUs />} />
       <Route path='/CovidHospitalListing' element={<CovidHospitalListing />} />

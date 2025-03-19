@@ -28,6 +28,7 @@ const Home = () => {
       icon: <FaUserDoctor className="text-5xl text-green-500 mb-4 mx-auto" />,
       buttonText: "Find a Doctor",
       buttonColor: "bg-green-500 hover:bg-green-600",
+      url: "/doctor",
     },
     {
       id: 3,

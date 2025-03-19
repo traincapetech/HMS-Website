@@ -1,6 +1,6 @@
 import React, { useEffect } from "react";
 import Slider from "react-slick";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import banner from "../assets/banner.jpg";
 import { MdVerified, MdPictureAsPdf, MdOutlineMessage } from "react-icons/md";
 import { IoIosArrowBack, IoIosArrowForward } from "react-icons/io";
@@ -63,56 +63,73 @@ const settings = {
 };
 
 const VideoConsult = () => {
+  const navigate = useNavigate();
+  
+  const handleBookSession = () => {
+    navigate('/Appointments');
+  };
+  
   const categories = [
     {
-      title: "General Physics",
+      title: "General Physician",
       icon: <FaBrain className="text-4xl text-blue-500 mx-auto" />,
       price: "$50",
+      specialtyId: 14,
     },
     {
       title: "Sexology",
       icon: <FaHeartbeat className="text-4xl text-blue-500 mx-auto" />,
       price: "$70",
+      specialtyId: 2,
     },
     {
       title: "Dermatology",
       icon: <FaHandHoldingMedical className="text-4xl text-blue-500 mx-auto" />,
       price: "$60",
+      specialtyId: 6,
     },
     {
       title: "Gynecology",
       icon: <FaStethoscope className="text-4xl text-blue-500 mx-auto" />,
       price: "$80",
+      specialtyId: 4,
     },
     {
       title: "Cardiology",
       icon: <FaHeartbeat className="text-4xl text-blue-500 mx-auto" />,
       price: "$90",
+      specialtyId: 10,
     },
     {
       title: "Psychiatry",
       icon: <FaUsers className="text-4xl text-blue-500 mx-auto" />,
       price: "$85",
+      specialtyId: 15,
     },
     {
       title: "Pulmonology",
       icon: <FaLungs className="text-4xl text-blue-500 mx-auto" />,
       price: "$95",
+      specialtyId: 19,
     },
     {
       title: "Ophthalmology",
       icon: <FaEye className="text-4xl text-blue-500 mx-auto" />,
       price: "$75",
+      specialtyId: 3,
     },
     {
       title: "Pharmacology",
       icon: <FaPills className="text-4xl text-blue-500 mx-auto" />,
       price: "$65",
+      specialtyId: 11,
     },
   ];
+  
   useEffect(() => {
     window.scrollTo(0, 0);
   }, []);
+  
   return (
     <div>
       {/* Banner Section */}
@@ -139,7 +156,10 @@ const VideoConsult = () => {
             consultation with our professionals and receive personalized
             guidance.
           </p>
-          <button className="text-white bg-blue-500 font-semibold py-2 px-6 rounded-md hover:bg-blue-600 hover:text-white transition transform hover:scale-105">
+          <button 
+            onClick={handleBookSession}
+            className="text-white bg-blue-500 font-semibold py-2 px-6 rounded-md hover:bg-blue-600 hover:text-white transition transform hover:scale-105"
+          >
             Book a Session
           </button>
           <div className="flex flex-col md:flex-row gap-4 mt-8">
@@ -180,11 +200,19 @@ const VideoConsult = () => {
               <p className="text-lg text-blue-500 mb-4 text-center">
                 {category.price}
               </p>
-              <Link to={`/consultation/${index}`}>
-                <button className="bg-blue-500 text-white font-semibold py-2 px-6 rounded-md hover:bg-blue-600 transition transform hover:scale-105 w-full ">
-                  Consult Now
-                </button>
-              </Link>
+              {category.specialtyId ? (
+                <Link to={`/specialty/${category.specialtyId}`}>
+                  <button className="bg-blue-500 text-white font-semibold py-2 px-6 rounded-md hover:bg-blue-600 transition transform hover:scale-105 w-full">
+                    View Details
+                  </button>
+                </Link>
+              ) : (
+                <Link to={`/consultation/${index}`}>
+                  <button className="bg-blue-500 text-white font-semibold py-2 px-6 rounded-md hover:bg-blue-600 transition transform hover:scale-105 w-full">
+                    Consult Now
+                  </button>
+                </Link>
+              )}
             </div>
           ))}
         </Slider>

@@ -2,6 +2,7 @@ import React, { useState, useRef, useEffect } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { useSelector, useDispatch } from "react-redux";
 import { logoutUser } from "../redux/userSlice";
+import tamdLogo from "../assets/TAMD.png";
 
 const NavBar = () => {
     const [isProfileOpen, setIsProfileOpen] = useState(false);
@@ -40,8 +41,8 @@ const NavBar = () => {
         <nav className="flex justify-between items-center bg-red-800 p-4 relative">
             {/* Left Side - Logo & Navigation */}
             <div className="text-white flex items-center space-x-6">
-                <Link to="/" className="font-extrabold text-white text-4xl py-4 md:px-20">
-                    TAMD.
+                <Link to="/" className="flex items-center py-4 md:px-20">
+                    <img src={tamdLogo} alt="TAMD Logo" className="h-16" />
                 </Link>
                 <div className="hidden md:flex text-white space-x-6 text-lg">
                     <Link to="/doctor" className="border-b-2 border-transparent hover:border-white transition-colors duration-300">Find Doctor</Link>
@@ -77,7 +78,7 @@ const NavBar = () => {
                                         />
                                         <div className="ml-3">
                                             <p className="font-semibold text-gray-800">{user?.UserName || "User"}</p>
-                                            <p className="text-sm text-gray-600">{user?.Mobile || "No Mobile Number"}</p>
+                                            <p className="text-sm text-gray-600">{user?.Phone || "No Mobile Number"}</p>
                                         </div>
                                     </div>
 
@@ -130,7 +131,9 @@ const NavBar = () => {
                 } md:hidden`}
             >
                 <div className="flex justify-between items-center p-4 border-b border-red-700">
-                    <Link to="/" className="font-extrabold text-white text-3xl">TAMD.</Link>
+                    <Link to="/" className="flex items-center">
+                        <img src={tamdLogo} alt="TAMD Logo" className="h-14" />
+                    </Link>
                     <button 
                         onClick={toggleMobileMenu} 
                         className="text-white text-2xl focus:outline-none"
@@ -197,7 +200,7 @@ const NavBar = () => {
                                     />
                                     <div className="ml-3">
                                         <p className="font-semibold">{user?.UserName || "User"}</p>
-                                        <p className="text-sm opacity-80">{user?.Mobile || "No Mobile Number"}</p>
+                                        <p className="text-sm opacity-80">{user?.Phone || "No Mobile Number"}</p>
                                     </div>
                                 </div>
                                 <div className="mt-4 space-y-2">

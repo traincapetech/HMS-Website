@@ -1,8 +1,10 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState } from "react";
+import { useNavigate } from "react-router-dom";
 
 const FindDoctor = () => {
-  const [searchQuery, setSearchQuery] = useState('');
-  const [selectedSpecialty, setSelectedSpecialty] = useState('');
+  const [searchQuery, setSearchQuery] = useState("");
+  const [selectedSpecialty, setSelectedSpecialty] = useState("");
+  const navigate = useNavigate();
 
   // Sample data for doctors
   const doctors = [
@@ -13,8 +15,9 @@ const FindDoctor = () => {
       experience: "15 years",
       location: "New York Medical Center",
       rating: 4.8,
-      image: "https://img.freepik.com/free-photo/woman-doctor-wearing-lab-coat-with-stethoscope-isolated_1303-29791.jpg",
-      availability: "Available Today"
+      image:
+        "https://img.freepik.com/free-photo/woman-doctor-wearing-lab-coat-with-stethoscope-isolated_1303-29791.jpg",
+      availability: "Available Today",
     },
     {
       id: 2,
@@ -23,8 +26,9 @@ const FindDoctor = () => {
       experience: "12 years",
       location: "City Hospital",
       rating: 4.7,
-      image: "https://img.freepik.com/free-photo/doctor-with-his-arms-crossed-white-background_1368-5790.jpg",
-      availability: "Next Available: Tomorrow"
+      image:
+        "https://img.freepik.com/free-photo/doctor-with-his-arms-crossed-white-background_1368-5790.jpg",
+      availability: "Next Available: Tomorrow",
     },
     {
       id: 3,
@@ -33,8 +37,9 @@ const FindDoctor = () => {
       experience: "10 years",
       location: "Children's Hospital",
       rating: 4.9,
-      image: "https://img.freepik.com/free-photo/female-doctor-hospital-with-stethoscope_23-2148827775.jpg",
-      availability: "Available Today"
+      image:
+        "https://img.freepik.com/free-photo/female-doctor-hospital-with-stethoscope_23-2148827775.jpg",
+      availability: "Available Today",
     },
   ];
 
@@ -49,16 +54,26 @@ const FindDoctor = () => {
     "Gynecologist",
   ];
 
-  const filteredDoctors = doctors.filter(doctor => {
-    const matchesSearch = doctor.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-                         doctor.specialty.toLowerCase().includes(searchQuery.toLowerCase());
-    const matchesSpecialty = selectedSpecialty === '' || selectedSpecialty === 'All Specialties' ||
-                            doctor.specialty === selectedSpecialty;
+  const filteredDoctors = doctors.filter((doctor) => {
+    const matchesSearch =
+      doctor.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      doctor.specialty.toLowerCase().includes(searchQuery.toLowerCase());
+    const matchesSpecialty =
+      selectedSpecialty === "" ||
+      selectedSpecialty === "All Specialties" ||
+      doctor.specialty === selectedSpecialty;
     return matchesSearch && matchesSpecialty;
   });
+  
+  // Handle booking appointment - redirects to the appointment page
+  const handleBookAppointment = (doctor) => {
+    navigate("/Appointments", { state: { selectedDoctor: doctor } });
+  };
+  
   useEffect(() => {
     window.scrollTo(0, 0);
   }, []);
+  
   return (
     <div className="min-h-screen bg-gray-100 py-8 px-4 sm:px-6 lg:px-8">
       {/* Search Section */}
@@ -78,7 +93,9 @@ const FindDoctor = () => {
             onChange={(e) => setSelectedSpecialty(e.target.value)}
           >
             {specialties.map((specialty) => (
-              <option key={specialty} value={specialty}>{specialty}</option>
+              <option key={specialty} value={specialty}>
+                {specialty}
+              </option>
             ))}
           </select>
         </div>
@@ -87,7 +104,10 @@ const FindDoctor = () => {
       {/* Doctors Grid */}
       <div className="max-w-7xl mx-auto grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
         {filteredDoctors.map((doctor) => (
-          <div key={doctor.id} className="bg-white rounded-lg shadow-md overflow-hidden hover:shadow-lg transition-shadow duration-300">
+          <div
+            key={doctor.id}
+            className="bg-white rounded-lg shadow-md overflow-hidden hover:shadow-lg transition-shadow duration-300"
+          >
             <div className="p-6">
               <div className="flex items-center mb-4">
                 <img
@@ -96,24 +116,33 @@ const FindDoctor = () => {
                   className="w-20 h-20 rounded-full object-cover mr-4"
                 />
                 <div>
-                  <h3 className="text-xl font-semibold text-gray-900">{doctor.name}</h3>
+                  <h3 className="text-xl font-semibold text-gray-900">
+                    {doctor.name}
+                  </h3>
                   <p className="text-red-800">{doctor.specialty}</p>
                 </div>
               </div>
               <div className="space-y-2">
                 <p className="text-gray-600">
-                  <span className="font-medium">Experience:</span> {doctor.experience}
+                  <span className="font-medium">Experience:</span>{" "}
+                  {doctor.experience}
                 </p>
                 <p className="text-gray-600">
-                  <span className="font-medium">Location:</span> {doctor.location}
+                  <span className="font-medium">Location:</span>{" "}
+                  {doctor.location}
                 </p>
                 <div className="flex items-center">
                   <span className="text-yellow-400 mr-1">★</span>
                   <span className="font-medium">{doctor.rating}</span>
                 </div>
-                <p className="text-green-600 font-medium">{doctor.availability}</p>
+                <p className="text-green-600 font-medium">
+                  {doctor.availability}
+                </p>
               </div>
-              <button className="mt-4 w-full bg-red-800 text-white py-2 px-4 rounded-lg hover:bg-red-700 transition-colors duration-300">
+              <button 
+                className="mt-4 w-full bg-red-800 text-white py-2 px-4 rounded-lg hover:bg-red-700 transition-colors duration-300"
+                onClick={() => handleBookAppointment(doctor)}
+              >
                 Book Appointment
               </button>
             </div>
@@ -124,4 +153,4 @@ const FindDoctor = () => {
   );
 };
 
-export default FindDoctor; 
+export default FindDoctor;
