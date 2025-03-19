@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { FaPlus, FaMinus } from 'react-icons/fa';
+import { useNavigate } from "react-router-dom";
 
 const faqs = [
     { question: "What services does TAMD Hospital provide?", answer: "TAMD Hospital offers a wide range of healthcare services, including emergency care, surgery, maternity, pediatrics, cardiology, and specialized wellness programs." },
@@ -21,6 +22,7 @@ const FAQPage = () => {
     useEffect(() => {
         window.scrollTo(0, 0);
       }, []);
+      const navigate=useNavigate()
     return (
         <div className="min-h-screen bg-gray-100">
             {/* Hero Section */}
@@ -54,7 +56,9 @@ const FAQPage = () => {
             <div className="bg-blue-600 text-white py-12 text-center">
                 <h2 className="text-2xl font-bold mb-4">Still have questions?</h2>
                 <p className="mb-6 text-lg">Feel free to reach out to our support team for any additional information.</p>
-                <button className="bg-white text-blue-600 px-6 py-3 rounded-lg font-semibold shadow-md hover:bg-gray-200 transition duration-200 ease-in-out">Contact Us</button>
+                <button onClick={()=>{
+                    navigate("/contactUs")
+                }} className="hover:cursor-pointer bg-white text-blue-600 px-6 py-3 rounded-lg font-semibold shadow-md hover:bg-gray-200 transition duration-200 ease-in-out">Contact Us</button>
             </div>
         </div>
     );

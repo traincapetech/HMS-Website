@@ -94,7 +94,7 @@ const Careers = () => {
                         We offer a comprehensive benefits package to support our employees' health and well-being, including:
                     </p>
                     <div className="bg-white rounded-lg shadow-lg p-6 mx-auto max-w-2xl">
-                        <ul className="list-disc list-inside mb-4">
+                        <ul className="text-left list-disc list-inside mb-4">
                             <li className="text-gray-600">✅ Competitive salary and performance bonuses</li>
                             <li className="text-gray-600">✅ Health, dental, and vision insurance</li>
                             <li className="text-gray-600">✅ Retirement savings plan with company match</li>
