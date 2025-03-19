@@ -36,15 +36,15 @@ const FAQPage = () => {
                 <h2 className="text-3xl font-bold text-blue-600 text-center mb-6">Common Questions</h2>
                 <div className="space-y-4">
                     {faqs.map((faq, index) => (
-                        <div key={index} className="border-b border-gray-300 pb-4">
+                        <div key={index} className=" border-b border-gray-300 pb-4">
                             <button
                                 onClick={() => toggleFAQ(index)}
-                                className={`w-full flex justify-between items-center p-4 text-lg font-semibold text-gray-700 bg-gray-200 rounded-md focus:outline-none hover:bg-gray-300 transition duration-200 ease-in-out ${openIndex === index ? 'bg-gray-300' : ''}`}
+                                className={`hover:cursor-pointer w-full flex justify-between items-center p-4 text-lg font-semibold text-gray-700 bg-gray-200 rounded-md focus:outline-none hover:bg-gray-300 transition duration-200 ease-in-out ${openIndex === index ? 'bg-gray-300' : ''}`}
                             >
                                 {faq.question}
                                 {openIndex === index ? <FaMinus className="text-blue-600" /> : <FaPlus className="text-blue-600" />}
                             </button>
-                            <div className={`overflow-hidden transition-all duration-300 ${openIndex === index ? 'max-h-40' : 'max-h-0'}`}>
+                            <div className={` overflow-hidden transition-all duration-300 ${openIndex === index ? 'max-h-40' : 'max-h-0'}`}>
                                 {openIndex === index && <p className="p-4 text-gray-600 bg-gray-100 rounded-md">{faq.answer}</p>}
                             </div>
                         </div>

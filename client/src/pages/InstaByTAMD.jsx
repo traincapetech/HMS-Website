@@ -1,10 +1,20 @@
 import React, { useEffect } from "react";
-import { FaChartLine, FaUsers, FaClipboardCheck, FaCogs, FaStar, FaQuoteLeft } from "react-icons/fa";
+import {
+  FaChartLine,
+  FaUsers,
+  FaClipboardCheck,
+  FaCogs,
+  FaStar,
+  FaQuoteLeft,
+} from "react-icons/fa";
+import { useNavigate } from "react-router-dom";
 
 const InstaByTAMD = () => {
   useEffect(() => {
     window.scrollTo(0, 0);
   }, []);
+  const navigate = useNavigate();
+
   return (
     <div className="min-h-screen bg-gray-50 text-gray-900">
       {/* Hero Section */}
@@ -19,12 +29,19 @@ const InstaByTAMD = () => {
             departments, patients, and staff. Enhance patient experience with
             intelligent decision-making tools.
           </p>
-          <button className="mt-6 bg-white text-blue-600 px-6 py-3 rounded-lg font-semibold shadow-md hover:bg-gray-200 transition duration-300">
+          <button
+            onClick={() => navigate("/contactUs")}
+            className="hover:cursor-pointer mt-6 bg-white text-blue-600 px-6 py-3 rounded-lg font-semibold shadow-md hover:bg-gray-200 transition duration-300"
+          >
             Request a Free Demo
           </button>
         </div>
         <div className="mt-8 md:mt-0">
-          <img src="/images/hospital-puzzle.png" alt="Hospital Puzzle" className="w-full max-w-md" />
+          <img
+            src="/images/hospital-puzzle.png"
+            alt="Hospital Puzzle"
+            className="w-full max-w-md"
+          />
         </div>
       </div>
 
@@ -34,42 +51,46 @@ const InstaByTAMD = () => {
           Key Features
         </h2>
         <p className="text-center mt-2 max-w-2xl mx-auto">
-          Our platform offers powerful features to streamline hospital operations.
+          Our platform offers powerful features to streamline hospital
+          operations.
         </p>
         <div className="mt-10 grid grid-cols-1 md:grid-cols-3 gap-8 max-w-6xl mx-auto">
           {[
             {
               icon: <FaChartLine className="text-blue-600 text-4xl" />,
               title: "Real-time Analytics",
-              desc: "Track hospital performance with powerful data insights."
+              desc: "Track hospital performance with powerful data insights.",
             },
             {
               icon: <FaUsers className="text-blue-600 text-4xl" />,
               title: "Patient & Staff Management",
-              desc: "Effortlessly handle patient records and staff assignments."
+              desc: "Effortlessly handle patient records and staff assignments.",
             },
             {
               icon: <FaClipboardCheck className="text-blue-600 text-4xl" />,
               title: "Appointment Scheduling",
-              desc: "Seamlessly book and manage patient appointments."
+              desc: "Seamlessly book and manage patient appointments.",
             },
             {
               icon: <FaCogs className="text-blue-600 text-4xl" />,
               title: "Automated Workflows",
-              desc: "Reduce manual work and streamline hospital processes."
+              desc: "Reduce manual work and streamline hospital processes.",
             },
             {
               icon: <FaUsers className="text-blue-600 text-4xl" />,
               title: "Secure Data Management",
-              desc: "Protect patient information with advanced security."
+              desc: "Protect patient information with advanced security.",
             },
             {
               icon: <FaChartLine className="text-blue-600 text-4xl" />,
               title: "Billing & Insurance",
-              desc: "Simplify payments with integrated billing systems."
-            }
+              desc: "Simplify payments with integrated billing systems.",
+            },
           ].map((feature, index) => (
-            <div key={index} className="bg-white p-6 rounded-lg shadow-md text-center">
+            <div
+              key={index}
+              className="bg-white p-6 rounded-lg shadow-md text-center"
+            >
               <div className="mb-4">{feature.icon}</div>
               <h3 className="text-xl font-semibold">{feature.title}</h3>
               <p className="mt-2 text-gray-600">{feature.desc}</p>
@@ -82,7 +103,8 @@ const InstaByTAMD = () => {
       <div className="bg-blue-100 py-16 px-8 text-center">
         <h2 className="text-3xl font-bold text-blue-700">Why Choose Insta?</h2>
         <p className="mt-3 max-w-2xl mx-auto">
-          Designed to simplify hospital operations and enhance patient experience.
+          Designed to simplify hospital operations and enhance patient
+          experience.
         </p>
         <div className="mt-8 grid grid-cols-1 md:grid-cols-3 gap-8 max-w-5xl mx-auto">
           {[
@@ -91,7 +113,7 @@ const InstaByTAMD = () => {
             "User-friendly & Intuitive Design",
             "24/7 Support & Assistance",
             "Improves Patient Care & Satisfaction",
-            "Comprehensive Reporting & Insights"
+            "Comprehensive Reporting & Insights",
           ].map((item, index) => (
             <div key={index} className="bg-white p-6 rounded-lg shadow-md">
               <h3 className="text-lg font-semibold">{item}</h3>
@@ -102,22 +124,26 @@ const InstaByTAMD = () => {
 
       {/* Testimonials Section */}
       <div className="py-16 px-8">
-        <h2 className="text-3xl font-bold text-center text-blue-600">What Our Clients Say</h2>
+        <h2 className="text-3xl font-bold text-center text-blue-600">
+          What Our Clients Say
+        </h2>
         <p className="text-center mt-2 max-w-2xl mx-auto">
           Hear from hospitals that have improved operations with Insta.
         </p>
         <div className="mt-10 grid grid-cols-1 md:grid-cols-2 gap-8 max-w-5xl mx-auto">
           {[
             {
-              quote: "Insta has completely transformed our hospital's workflow. The analytics and automation features have saved us hours of work every day.",
+              quote:
+                "Insta has completely transformed our hospital's workflow. The analytics and automation features have saved us hours of work every day.",
               name: "Dr. Ankit Sharma",
-              role: "Chief Medical Officer"
+              role: "Chief Medical Officer",
             },
             {
-              quote: "With Insta, we now manage patient appointments and billing seamlessly. Our staff efficiency has improved significantly.",
+              quote:
+                "With Insta, we now manage patient appointments and billing seamlessly. Our staff efficiency has improved significantly.",
               name: "Ms. Priya Menon",
-              role: "Hospital Administrator"
-            }
+              role: "Hospital Administrator",
+            },
           ].map((testimonial, index) => (
             <div key={index} className="bg-white p-6 rounded-lg shadow-md">
               <FaQuoteLeft className="text-blue-600 text-3xl mb-4" />
@@ -133,10 +159,16 @@ const InstaByTAMD = () => {
 
       {/* Call to Action Section */}
       <div className="bg-blue-600 text-white py-16 text-center">
-        <h2 className="text-3xl font-bold mb-4">Ready to Transform Your Hospital?</h2>
-        <p className="mb-6 text-lg">Schedule a free demo and see Insta in action.</p>
-        <button className="bg-white text-blue-600 px-8 py-3 rounded-lg font-semibold shadow-md hover:bg-gray-200 transition duration-300">
-          Get a Free Demo Now 
+        <h2 className="text-3xl font-bold mb-4">
+          Ready to Transform Your Hospital?
+        </h2>
+        <p className="mb-6 text-lg">
+          Schedule a free demo and see Insta in action.
+        </p>
+        <button 
+        onClick={() => navigate("/contactUs")}
+        className="hover:cursor-pointer bg-white text-blue-600 px-8 py-3 rounded-lg font-semibold shadow-md hover:bg-gray-200 transition duration-300">
+          Get a Free Demo Now
         </button>
       </div>
     </div>

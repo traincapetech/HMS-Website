@@ -13,7 +13,7 @@ import TAMDCareClinics from '../pages/TAMDCareClinic'
 import ReadHealthArticles from '../pages/ReadHealthArticles'
 import ReadAboutMedicines from '../pages/ReadAboutMedicines'
 import TAMDDrive from '../pages/TAMDDrive'
-import PractoHealthFeed from '../pages/PractoHealthFeed'
+import TAMDHealthFeed from '../pages/TAMDHealthFeed'
 import WellnessPlans from '../pages/WellnessPlans'
 import FAQPage from "../pages/FAQPage"
 import InstaByTAMD from '../pages/InstaByTAMD'
@@ -83,7 +83,7 @@ const AllRoutes = () => {
       <Route path='/ReadAboutMedicines' element={<ReadAboutMedicines />} />
       <Route path='/TAMDCareClinics' element={<TAMDCareClinics />} />
       <Route path='/TAMDDrive' element={<TAMDDrive />} />
-      <Route path='/PractoHealthFeed' element={<PractoHealthFeed />} />
+      <Route path='/TAMDHealthFeed' element={<TAMDHealthFeed />} />
       <Route path='/WellnessPlans' element={<WellnessPlans />} />
       <Route path='/FAQPage' element={<FAQPage />} />
       <Route path='/InstaByTAMD' element={<InstaByTAMD />} />

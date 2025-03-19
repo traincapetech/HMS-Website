@@ -38,7 +38,7 @@ const Footer = () => {
           <h3 className="text-lg font-semibold mb-2">For Doctors</h3>
           <ul className="space-y-1">
             <li><Link to="/ProfilePage" className="hover:underline">TAMD Profile</Link></li>
-            <li><Link to="/PractoHealthFeed" className="hover:underline">TAMD Health Feed</Link></li>
+            <li><Link to="/TAMDHealthFeed" className="hover:underline">TAMD Health Feed</Link></li>
           </ul>
           <h3 className="text-lg font-semibold mb-2">For Corporates</h3>
           <ul className="space-y-1">

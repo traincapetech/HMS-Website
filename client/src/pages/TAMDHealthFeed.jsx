@@ -5,11 +5,12 @@ import InspireImage from "../assets/inspire.jpg";
 import EducateImage from "../assets/educate.webp";
 import EditorImage from "../assets/editor.jpg";
 import PractoProImage from "../assets/TAMD.png";
-
+import {useNavigate} from 'react-router-dom';
 const PractoHealthFeed = () => {
     useEffect(() => {
         window.scrollTo(0, 0);
       }, []);
+      const navigate = useNavigate();
     return (
         <div className="min-h-screen bg-gray-50">
             {/* Header Section */}
@@ -18,9 +19,9 @@ const PractoHealthFeed = () => {
                 <p className="text-lg text-gray-700 mt-4 max-w-3xl mx-auto">
                     Health Feed is a medium for doctors and health experts to publish health tips and articles to connect with millions of people.
                 </p>
-                <button className="mt-6 bg-blue-600 text-white px-6 py-3 rounded-lg shadow-md hover:bg-blue-700 transition">
+                {/* <button className="mt-6 bg-blue-600 text-white px-6 py-3 rounded-lg shadow-md hover:bg-blue-700 transition">
                     Start Writing
-                </button>
+                </button> */}
             </section>
 
             {/* How it Helps - Share Expertise */}

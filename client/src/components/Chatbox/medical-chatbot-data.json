@@ -1,0 +1,270 @@
+{
+  "questions": {
+    "start": {
+      "id": "start",
+      "text": "Welcome to our medical support center! How can we assist you today?",
+      "options": [
+        { "text": "I have a medical concern", "nextQuestion": "medical_concern" },
+        { "text": "I want to learn about your services", "nextQuestion": "services" },
+        { "text": "I need to contact a doctor", "nextQuestion": "contact_doctor" },
+        { "text": "I have a payment issue", "nextQuestion": "payment_issue" },
+        { "text": "I need to raise a support ticket", "nextQuestion": "raise_ticket" },
+        { "text": "I have an insurance-related query", "nextQuestion": "insurance_query" },
+        { "text": "I need emergency assistance", "nextQuestion": "emergency" },
+        { "text": "I need mental health support", "nextQuestion": "mental_health" }
+      ]
+    },
+    "insurance_query": {
+      "id": "insurance_query",
+      "text": "Please provide details about your insurance query:",
+      "freeText": true,
+      "nextQuestion": "support_review"
+    },
+    "emergency": {
+      "id": "emergency",
+      "text": "If this is a medical emergency, please call emergency services immediately. Would you like to see emergency contact numbers?",
+      "options": [
+        { "text": "Yes, show emergency contacts", "nextQuestion": "emergency_contacts" },
+        { "text": "No, I need other help", "nextQuestion": "start" }
+      ]
+    },
+    "emergency_contacts": {
+      "id": "emergency_contacts",
+      "text": "Here are the emergency contact numbers: \n - Ambulance: 911 \n - Poison Control: 1-800-222-1222 \n - Suicide Prevention: 988. Do you need further assistance?",
+      "options": [
+        { "text": "Yes, I have another question", "nextQuestion": "start" },
+        { "text": "No, that’s all for now", "nextQuestion": "end" }
+      ]
+    },
+    "mental_health": {
+      "id": "mental_health",
+      "text": "Mental health is important. Would you like to speak to a counselor or access mental health resources?",
+      "options": [
+        { "text": "Speak to a counselor", "nextQuestion": "counselor" },
+        { "text": "Access mental health resources", "nextQuestion": "mental_resources" }
+      ]
+    },
+    "counselor": {
+      "id": "counselor",
+      "text": "Please provide your contact details, and a counselor will reach out to you soon:",
+      "freeText": true,
+      "nextQuestion": "thankyou"
+    },
+    "mental_resources": {
+      "id": "mental_resources",
+      "text": "You can visit mental health organizations like NAMI (National Alliance on Mental Illness) or call helplines for support. Do you need further help?",
+      "options": [
+        { "text": "Yes, I have another question", "nextQuestion": "start" },
+        { "text": "No, that’s all for now", "nextQuestion": "end" }
+      ]
+    },
+    "prescription_refill": {
+      "id": "prescription_refill",
+      "text": "Do you need a prescription refill or medication change?",
+      "options": [
+        { "text": "Request a refill", "nextQuestion": "refill_request" },
+        { "text": "Change medication", "nextQuestion": "medication_change" }
+      ]
+    },
+    "refill_request": {
+      "id": "refill_request",
+      "text": "Please provide your prescription details for a refill request:",
+      "freeText": true,
+      "nextQuestion": "thankyou"
+    },
+    "medication_change": {
+      "id": "medication_change",
+      "text": "Please describe your concerns regarding your current medication:",
+      "freeText": true,
+      "nextQuestion": "doctor_review"
+    },
+    "medical_concern": {
+      "id": "medical_concern",
+      "text": "What type of medical concern do you have?",
+      "options": [
+        { "text": "Symptoms assessment", "nextQuestion": "symptoms" },
+        { "text": "Medication inquiry", "nextQuestion": "medication" },
+        { "text": "Other health concerns", "nextQuestion": "other_health" }
+      ]
+    },
+      "services": {
+        "id": "services",
+        "text": "Which service would you like to learn more about?",
+        "options": [
+          {
+            "text": "General consultation",
+            "nextQuestion": "general_consult"
+          },
+          {
+            "text": "Specialist consultation",
+            "nextQuestion": "specialist_consult"
+          },
+          {
+            "text": "Health check-up packages",
+            "nextQuestion": "health_packages"
+          }
+        ]
+      },
+      "contact_doctor": {
+        "id": "contact_doctor",
+        "text": "How would you like to contact a doctor?",
+        "options": [
+          {
+            "text": "Book an appointment",
+            "nextQuestion": "appointment"
+          },
+          {
+            "text": "Live chat with a doctor",
+            "nextQuestion": "live_chat"
+          },
+          {
+            "text": "Call our helpline",
+            "nextQuestion": "helpline"
+          }
+        ]
+      },
+      "symptoms": {
+        "id": "symptoms",
+        "text": "Please describe your symptoms:",
+        "freeText": true,
+        "nextQuestion": "doctor_review"
+      },
+      "medication": {
+        "id": "medication",
+        "text": "Please provide details about your medication inquiry:",
+        "freeText": true,
+        "nextQuestion": "doctor_review"
+      },
+      "other_health": {
+        "id": "other_health",
+        "text": "Please describe your health concern:",
+        "freeText": true,
+        "nextQuestion": "doctor_review"
+      },
+      "doctor_review": {
+        "id": "doctor_review",
+        "text": "Thank you for providing the details. A medical professional will review your information and get back to you shortly. You can contact us at \nPhone Number: \n+1 (787) 949-3280 \nEmail Address: \nsupport@totalaccessmd.net \nWould you like to ask anything else?",
+        "options": [
+          {
+            "text": "Yes, I have another question",
+            "nextQuestion": "start"
+          },
+          {
+            "text": "No, that's all for now",
+            "nextQuestion": "end"
+          }
+        ]
+      },
+      "payment_issue": {
+        "id": "payment_issue",
+        "text": "Please describe your payment issue so we can assist you:",
+        "freeText": true,
+        "nextQuestion": "support_review"
+      },
+      "raise_ticket": {
+        "id": "raise_ticket",
+        "text": "Please provide details about your issue, and we will raise a support ticket for you:",
+        "freeText": true,
+        "nextQuestion": "support_review"
+      },
+      "support_review": {
+        "id": "support_review",
+        "text": "Thank you for reaching out. Our support team will review your request and get back to you soon. Do you need further assistance?",
+        "options": [
+          {
+            "text": "Yes, I have another question",
+            "nextQuestion": "start"
+          },
+          {
+            "text": "No, that's all for now",
+            "nextQuestion": "end"
+          }
+        ]
+      },
+      "contact_details": {
+        "id": "contact_details",
+        "text":"Thank you for reaching out to our medical support center. Our team will review your request and get back to you soon. If you have any further questions or concerns, please don't hesitate to ask. \nPhone Number: \n+1 (787) 949-3280 \nEmail Address: \nsupport@totalaccessmd.net \nOffice Hours: Monday - Friday, 9am - 5pm EST \nAddress: 123 Main St, Anytown, USA 12345 "
+        ,"options": [
+          {
+            "text": "Yes, I have aother question",
+            "nextQuestion": "start"
+          },
+          {
+            "text": "No, that's all for now",
+            "nextQuestion": "end"
+          }
+        ]
+      },
+      "general_consult": {
+        "id": "general_consult",
+        "text": "Our general consultation service provides access to certified doctors for common medical issues. Would you like to book an appointment?",
+        "options": [
+          {
+            "text": "Yes, book an appointment",
+            "nextQuestion": "appointment"
+          },
+          {
+            "text": "No, tell me about other services",
+            "nextQuestion": "services"
+          },
+          {
+            "text": "No, thanks",
+            "nextQuestion": "end"
+          }
+        ]
+      },
+      "specialist_consult": {
+        "id": "specialist_consult",
+        "text": "We offer specialist consultations in various fields. Would you like to schedule one?",
+        "options": [
+          {
+            "text": "Yes, schedule a consultation",
+            "nextQuestion": "appointment"
+          },
+          {
+            "text": "No, tell me about other services",
+            "nextQuestion": "services"
+          }
+        ]
+      },
+      "health_packages": {
+        "id": "health_packages",
+        "text": "We offer various health check-up packages. Would you like to see the available options?",
+        "options": [
+          {
+            "text": "Yes, show me the packages",
+            "nextQuestion": "package_info"
+          },
+          {
+            "text": "No, tell me about other services",
+            "nextQuestion": "services"
+          }
+        ]
+      },
+      "appointment": {
+        "id": "appointment",
+        "text": "Please provide your contact details and preferred time for the appointment:",
+        "freeText": true,
+        "nextQuestion": "thankyou"
+      },
+      "thankyou": {
+        "id": "thankyou",
+        "text": "Thank you! We have received your request and will be in touch soon. You can contact us at \nPhone Number: \n+1 (787) 949-3280 \nEmail Address: \nsupport@totalaccessmd.net \nDo you need further assistance?",
+        "options": [
+          {
+            "text": "Yes, I have another question",
+            "nextQuestion": "start"
+          },
+          {
+            "text": "No, that's all for now",
+            "nextQuestion": "end"
+          }
+        ]
+      },
+      "end": {
+        "id": "end",
+        "text": "Thank you for reaching out! Stay healthy and have a great day.",
+        "isEnd": true
+      }
+    }
+  }
