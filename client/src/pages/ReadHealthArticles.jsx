@@ -28,8 +28,8 @@ const articles = [
       "Enhances mood and reduces anxiety.",
       "Improves sleep quality.",
       "Increases energy levels.",
-      "Promotes better overall health."
-    ]
+      "Promotes better overall health.",
+    ],
   },
   {
     id: 2,
@@ -44,8 +44,8 @@ const articles = [
       "Limit processed foods high in sugar.",
       "Incorporate lean proteins.",
       "Stay hydrated.",
-      "Enjoy a variety of foods for balanced nutrition."
-    ]
+      "Enjoy a variety of foods for balanced nutrition.",
+    ],
   },
   {
     id: 3,
@@ -60,8 +60,8 @@ const articles = [
       "Prioritize self-care and emotional well-being.",
       "Recognize signs of mental health issues.",
       "Build a support network.",
-      "Practice gratitude and positive thinking."
-    ]
+      "Practice gratitude and positive thinking.",
+    ],
   },
   {
     id: 4,
@@ -76,8 +76,8 @@ const articles = [
       "Improves energy levels.",
       "Enhances cognitive function.",
       "Promotes healthy weight management.",
-      "Aids in detoxification."
-    ]
+      "Aids in detoxification.",
+    ],
   },
   {
     id: 5,
@@ -92,8 +92,8 @@ const articles = [
       "Practice deep breathing exercises.",
       "Maintain a balanced diet.",
       "Connect with friends and family.",
-      "Consider professional counseling if needed."
-    ]
+      "Consider professional counseling if needed.",
+    ],
   },
   {
     id: 6,
@@ -108,8 +108,8 @@ const articles = [
       "Engage in relaxing activities before bedtime.",
       "Keep your bedroom dark and cool.",
       "Consider using white noise or calming music.",
-      "Practice relaxation techniques."
-    ]
+      "Practice relaxation techniques.",
+    ],
   },
   {
     id: 7,
@@ -124,8 +124,8 @@ const articles = [
       "Encourages a positive outlook.",
       "Can be practiced through meditation.",
       "Incorporates mindful breathing techniques.",
-      "Helps in managing difficult emotions."
-    ]
+      "Helps in managing difficult emotions.",
+    ],
   },
   {
     id: 8,
@@ -140,8 +140,8 @@ const articles = [
       "Provides exposure to sunlight for vitamin D.",
       "Encourages a connection with nature.",
       "Can improve sleep quality.",
-      "Offers opportunities for adventure and exploration."
-    ]
+      "Offers opportunities for adventure and exploration.",
+    ],
   },
   {
     id: 9,
@@ -156,8 +156,8 @@ const articles = [
       "Choose foods with higher fiber content.",
       "Be aware of allergens listed.",
       "Use labels to make informed choices.",
-      "Compare products to find healthier options."
-    ]
+      "Compare products to find healthier options.",
+    ],
   },
   {
     id: 10,
@@ -172,8 +172,8 @@ const articles = [
       "Helps maintain a healthy lifestyle.",
       "Encourages open communication with healthcare providers.",
       "Provides an opportunity for vaccinations.",
-      "Promotes overall health awareness."
-    ]
+      "Promotes overall health awareness.",
+    ],
   },
   {
     id: 11,
@@ -188,8 +188,8 @@ const articles = [
       "Foster trust and mutual respect.",
       "Engage in shared activities.",
       "Support each other's goals.",
-      "Build a strong support network."
-    ]
+      "Build a strong support network.",
+    ],
   },
   {
     id: 12,
@@ -204,8 +204,8 @@ const articles = [
       "Increases feelings of fullness.",
       "Reduces the risk of certain diseases.",
       "Found in fruits, vegetables, and whole grains.",
-      "Aids in detoxification."
-    ]
+      "Aids in detoxification.",
+    ],
   },
   {
     id: 13,
@@ -220,8 +220,8 @@ const articles = [
       "Avoid cross-contamination.",
       "Carry an epinephrine auto-injector if prescribed.",
       "Educate friends and family about your allergies.",
-      "Create an emergency action plan."
-    ]
+      "Create an emergency action plan.",
+    ],
   },
   {
     id: 14,
@@ -236,8 +236,8 @@ const articles = [
       "Supports mental clarity and focus.",
       "Can be adapted for all fitness levels.",
       "Encourages a sense of community.",
-      "Improves overall well-being."
-    ]
+      "Improves overall well-being.",
+    ],
   },
   {
     id: 15,
@@ -252,8 +252,8 @@ const articles = [
       "Incorporate protein-rich snacks.",
       "Stay mindful of portion sizes.",
       "Experiment with healthy recipes.",
-      "Make snacking a part of a balanced diet."
-    ]
+      "Make snacking a part of a balanced diet.",
+    ],
   },
 ];
 
@@ -264,25 +264,62 @@ const ReadHealthArticles = () => {
   }, []);
   return (
     <div className="min-h-screen bg-gray-50 text-gray-900 font-sans p-6">
-      <h1 className="text-4xl font-bold text-center text-blue-600 mb-8">Read Health Articles</h1>
-      
+      <h1 className="text-4xl font-bold text-center text-blue-600 mb-8">
+        Read Health Articles
+      </h1>
+
       {selectedArticle ? (
         <div className="max-w-3xl mx-auto bg-white p-6 rounded-lg shadow-md">
-          <button onClick={() => setSelectedArticle(null)} className="text-blue-600 underline mb-4">Back</button>
-          <img src={selectedArticle.image} alt={selectedArticle.title} className="w-full h-60 object-cover rounded-lg mb-4" />
+          <button
+            onClick={() => setSelectedArticle(null)}
+            className="hover:cursor-pointer flex items-center text-blue-600 underline mb-4"
+          >
+            <svg
+              className="w-4 h-4 mr-2"
+              fill="none"
+              stroke="currentColor"
+              viewBox="0 0 24 24"
+              xmlns="http://www.w3.org/2000/svg"
+            >
+              <path
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                stroke-width="2"
+                d="M10 19l-7-7m0 0l7-7"
+              ></path>
+            </svg>
+            Back
+          </button>
+          <img
+            src={selectedArticle.image}
+            alt={selectedArticle.title}
+            className="w-full h-60 object-cover rounded-lg mb-4"
+          />
           <h2 className="text-3xl font-semibold">{selectedArticle.title}</h2>
-          <h3 className="text-xl font-medium text-gray-700 mt-2">{selectedArticle.subtitle}</h3>
+          <h3 className="text-xl font-medium text-gray-700 mt-2">
+            {selectedArticle.subtitle}
+          </h3>
           <ul className="list-disc list-inside mt-4 text-gray-700">
             {selectedArticle.content.map((point, index) => (
-              <li key={index} className="mb-2">{point}</li>
+              <li key={index} className="mb-2">
+                {point}
+              </li>
             ))}
           </ul>
         </div>
       ) : (
         <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-          {articles.map(article => (
-            <div key={article.id} className="bg-white p-4 rounded-lg shadow-md cursor-pointer hover:shadow-lg transition" onClick={() => setSelectedArticle(article)}>
-              <img src={article.image} alt={article.title} className="w-full h-40 object-cover rounded-lg" />
+          {articles.map((article) => (
+            <div
+              key={article.id}
+              className="bg-white p-4 rounded-lg shadow-md cursor-pointer hover:shadow-lg transition"
+              onClick={() => setSelectedArticle(article)}
+            >
+              <img
+                src={article.image}
+                alt={article.title}
+                className="w-full h-40 object-cover rounded-lg"
+              />
               <h3 className="text-xl font-semibold mt-4">{article.title}</h3>
               <p className="text-gray-600 mt-2">{article.subtitle}</p>
             </div>

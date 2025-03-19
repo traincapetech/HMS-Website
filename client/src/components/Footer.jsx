@@ -37,8 +37,8 @@ const Footer = () => {
         <div>
           <h3 className="text-lg font-semibold mb-2">For Doctors</h3>
           <ul className="space-y-1">
-            <li><Link to="/ProfilePage" className="hover:underline">TAMD Profile</Link></li>
-            <li><Link to="/PractoHealthFeed" className="hover:underline">TAMD Health Feed</Link></li>
+            {/* <li><Link to="/ProfilePage" className="hover:underline">TAMD Profile</Link></li> */}
+            <li><Link to="/TAMDHealthFeed" className="hover:underline">TAMD Health Feed</Link></li>
           </ul>
           <h3 className="text-lg font-semibold mb-2">For Corporates</h3>
           <ul className="space-y-1">
@@ -52,7 +52,7 @@ const Footer = () => {
           <ul className="space-y-1">
             <li><Link to="/InstaByTAMD" className="hover:underline">Insta by TAMD</Link></li>
             <li><Link to="/privacy-policy" className="hover:underline">Qikwell by TAMD</Link></li>
-            <li><Link to="/ProfilePage" className="hover:underline">TAMD Profile</Link></li>
+            {/* <li><Link to="/ProfilePage" className="hover:underline">TAMD Profile</Link></li> */}
             <li><Link to="/TAMDReachPage" className="hover:underline">TAMD Reach</Link></li>
             <li><Link to="/TAMDDrive" className="hover:underline">TAMD Drive</Link></li>
           </ul>

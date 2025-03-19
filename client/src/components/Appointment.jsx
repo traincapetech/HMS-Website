@@ -17,7 +17,8 @@ const Appointments = () => {
 
   useEffect(() => {
     if (!token) {
-      navigate("/login"); // Redirect if not logged in
+      // Redirect with information about where user came from
+      navigate("/login", { state: { from: "appointments" } });
     }
   }, [token, navigate]);
 
