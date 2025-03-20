@@ -1,24 +1,30 @@
-import React, { useState, useEffect } from 'react';
-import { useDispatch, useSelector } from 'react-redux';
-import { useNavigate, Link } from 'react-router-dom';
-import { loginDoctor, clearError } from '../redux/doctorSlice';
-import { FaUserMd, FaLock, FaExclamationCircle } from 'react-icons/fa';
+import React, { useState, useEffect } from "react";
+import { useDispatch, useSelector } from "react-redux";
+import { useNavigate, Link } from "react-router-dom";
+import { loginDoctor, clearError } from "../redux/doctorSlice";
+import { FaUserMd, FaLock, FaExclamationCircle, FaEye, FaEyeSlash  } from "react-icons/fa";
 
 const DoctorLogin = () => {
   const dispatch = useDispatch();
   const navigate = useNavigate();
-  const { isAuthenticated, loading, error } = useSelector((state) => state.doctor);
+  const { isAuthenticated, loading, error } = useSelector(
+    (state) => state.doctor
+  );
   const [formData, setFormData] = useState({
-    email: 'doctor@test.com',
-    password: 'password123',
+    email: "doctor@test.com",
+    password: "password123",
   });
   const [validationErrors, setValidationErrors] = useState({});
   const [autoLogin, setAutoLogin] = useState(false);
   const [countdown, setCountdown] = useState(5);
+  const [showPassword, setShowPassword] = useState(false);
 
+  const togglePasswordVisibility = () => {
+    setShowPassword(!showPassword);
+  };
   useEffect(() => {
     if (isAuthenticated) {
-      navigate('/doctor/dashboard');
+      navigate("/doctor/dashboard");
     }
   }, [isAuthenticated, navigate]);
 
@@ -31,33 +37,33 @@ const DoctorLogin = () => {
       } else {
         // Manual dispatch to update Redux state
         dispatch({
-          type: 'doctor/login/fulfilled',
+          type: "doctor/login/fulfilled",
           payload: {
-            token: 'temp-token-for-testing',
+            token: "temp-token-for-testing",
             doctor: {
-              id: 'temp-id',
-              name: 'Test Doctor',
-              email: 'doctor@test.com',
-              specialization: 'General Medicine'
-            }
-          }
+              id: "temp-id",
+              name: "Test Doctor",
+              email: "doctor@test.com",
+              specialization: "General Medicine",
+            },
+          },
         });
-        navigate('/doctor/dashboard');
+        navigate("/doctor/dashboard");
       }
     }
   }, [autoLogin, countdown, dispatch, navigate]);
 
   const handleChange = (e) => {
     const { name, value } = e.target;
-    setFormData(prev => ({
+    setFormData((prev) => ({
       ...prev,
-      [name]: value
+      [name]: value,
     }));
     // Clear validation error when user types
     if (validationErrors[name]) {
-      setValidationErrors(prev => ({
+      setValidationErrors((prev) => ({
         ...prev,
-        [name]: ''
+        [name]: "",
       }));
     }
   };
@@ -65,12 +71,12 @@ const DoctorLogin = () => {
   const validateForm = () => {
     const errors = {};
     if (!formData.email) {
-      errors.email = 'Email is required';
+      errors.email = "Email is required";
     } else if (!/\S+@\S+\.\S+/.test(formData.email)) {
-      errors.email = 'Please enter a valid email address';
+      errors.email = "Please enter a valid email address";
     }
     if (!formData.password) {
-      errors.password = 'Password is required';
+      errors.password = "Password is required";
     }
     setValidationErrors(errors);
     return Object.keys(errors).length === 0;
@@ -82,18 +88,18 @@ const DoctorLogin = () => {
 
     // TEMPORARY: Direct login for testing
     dispatch({
-      type: 'doctor/login/fulfilled',
+      type: "doctor/login/fulfilled",
       payload: {
-        token: 'temp-token-for-testing',
+        token: "temp-token-for-testing",
         doctor: {
-          id: 'temp-id',
-          name: 'Test Doctor',
+          id: "temp-id",
+          name: "Test Doctor",
           email: formData.email,
-          specialization: 'General Medicine'
-        }
-      }
+          specialization: "General Medicine",
+        },
+      },
     });
-    navigate('/doctor/dashboard');
+    navigate("/doctor/dashboard");
 
     // Original code (commented out)
     // try {
@@ -122,13 +128,13 @@ const DoctorLogin = () => {
 
       {/* TEMPORARY: Quick access option */}
       <div className="sm:mx-auto sm:w-full sm:max-w-md mt-4">
-        <button 
+        <button
           onClick={() => setAutoLogin(true)}
           className="w-full flex justify-center py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-green-600 hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500"
         >
-          {autoLogin 
-            ? `Auto-login in ${countdown} seconds...` 
-            : 'Quick Access (for testing)'}
+          {autoLogin
+            ? `Auto-login in ${countdown} seconds...`
+            : "Quick Access (for testing)"}
         </button>
       </div>
 
@@ -136,7 +142,10 @@ const DoctorLogin = () => {
         <div className="bg-white py-8 px-4 shadow sm:rounded-lg sm:px-10">
           <form className="space-y-6" onSubmit={handleSubmit}>
             <div>
-              <label htmlFor="email" className="block text-sm font-medium text-gray-700">
+              <label
+                htmlFor="email"
+                className="block text-sm font-medium text-gray-700"
+              >
                 Email address
               </label>
               <div className="mt-1 relative rounded-md shadow-sm">
@@ -152,7 +161,9 @@ const DoctorLogin = () => {
                   value={formData.email}
                   onChange={handleChange}
                   className={`block w-full pl-10 pr-3 py-2 border rounded-md shadow-sm focus:outline-none focus:ring-red-500 focus:border-red-500 sm:text-sm ${
-                    validationErrors.email ? 'border-red-300' : 'border-gray-300'
+                    validationErrors.email
+                      ? "border-red-300"
+                      : "border-gray-300"
                   }`}
                   placeholder="Enter your email"
                 />
@@ -166,7 +177,10 @@ const DoctorLogin = () => {
             </div>
 
             <div>
-              <label htmlFor="password" className="block text-sm font-medium text-gray-700">
+              <label
+                htmlFor="password"
+                className="block text-sm font-medium text-gray-700"
+              >
                 Password
               </label>
               <div className="mt-1 relative rounded-md shadow-sm">
@@ -176,16 +190,34 @@ const DoctorLogin = () => {
                 <input
                   id="password"
                   name="password"
-                  type="password"
+                  type={showPassword ? "text" : "password"}
                   autoComplete="current-password"
                   required
                   value={formData.password}
                   onChange={handleChange}
-                  className={`block w-full pl-10 pr-3 py-2 border rounded-md shadow-sm focus:outline-none focus:ring-red-500 focus:border-red-500 sm:text-sm ${
-                    validationErrors.password ? 'border-red-300' : 'border-gray-300'
+                  className={`block w-full pl-10 pr-10 py-2 border rounded-md shadow-sm focus:outline-none focus:ring-red-500 focus:border-red-500 sm:text-sm ${
+                    validationErrors.password
+                      ? "border-red-300"
+                      : "border-gray-300"
                   }`}
                   placeholder="Enter your password"
                 />
+                <div className="absolute inset-y-0 right-0 pr-3 flex items-center">
+                  <button
+                    type="button"
+                    onClick={togglePasswordVisibility}
+                    className="text-gray-400 hover:text-gray-500 focus:outline-none"
+                  >
+                    {showPassword ? (
+                      <FaEyeSlash className="hover:cursor-pointer h-5 w-5" aria-hidden="true" />
+                    ) : (
+                      <FaEye className="h-5 w-5 hover:cursor-pointer" aria-hidden="true" />
+                    )}
+                    <span className="sr-only">
+                      {showPassword ? "Hide password" : "Show password"}
+                    </span>
+                  </button>
+                </div>
               </div>
               {validationErrors.password && (
                 <p className="mt-1 text-sm text-red-600 flex items-center">
@@ -215,10 +247,10 @@ const DoctorLogin = () => {
                 type="submit"
                 disabled={loading}
                 className={`w-full flex justify-center py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-red-600 hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500 ${
-                  loading ? 'opacity-50 cursor-not-allowed' : ''
+                  loading ? "opacity-50 cursor-not-allowed" : ""
                 }`}
               >
-                {loading ? 'Signing in...' : 'Sign in'}
+                {loading ? "Signing in..." : "Sign in"}
               </button>
             </div>
           </form>
@@ -250,4 +282,4 @@ const DoctorLogin = () => {
   );
 };
 
-export default DoctorLogin; 
+export default DoctorLogin;
