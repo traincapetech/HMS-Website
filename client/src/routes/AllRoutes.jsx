@@ -13,7 +13,6 @@ import TAMDCareClinics from '../pages/TAMDCareClinic'
 import ReadHealthArticles from '../pages/ReadHealthArticles'
 import ReadAboutMedicines from '../pages/ReadAboutMedicines'
 import TAMDDrive from '../pages/TAMDDrive'
-import PractoHealthFeed from '../pages/PractoHealthFeed'
 import WellnessPlans from '../pages/WellnessPlans'
 import FAQPage from "../pages/FAQPage"
 import InstaByTAMD from '../pages/InstaByTAMD'
@@ -52,6 +51,12 @@ import DoctorLogin from '../pages/DoctorLogin'
 import DoctorRegister from '../pages/DoctorRegister'
 import ProtectedDoctorRoute from '../components/ProtectedDoctorRoute'
 import SpecialtyDetail from '../pages/SpecialtyDetail'
+import AdminLogin from '../pages/AdminLogin'
+import AdminDashboard from '../pages/AdminDashboard'
+import AdminDoctors from '../pages/AdminDoctors'
+import AdminPricing from '../pages/AdminPricing'
+import ProtectedAdminRoute from '../components/ProtectedAdminRoute'
+import TAMDHealthFeed from '../pages/TAMDHealthFeed'
 
 const AllRoutes = () => {
   return (
@@ -83,7 +88,7 @@ const AllRoutes = () => {
       <Route path='/ReadAboutMedicines' element={<ReadAboutMedicines />} />
       <Route path='/TAMDCareClinics' element={<TAMDCareClinics />} />
       <Route path='/TAMDDrive' element={<TAMDDrive />} />
-      <Route path='/PractoHealthFeed' element={<PractoHealthFeed />} />
+      <Route path='/TAMDHealthFeed' element={<TAMDHealthFeed />} />
       <Route path='/WellnessPlans' element={<WellnessPlans />} />
       <Route path='/FAQPage' element={<FAQPage />} />
       <Route path='/InstaByTAMD' element={<InstaByTAMD />} />
@@ -144,6 +149,33 @@ const AllRoutes = () => {
       {/* Doctor Authentication Routes */}
       <Route path="/doctor/login" element={<DoctorLogin />} />
       <Route path="/doctor/register" element={<DoctorRegister />} />
+
+      {/* Admin Routes */}
+      <Route path="/admin/login" element={<AdminLogin />} />
+      <Route
+        path="/admin/dashboard"
+        element={
+          <ProtectedAdminRoute>
+            <AdminDashboard />
+          </ProtectedAdminRoute>
+        }
+      />
+      <Route
+        path="/admin/doctors"
+        element={
+          <ProtectedAdminRoute>
+            <AdminDoctors />
+          </ProtectedAdminRoute>
+        }
+      />
+      <Route
+        path="/admin/pricing"
+        element={
+          <ProtectedAdminRoute>
+            <AdminPricing />
+          </ProtectedAdminRoute>
+        }
+      />
     </Routes>
   )
 }

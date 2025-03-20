@@ -38,7 +38,7 @@ const Home = () => {
       icon: <GiScalpel className="text-5xl text-red-500 mb-4 mx-auto" />,
       buttonText: "Explore Surgeries",
       buttonColor: "bg-red-500 hover:bg-red-600",
-      url:"/surgeries"
+      url: "/surgeries",
     },
   ];
 
@@ -86,10 +86,10 @@ const Home = () => {
           </Link>
         ))}
       </div>
-      
+
       <Specialties />
       <ConsultTopDoctors />
-      
+
       <div className="w-full py-6">
         <div className="text-4xl font-semibold text-gray-800 mb-4 w-full text-center">
           What Our Patients Say

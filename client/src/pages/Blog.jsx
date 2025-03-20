@@ -56,7 +56,9 @@ const Blog = () => {
 
     const filteredPosts = posts.filter(post =>
         post.title.toLowerCase().includes(search.toLowerCase()) ||
-        post.tags.some(tag => tag.toLowerCase().includes(search.toLowerCase()))
+        post.tags.some(tag => tag.toLowerCase().includes(search.toLowerCase())) ||
+        post.author.toLowerCase().includes(search.toLowerCase()) ||
+        post.content.toLowerCase().includes(search.toLowerCase())
     );
     useEffect(() => {
         window.scrollTo(0, 0);
@@ -103,7 +105,7 @@ const Blog = () => {
                                     <div>
                                         <button
                                             onClick={() => togglePost(index)}
-                                            className="text-blue-600 hover:text-blue-800 font-semibold mb-2 transition-colors"
+                                            className="hover:cursor-pointer text-blue-600 hover:text-blue-800 font-semibold mb-2 transition-colors"
                                         >
                                             {expandedPostIndex === index ? "Show Less" : "Read More"}
                                         </button>

@@ -65,12 +65,31 @@ const HelpPage = () => {
         setSearchTerm(e.target.value);
     };
 
-    // In a real application, you might filter the helpCategories
-    // based on the searchTerm here.  For simplicity, we'll
-    // display all categories for now.
+    // Filter categories and topics based on search term
+    const filteredCategories = helpCategories
+        .map(category => {
+            // Filter topics that match the search term
+            const filteredTopics = category.topics.filter(topic =>
+                topic.title.toLowerCase().includes(searchTerm.toLowerCase())
+            );
+
+            // Return a new category object with filtered topics
+            return {
+                ...category,
+                topics: filteredTopics
+            };
+        })
+        // Only include categories that either:
+        // 1. Have the search term in their title
+        // 2. Have at least one topic that matches the search term
+        .filter(category =>
+            category.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
+            category.topics.length > 0
+        );
+
     useEffect(() => {
         window.scrollTo(0, 0);
-      }, []);
+}, []);
     return (
         <div className="bg-gray-50 font-sans">
             <div className="container mx-auto py-12 px-4">
@@ -92,28 +111,41 @@ const HelpPage = () => {
                 </div>
 
                 {/* Help Categories */}
-                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-                    {helpCategories.map((category, index) => (
-                        <div
-                            key={index}
-                            className="bg-white rounded-xl shadow-md p-6 hover:shadow-lg transition-shadow duration-300"
+                {filteredCategories.length > 0 ? (
+                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+                        {filteredCategories.map((category, index) => (
+                            <div
+                                key={index}
+                                className="bg-white rounded-xl shadow-md p-6 hover:shadow-lg transition-shadow duration-300"
+                            >
+                                <h2 className="text-xl font-semibold text-blue-600 mb-4">{category.title}</h2>
+                                <ul className="list-disc list-inside text-gray-700">
+                                    {category.topics.map((topic, index) => (
+                                        <li key={index}>
+                                            <a
+                                                href={topic.link}
+                                                className="hover:text-blue-500"
+                                            >
+                                                {topic.title}
+                                            </a>
+                                        </li>
+                                    ))}
+                                </ul>
+                            </div>
+                        ))}
+                    </div>
+                ) : (
+                    <div className="text-center py-8">
+                        <p className="text-lg text-gray-600">No results found for "{searchTerm}"</p>
+                        <p className="text-gray-500 mt-2">Try using different keywords or browse all categories below</p>
+                        <button
+                            onClick={() => setSearchTerm('')}
+                            className="mt-4 px-6 py-2 bg-blue-600 text-white rounded-full hover:bg-blue-700 transition-colors"
                         >
-                            <h2 className="text-xl font-semibold text-blue-600 mb-4">{category.title}</h2>
-                            <ul className="list-disc list-inside text-gray-700">
-                                {category.topics.map((topic, index) => (
-                                    <li key={index}>
-                                        <a
-                                            href={topic.link}
-                                            className="hover:text-blue-500"
-                                        >
-                                            {topic.title}
-                                        </a>
-                                    </li>
-                                ))}
-                            </ul>
-                        </div>
-                    ))}
-                </div>
+                            Clear Search
+                        </button>
+                    </div>
+                )}
 
                 {/* Additional Support Section */}
                 <div className="mt-12 text-center">

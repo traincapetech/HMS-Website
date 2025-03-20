@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { registerUser, clearError } from "../redux/userSlice.js"; // Import Redux actions
-import { useNavigate } from "react-router-dom"; // For navigation after registration
+import { useNavigate, useLocation, Link } from "react-router-dom"; // For navigation after registration
 
 const Signup = () => {
   const [currentStep, setCurrentStep] = useState(1);
@@ -22,6 +22,10 @@ const Signup = () => {
 
   const dispatch = useDispatch();
   const navigate = useNavigate();
+  const location = useLocation();
+  
+  // Check if coming from a specific page like appointments
+  const fromPage = location.state?.from;
 
   // Access loading and error states from Redux store
   const { loading, error } = useSelector((state) => state.user);
@@ -52,18 +56,38 @@ const Signup = () => {
     // Dispatch the registerUser action with form data
     const resultAction = await dispatch(registerUser(formData));
 
-    // If registration is successful, navigate to the login page
+    // If registration is successful, navigate to the appropriate page
     if (registerUser.fulfilled.match(resultAction)) {
-      navigate("/login"); // Redirect to login page
+      if (fromPage === "appointments") {
+        // If coming from appointments, tell user to login first
+        navigate("/login", { 
+          state: { 
+            from: fromPage, 
+            justRegistered: true 
+          } 
+        });
+      } else {
+        // Otherwise go to login page
+        navigate("/login");
+      }
     }
   };
+  
   useEffect(() => {
     window.scrollTo(0, 0);
   }, []);
+  
   return (
     <div className="flex justify-center items-center min-h-screen bg-gray-100 p-4">
       <div className="bg-white rounded-lg shadow-xl p-8 w-full sm:w-3xl">
         <h2 className="text-3xl font-bold text-center text-red-800 mb-6">Sign Up</h2>
+        
+        {/* Show message if redirected from appointments */}
+        {fromPage === "appointments" && (
+          <div className="mb-4 p-3 bg-blue-50 text-blue-700 rounded-md">
+            Create an account to book appointments. After registration, you'll be able to book your appointment.
+          </div>
+        )}
 
         <form onSubmit={handleSubmit} className="space-y-6">
           {/* Step 1 - Basic Information */}

@@ -1,16 +1,22 @@
 import React, { useEffect } from "react";
 import MedicalRecords from "../assets/MedicalRecords.webp"
+import {useNavigate} from 'react-router-dom';
 const TAMDDrive = () => {
     useEffect(() => {
         window.scrollTo(0, 0);
       }, []);
+      const navigate = useNavigate();
     return (
         <div className="bg-gray-50 min-h-screen text-gray-800">
             {/* Hero Section */}
             <section className="bg-blue-600 text-white text-center py-16 px-6">
                 <h1 className="text-5xl font-bold">All Your Medical Records in One Place</h1>
                 <p className="text-lg mt-4">Join thousands of users who securely store and access their medical records online.</p>
-                <button className="mt-6 bg-white text-blue-600 font-semibold px-6 py-3 rounded-full shadow-md hover:bg-gray-100 transition">
+                <button 
+                onClick={()=>{
+                    navigate('/video')
+                }}
+                className="hover:cursor-pointer mt-6 bg-white text-blue-600 font-semibold px-6 py-3 rounded-full shadow-md hover:bg-gray-100 transition">
                     Get Started
                 </button>
             </section>
@@ -44,7 +50,11 @@ const TAMDDrive = () => {
                     TAMD Drive uses advanced security measures and end-to-end encryption
                     to ensure your health data remains confidential and accessible only to you.
                 </p>
-                <button className="mt-6 bg-blue-600 text-white font-semibold px-6 py-3 rounded-full shadow-md hover:bg-blue-700 transition">
+                <button 
+                onClick={()=>{
+                    navigate('/contactUs')
+                }}
+                className="hover:cursor-pointer mt-6 bg-blue-600 text-white font-semibold px-6 py-3 rounded-full shadow-md hover:bg-blue-700 transition">
                     Learn More
                 </button>
             </section>
@@ -102,7 +112,7 @@ const TAMDDrive = () => {
                         </div>
                     ))}
                 </div>
-                <button className="mt-6 bg-blue-600 text-white font-semibold px-6 py-3 rounded-full shadow-md hover:bg-blue-700 transition">
+                <button className="hover:cursor-pointer mt-6 bg-blue-600 text-white font-semibold px-6 py-3 rounded-full shadow-md hover:bg-blue-700 transition">
                     Download the App
                 </button>
             </section>
