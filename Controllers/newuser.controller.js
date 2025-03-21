@@ -41,11 +41,12 @@ const registerNewuser = async (req, res) => {
 
         //create new user
         const newUser = new Newuser({
-            UserName, FirstName, LastName, Email, Phone, Password: hashedPassword, DOB, Gender, BloodGroup,Country, State, City, Address, Pincode, ExtraPhone, Language });
-            // image: {
-            //     data: image.buffer,
-            //     contentType: image.mimetype,
-            // },
+            UserName, FirstName, LastName, Email, Phone, Password: hashedPassword, DOB, Gender, BloodGroup,Country, State, City, Address, Pincode, ExtraPhone, Language,
+            image: {
+                data: image.buffer,
+                contentType: image.mimetype,
+            },
+        });
        
         //save the new user
         await newUser.save();
@@ -133,25 +134,24 @@ const getnewUserById = async (req, res) => {
     }
 };
 
-
-// //serve the newuser's image
-// const getNewuserImage = async(req, res) => {
-//     try {
-//         const doctor = await Newuser.findById(req.params.id);
-//         if(!newuser || !newuser.image.data) {
-//             return res.status(404).json({ message: 'Image not found'});
-//         }
+//serve the newuser's image
+const getNewuserImage = async(req, res) => {
+    try {
+        const newuser = await Newuser.findById(req.params.id);
+        if(!newuser || !newuser.image || !newuser.image.data) {
+            return res.status(404).json({ message: 'Image not found'});
+        }
         
-//         //set headers for image
-//         res.setHeader('Content-Type', newuser.image.contentType);
-//         res.setHeader('Content-Disposition', 'inline; filename = "doctor-image.png"');
+        //set headers for image
+        res.setHeader('Content-Type', newuser.image.contentType);
+        res.setHeader('Content-Disposition', 'inline; filename = "newuser-image.png"');
 
-//         //send the buffer as response
-//         res.send(newuser.image.data);
-//     }catch (error){
-//         console.error(error);
-//         res.status(500).json({ message: "An error occurred while fetching the image "});
-//     }
-// };
+        //send the buffer as response
+        res.send(newuser.image.data);
+    }catch (error){
+        console.error(error);
+        res.status(500).json({ message: "An error occurred while fetching the image "});
+    }
+};
 
-export {registerNewuser, loginNewuser, getnewUser, getnewUserById};
+export {registerNewuser, loginNewuser, getnewUser, getnewUserById, getNewuserImage};

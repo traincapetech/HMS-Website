@@ -30,10 +30,10 @@ const newuserSchema = new mongoose.Schema({
     Pincode: {type: Number},
     ExtraPhone: {type: Number},
     Language: {type: String},
-    // image: {
-    //     data: Buffer,
-    //     contentType: String
-    // },
+    image: {
+        data: Buffer,
+        contentType: String
+    },
 },
 {
     timestamps: true,
