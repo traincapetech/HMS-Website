@@ -1,76 +1,88 @@
-import React, { useState, useEffect } from 'react';
-import { useDispatch, useSelector } from 'react-redux';
-import { useNavigate, Link } from 'react-router-dom';
-import { loginDoctor, clearError } from '../redux/doctorSlice';
-import { FaUserMd, FaLock, FaExclamationCircle } from 'react-icons/fa';
+import React, { useState, useEffect } from "react";
+import { useDispatch, useSelector } from "react-redux";
+import { useNavigate, Link, useLocation } from "react-router-dom";
+import { loginDoctor, clearError } from "../redux/doctorSlice";
+import { FaUserMd, FaLock, FaExclamationCircle, FaEye, FaEyeSlash } from "react-icons/fa";
+import { ToastContainer, toast } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
 
 const DoctorLogin = () => {
   const dispatch = useDispatch();
   const navigate = useNavigate();
-  const { isAuthenticated, loading, error } = useSelector((state) => state.doctor);
+  const location = useLocation();
+  
+  // Get redirect path from location state or default to dashboard
+  const from = location.state?.from?.pathname || "/doctor/dashboard";
+  
+  const { isAuthenticated, loading, error } = useSelector(
+    (state) => state.doctor
+  );
+  
   const [formData, setFormData] = useState({
-    email: 'doctor@test.com',
-    password: 'password123',
+    Email: "",
+    Password: "",
   });
+  
   const [validationErrors, setValidationErrors] = useState({});
-  const [autoLogin, setAutoLogin] = useState(false);
-  const [countdown, setCountdown] = useState(5);
+  const [showPassword, setShowPassword] = useState(false);
 
+  const togglePasswordVisibility = () => {
+    setShowPassword(!showPassword);
+  };
+  
+  // Clear errors when component mounts
+  useEffect(() => {
+    dispatch(clearError());
+  }, [dispatch]);
+  
+  // Redirect if already authenticated
   useEffect(() => {
     if (isAuthenticated) {
-      navigate('/doctor/dashboard');
+      toast.success("Already logged in. Redirecting to dashboard...");
+      const timer = setTimeout(() => {
+        navigate(from);
+      }, 1500);
+      return () => clearTimeout(timer);
     }
-  }, [isAuthenticated, navigate]);
+  }, [isAuthenticated, navigate, from]);
 
-  // TEMPORARY: Quick access option
+  // Show toast when there's an error from Redux
   useEffect(() => {
-    if (autoLogin) {
-      if (countdown > 0) {
-        const timer = setTimeout(() => setCountdown(countdown - 1), 1000);
-        return () => clearTimeout(timer);
-      } else {
-        // Manual dispatch to update Redux state
-        dispatch({
-          type: 'doctor/login/fulfilled',
-          payload: {
-            token: 'temp-token-for-testing',
-            doctor: {
-              id: 'temp-id',
-              name: 'Test Doctor',
-              email: 'doctor@test.com',
-              specialization: 'General Medicine'
-            }
-          }
-        });
-        navigate('/doctor/dashboard');
-      }
+    if (error) {
+      toast.error(error);
     }
-  }, [autoLogin, countdown, dispatch, navigate]);
+  }, [error]);
 
   const handleChange = (e) => {
     const { name, value } = e.target;
-    setFormData(prev => ({
+    setFormData((prev) => ({
       ...prev,
-      [name]: value
+      [name]: value,
     }));
+    
     // Clear validation error when user types
     if (validationErrors[name]) {
-      setValidationErrors(prev => ({
+      setValidationErrors((prev) => ({
         ...prev,
-        [name]: ''
+        [name]: "",
       }));
+    }
+    
+    // Clear Redux error when user types
+    if (error) {
+      dispatch(clearError());
     }
   };
 
   const validateForm = () => {
     const errors = {};
-    if (!formData.email) {
-      errors.email = 'Email is required';
-    } else if (!/\S+@\S+\.\S+/.test(formData.email)) {
-      errors.email = 'Please enter a valid email address';
+    if (!formData.Email) {
+      errors.Email = "Email is required";
+    } else if (!/\S+@\S+\.\S+/.test(formData.Email)) {
+      errors.Email = "Please enter a valid email address";
     }
-    if (!formData.password) {
-      errors.password = 'Password is required';
+    if (!formData.Password) {
+      errors.Password = "Password is required";
     }
     setValidationErrors(errors);
     return Object.keys(errors).length === 0;
@@ -78,36 +90,45 @@ const DoctorLogin = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    if (!validateForm()) return;
+    if (!validateForm()) {
+      toast.error("Please fix the form errors before submitting");
+      return;
+    }
 
-    // TEMPORARY: Direct login for testing
-    dispatch({
-      type: 'doctor/login/fulfilled',
-      payload: {
-        token: 'temp-token-for-testing',
-        doctor: {
-          id: 'temp-id',
-          name: 'Test Doctor',
-          email: formData.email,
-          specialization: 'General Medicine'
-        }
-      }
-    });
-    navigate('/doctor/dashboard');
-
-    // Original code (commented out)
-    // try {
-    //   await dispatch(loginDoctor(formData)).unwrap();
-    //   navigate('/doctor/dashboard');
-    // } catch (error) {
-    //   console.error('Login failed:', error);
-    // }
+    try {
+      // Show loading toast
+      toast.info("Logging in...", { autoClose: false, toastId: "loginToast" });
+      
+      // Dispatch login action
+      await dispatch(loginDoctor(formData)).unwrap();
+      
+      // Dismiss loading toast
+      toast.dismiss("loginToast");
+      
+      // Show success toast
+      toast.success("Login successful! Redirecting...");
+      
+      // Navigate to dashboard after a short delay
+      setTimeout(() => {
+        navigate(from);
+      }, 1500);
+    } catch (error) {
+      // Dismiss loading toast
+      toast.dismiss("loginToast");
+      
+      console.error('Login failed:', error);
+      
+      // Toast is already shown by the useEffect that watches for Redux error
+    }
   };
+  
   useEffect(() => {
     window.scrollTo(0, 0);
   }, []);
+  
   return (
     <div className="min-h-screen bg-gray-100 flex flex-col justify-center py-12 sm:px-6 lg:px-8">
+      <ToastContainer position="top-right" autoClose={5000} />
       <div className="sm:mx-auto sm:w-full sm:max-w-md">
         <div className="flex justify-center">
           <FaUserMd className="h-12 w-12 text-red-600" />
@@ -120,23 +141,14 @@ const DoctorLogin = () => {
         </p>
       </div>
 
-      {/* TEMPORARY: Quick access option */}
-      <div className="sm:mx-auto sm:w-full sm:max-w-md mt-4">
-        <button 
-          onClick={() => setAutoLogin(true)}
-          className="w-full flex justify-center py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-green-600 hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500"
-        >
-          {autoLogin 
-            ? `Auto-login in ${countdown} seconds...` 
-            : 'Quick Access (for testing)'}
-        </button>
-      </div>
-
       <div className="mt-8 sm:mx-auto sm:w-full sm:max-w-md">
         <div className="bg-white py-8 px-4 shadow sm:rounded-lg sm:px-10">
           <form className="space-y-6" onSubmit={handleSubmit}>
             <div>
-              <label htmlFor="email" className="block text-sm font-medium text-gray-700">
+              <label
+                htmlFor="Email"
+                className="block text-sm font-medium text-gray-700"
+              >
                 Email address
               </label>
               <div className="mt-1 relative rounded-md shadow-sm">
@@ -144,29 +156,34 @@ const DoctorLogin = () => {
                   <FaUserMd className="h-5 w-5 text-gray-400" />
                 </div>
                 <input
-                  id="email"
-                  name="email"
+                  id="Email"
+                  name="Email"
                   type="email"
                   autoComplete="email"
                   required
-                  value={formData.email}
+                  value={formData.Email}
                   onChange={handleChange}
                   className={`block w-full pl-10 pr-3 py-2 border rounded-md shadow-sm focus:outline-none focus:ring-red-500 focus:border-red-500 sm:text-sm ${
-                    validationErrors.email ? 'border-red-300' : 'border-gray-300'
+                    validationErrors.Email
+                      ? "border-red-300"
+                      : "border-gray-300"
                   }`}
                   placeholder="Enter your email"
                 />
               </div>
-              {validationErrors.email && (
+              {validationErrors.Email && (
                 <p className="mt-1 text-sm text-red-600 flex items-center">
                   <FaExclamationCircle className="mr-1" />
-                  {validationErrors.email}
+                  {validationErrors.Email}
                 </p>
               )}
             </div>
 
             <div>
-              <label htmlFor="password" className="block text-sm font-medium text-gray-700">
+              <label
+                htmlFor="Password"
+                className="block text-sm font-medium text-gray-700"
+              >
                 Password
               </label>
               <div className="mt-1 relative rounded-md shadow-sm">
@@ -174,25 +191,63 @@ const DoctorLogin = () => {
                   <FaLock className="h-5 w-5 text-gray-400" />
                 </div>
                 <input
-                  id="password"
-                  name="password"
-                  type="password"
+                  id="Password"
+                  name="Password"
+                  type={showPassword ? "text" : "password"}
                   autoComplete="current-password"
                   required
-                  value={formData.password}
+                  value={formData.Password}
                   onChange={handleChange}
-                  className={`block w-full pl-10 pr-3 py-2 border rounded-md shadow-sm focus:outline-none focus:ring-red-500 focus:border-red-500 sm:text-sm ${
-                    validationErrors.password ? 'border-red-300' : 'border-gray-300'
+                  className={`block w-full pl-10 pr-10 py-2 border rounded-md shadow-sm focus:outline-none focus:ring-red-500 focus:border-red-500 sm:text-sm ${
+                    validationErrors.Password
+                      ? "border-red-300"
+                      : "border-gray-300"
                   }`}
                   placeholder="Enter your password"
                 />
+                <div className="absolute inset-y-0 right-0 pr-3 flex items-center">
+                  <button
+                    type="button"
+                    onClick={togglePasswordVisibility}
+                    className="text-gray-400 hover:text-gray-500 focus:outline-none"
+                  >
+                    {showPassword ? (
+                      <FaEyeSlash className="hover:cursor-pointer h-5 w-5" aria-hidden="true" />
+                    ) : (
+                      <FaEye className="h-5 w-5 hover:cursor-pointer" aria-hidden="true" />
+                    )}
+                    <span className="sr-only">
+                      {showPassword ? "Hide password" : "Show password"}
+                    </span>
+                  </button>
+                </div>
               </div>
-              {validationErrors.password && (
+              {validationErrors.Password && (
                 <p className="mt-1 text-sm text-red-600 flex items-center">
                   <FaExclamationCircle className="mr-1" />
-                  {validationErrors.password}
+                  {validationErrors.Password}
                 </p>
               )}
+            </div>
+
+            <div className="flex items-center justify-between">
+              <div className="flex items-center">
+                <input
+                  id="remember-me"
+                  name="remember-me"
+                  type="checkbox"
+                  className="h-4 w-4 text-red-600 focus:ring-red-500 border-gray-300 rounded"
+                />
+                <label htmlFor="remember-me" className="ml-2 block text-sm text-gray-900">
+                  Remember me
+                </label>
+              </div>
+
+              <div className="text-sm">
+                <Link to="/doctor/forgot-password" className="font-medium text-red-600 hover:text-red-500">
+                  Forgot your password?
+                </Link>
+              </div>
             </div>
 
             {error && (
@@ -215,10 +270,10 @@ const DoctorLogin = () => {
                 type="submit"
                 disabled={loading}
                 className={`w-full flex justify-center py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-red-600 hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500 ${
-                  loading ? 'opacity-50 cursor-not-allowed' : ''
+                  loading ? "opacity-50 cursor-not-allowed" : ""
                 }`}
               >
-                {loading ? 'Signing in...' : 'Sign in'}
+                {loading ? "Logging in..." : "Sign in"}
               </button>
             </div>
           </form>
@@ -240,7 +295,7 @@ const DoctorLogin = () => {
                 to="/doctor/register"
                 className="w-full flex justify-center py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-red-600 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500"
               >
-                Register as a Doctor
+                Register as a doctor
               </Link>
             </div>
           </div>
@@ -250,4 +305,4 @@ const DoctorLogin = () => {
   );
 };
 
-export default DoctorLogin; 
+export default DoctorLogin;
