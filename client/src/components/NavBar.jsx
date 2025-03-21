@@ -268,7 +268,7 @@
 import React, { useState, useRef, useEffect } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { useSelector, useDispatch } from "react-redux";
-import { logoutUser  } from "../redux/userSlice";
+import { logoutUser } from "../redux/userSlice";
 import tamdLogo from "../assets/TAMD.png";
 
 const NavBar = () => {
@@ -284,6 +284,14 @@ const NavBar = () => {
     const toggleProfile = () => setIsProfileOpen(!isProfileOpen);
     const toggleMobileMenu = () => setIsMobileMenuOpen(!isMobileMenuOpen);
 
+    // Helper function to get image URL with cache-busting parameter
+    const getImageUrl = (photoUrl) => {
+        if (!photoUrl) return "https://accounts.practo.com/profile_picture/22269865/medium_thumbnail";
+        // Add a cache-busting parameter to force re-render of image
+        return `${photoUrl}?v=${new Date().getTime()}`;
+    };
+
+    // Handle clicks outside the profile dropdown to close it
     useEffect(() => {
         const handleClickOutside = (event) => {
             if (
@@ -299,8 +307,9 @@ const NavBar = () => {
         return () => document.removeEventListener("mousedown", handleClickOutside);
     }, []);
 
+    // Handle logout
     const handleLogout = () => {
-        dispatch(logoutUser ());
+        dispatch(logoutUser());
         navigate("/login");
     };
 
@@ -312,17 +321,17 @@ const NavBar = () => {
                     <img src={tamdLogo} alt="TAMD Logo" className="h-10 sm:h-12 md:h-16 w-auto" />
                 </Link>
                 <div className="hidden md:flex text-white space-x-2 lg:space-x-6 text-sm lg:text-lg">
-                    <Link to="/doctor" className="border-b-2 border-transparent hover:border-white transition-colors duration-300">Find Doctor</Link>
-                    <Link to="/video" className="border-b-2 border-transparent hover:border-white transition-colors duration-300">Video Consult</Link>
-                    <Link to="/surgeries" className="border-b-2 border-transparent hover:border-white transition-colors duration-300">Surgeries</Link>
+                    <Link to="/doctor" className="nav-link">Find Doctor</Link>
+                    <Link to="/video" className="nav-link">Video Consult</Link>
+                    <Link to="/surgeries" className="nav-link">Surgeries</Link>
                 </div>
             </div>
 
             {/* Right Side - User Actions */}
             <div className="hidden md:flex space-x-3 lg:space-x-7 text-white items-center pr-4 lg:pr-8 text-sm lg:text-base">
-                <Link to="/doctorPage" className="border-b-2 border-transparent hover:border-white transition-colors duration-300">For Doctor</Link>
-                <Link to="/WellnessPlans" className="border-b-2 border-transparent hover:border-white transition-colors duration-300">For Corporate</Link>
-                <Link to="/HelpPage" className="border-b-2 border-transparent hover:border-white transition-colors duration-300">Help</Link>
+                <Link to="/doctorPage" className="nav-link">For Doctor</Link>
+                <Link to="/WellnessPlans" className="nav-link">For Corporate</Link>
+                <Link to="/HelpPage" className="nav-link">Help</Link>
                 
                 {token ? (
                     <div className="relative" ref={profileRef}>
@@ -337,14 +346,16 @@ const NavBar = () => {
                         {isProfileOpen && (
                             <div className="absolute right-0 mt-2 w-56 bg-white rounded-lg shadow-md z-50 focus:outline-none">
                                 <div className="py-2">
+                                    {/* Profile Section */}
                                     <div className="flex items-center px-4 py-3 border-b border-gray-200">
                                         <img
-                                            src={user?.photo || "https://accounts.practo.com/profile_picture/22269865/medium_thumbnail"}
-                                            alt="User "
+                                            src={getImageUrl(user?.photo)}
+                                            alt="User"
                                             className="w-12 h-12 rounded-full object-cover border-2 border-red-800"
+                                            key={`profile-img-${user?.photo}`} // Add key to force re-render
                                         />
                                         <div className="ml-3">
-                                            <p className="font-semibold text-gray-800">{user?.UserName || "User "}</p>
+                                            <p className="font-semibold text-gray-800">{user?.UserName || "User"}</p>
                                             <p className="text-sm text-gray-600">{user?.Phone || "No Mobile Number"}</p>
                                         </div>
                                     </div>
@@ -410,7 +421,8 @@ const NavBar = () => {
                     </button>
                 </div>
                 
-                <div className="p-4">
+                {/* Scrollable Content */}
+                <div className="h-[calc(100%-64px)] overflow-y-auto p-4">
                     <div className="text-white space-y-4 text-lg">
                         <Link 
                             to="/doctor" 
@@ -461,12 +473,13 @@ const NavBar = () => {
                             <div className="text-white">
                                 <div className="flex items-center py-4 border-b border-red-700">
                                     <img
-                                        src={user?.photo || "https://accounts.practo.com/profile_picture/22269865/medium_thumbnail"}
-                                        alt="User "
+                                        src={getImageUrl(user?.photo)}
+                                        alt="User"
                                         className="w-12 h-12 rounded-full object-cover border-2 border-white"
+                                        key={`mobile-img-${user?.photo}`} // Add key to force re-render
                                     />
                                     <div className="ml-3">
-                                        <p className="font-semibold">{user?.UserName || "User "}</p>
+                                        <p className="font-semibold">{user?.UserName || "User"}</p>
                                         <p className="text-sm opacity-80">{user?.Phone || "No Mobile Number"}</p>
                                     </div>
                                 </div>

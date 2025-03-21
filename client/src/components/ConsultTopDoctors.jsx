@@ -94,12 +94,12 @@ const ConsultTopDoctors = () => {
         </div>
         
         {/* Additional Info */}
-        <div className="mt-8 text-sm text-gray-600">
+        {/* <div className="mt-8 text-sm text-gray-600">
           <p>Our doctors are available 24/7 for video consultations</p>
           <p className="mt-2">
             Already have an appointment? <Link to="/VideoCall" className="text-blue-600 hover:underline">Join your video call</Link>
           </p>
-        </div>
+        </div> */}
       </div>
     </div>
   );

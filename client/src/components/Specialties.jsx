@@ -43,7 +43,7 @@ export const specialties = [
   {
     id: 4,
     name: "Womens Health",
-    icon: <GrRestroomWomen className="mx-auto text-6xl" />,
+    icon: <GrRestroomWomen className="mx-auto" />,
   },
   {
     id: 5,

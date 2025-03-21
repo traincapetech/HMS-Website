@@ -4,24 +4,6 @@ import { Link, useNavigate } from "react-router-dom";
 import banner from "../assets/banner.jpg";
 import { MdVerified, MdPictureAsPdf, MdOutlineMessage } from "react-icons/md";
 import { IoIosArrowBack, IoIosArrowForward } from "react-icons/io";
-
-const PrevArrow = ({ onClick }) => (
-  <button
-    className="absolute left-0 top-1/2 transform -translate-y-1/2 text-2xl cursor-pointer z-10"
-    onClick={onClick}
-  >
-    <IoIosArrowBack /> 
-  </button>
-);
-
-const NextArrow = ({ onClick }) => (
-  <button
-    className="absolute right-0 top-1/2 transform -translate-y-1/2 text-2xl cursor-pointer"
-    onClick={onClick}
-  >
-    <IoIosArrowForward /> 
-  </button>
-);
 import {
   FaBrain,
   FaHeartbeat,
@@ -33,30 +15,53 @@ import {
   FaPills,
 } from "react-icons/fa";
 
+// Custom Arrow Components
+const PrevArrow = ({ onClick }) => (
+  <button
+    className="absolute left-0 top-1/2 transform -translate-y-1/2 text-2xl cursor-pointer z-10 bg-white rounded-full p-2 shadow-lg hover:bg-gray-100"
+    onClick={onClick}
+  >
+    <IoIosArrowBack />
+  </button>
+);
+
+const NextArrow = ({ onClick }) => (
+  <button
+    className="absolute right-0 top-1/2 transform -translate-y-1/2 text-2xl cursor-pointer bg-white rounded-full p-2 shadow-lg hover:bg-gray-100"
+    onClick={onClick}
+  >
+    <IoIosArrowForward />
+  </button>
+);
+
+// Slider Settings
 const settings = {
   infinite: true,
   speed: 500,
   slidesToShow: 5,
   slidesToScroll: 1,
-  prevArrow: <PrevArrow />, 
+  prevArrow: <PrevArrow />,
   nextArrow: <NextArrow />,
   responsive: [
     {
-      breakpoint: 1240,
+      breakpoint: 1024, // iPad Mini and similar devices
       settings: {
-        slidesToShow: 4,
+        slidesToShow: 3,
+        slidesToScroll: 1,
       },
     },
     {
-      breakpoint: 768,
+      breakpoint: 768, // Tablets
       settings: {
-        slidesToShow: 4,
+        slidesToShow: 2,
+        slidesToScroll: 1,
       },
     },
     {
-      breakpoint: 640,
+      breakpoint: 480, // Mobile devices
       settings: {
         slidesToShow: 1,
+        slidesToScroll: 1,
       },
     },
   ],
@@ -64,11 +69,11 @@ const settings = {
 
 const VideoConsult = () => {
   const navigate = useNavigate();
-  
+
   const handleBookSession = () => {
-    navigate('/Appointments');
+    navigate("/Appointments");
   };
-  
+
   const categories = [
     {
       title: "General Physician",
@@ -125,11 +130,11 @@ const VideoConsult = () => {
       specialtyId: 11,
     },
   ];
-  
+
   useEffect(() => {
     window.scrollTo(0, 0);
   }, []);
-  
+
   return (
     <div>
       {/* Banner Section */}
@@ -146,17 +151,18 @@ const VideoConsult = () => {
 
         {/* Content (Text) */}
         <div className="relative flex-1 md:pl-24 text-white z-10">
-          <span className="text-6xl font-bold mb-2">Skip the travel!</span>
+          <span className="text-4xl md:text-6xl font-bold mb-2">
+            Skip the travel!
+          </span>
           <br />
-          <span className="text-4xl leading-14 font-bold mb-2">
+          <span className="text-2xl md:text-4xl leading-14 font-bold mb-2">
             Take Online Doctor Consultation
           </span>
-          <p className="text-lg mb-4 w-1/2">
+          <p className="text-sm md:text-lg mb-4 md:w-1/2">
             Get expert advice from the comfort of your home. Schedule a video
-            consultation with our professionals and receive personalized
-            guidance.
+            consultation with our professionals and receive personalized guidance.
           </p>
-          <button 
+          <button
             onClick={handleBookSession}
             className="text-white bg-blue-500 font-semibold py-2 px-6 rounded-md hover:bg-blue-600 hover:text-white transition transform hover:scale-105"
           >
@@ -181,34 +187,34 @@ const VideoConsult = () => {
 
       {/* Categories Slider Section */}
       <div className="py-16 px-4 bg-gray-50 mx-2 md:px-10">
-        <h2 className="text-3xl font-semibold text-left ">
+        <h2 className="text-2xl md:text-3xl font-semibold text-left">
           Available Consultations
         </h2>
-        <span className="text-lg font-semibold text-left text-slate-500 ">
+        <span className="text-base md:text-lg font-semibold text-left text-slate-500">
           Consult with top doctors across specialities
         </span>
         <Slider {...settings}>
           {categories.map((category, index) => (
             <div
               key={index}
-              className="bg-white rounded-lg shadow-lg p-6 flex flex-col mt-10 items-center mx-auto justify-between transform hover:scale-105 transition-transform duration-300"
+              className="bg-white rounded-lg shadow-lg p-4 md:p-6 flex flex-col mt-10 items-center mx-auto justify-between transform hover:scale-105 transition-transform duration-300"
             >
               <div className="mb-4 mx-auto">{category.icon}</div>
-              <h3 className="text-xl font-semibold mb-2 text-center">
+              <h3 className="text-lg md:text-xl font-semibold mb-2 text-center">
                 {category.title}
               </h3>
-              <p className="text-lg text-blue-500 mb-4 text-center">
+              <p className="text-base md:text-lg text-blue-500 mb-4 text-center">
                 {category.price}
               </p>
               {category.specialtyId ? (
                 <Link to={`/specialty/${category.specialtyId}`}>
-                  <button className="bg-blue-500 text-white font-semibold py-2 px-6 rounded-md hover:bg-blue-600 transition transform hover:scale-105 w-full">
+                  <button className="bg-blue-500 text-white font-semibold py-2 px-4 md:px-6 rounded-md hover:bg-blue-600 transition transform hover:scale-105 w-full">
                     View Details
                   </button>
                 </Link>
               ) : (
                 <Link to={`/consultation/${index}`}>
-                  <button className="bg-blue-500 text-white font-semibold py-2 px-6 rounded-md hover:bg-blue-600 transition transform hover:scale-105 w-full">
+                  <button className="bg-blue-500 text-white font-semibold py-2 px-4 md:px-6 rounded-md hover:bg-blue-600 transition transform hover:scale-105 w-full">
                     Consult Now
                   </button>
                 </Link>

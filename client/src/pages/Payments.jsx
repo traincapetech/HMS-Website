@@ -84,7 +84,7 @@ const Payments = () => {
           <li><Link to="/MyFeedback" className="block py-2 px-3 rounded-lg hover:bg-gray-200">My Feedback</Link></li>
           <li><Link to="/Profile" className="block py-2 px-3 rounded-lg hover:bg-gray-200">View / Update Profile</Link></li>
           
-          {/* ✅ Payments Section Highlighted */}
+          {/* Payments Section Highlighted */}
           <li>
             <Link to="/Payments" className="block py-2 px-3 rounded-lg bg-blue-100 text-blue-700 font-bold">
               Payments

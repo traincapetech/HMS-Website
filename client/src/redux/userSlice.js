@@ -14,7 +14,7 @@ export const loginUser = createAsyncThunk(
         }
       );
 
-      const {token, user} = response.data;
+      const { token, user } = response.data;
       localStorage.setItem("token", token);
       localStorage.setItem("user", JSON.stringify(user));
 
@@ -51,7 +51,7 @@ export const registerUser = createAsyncThunk(
         "https://hms-backend-1-pngp.onrender.com/api/newuser/register",
         requestBody
       );
-      
+
       return response.data;
     } catch (error) {
       console.error("Error Response:", error.response?.data); // Debugging line
@@ -60,6 +60,31 @@ export const registerUser = createAsyncThunk(
   }
 );
 
+// Async Thunk for Updating User Profile (including photo)
+export const updateUserProfile = createAsyncThunk(
+  "user/updateProfile",
+  async (updatedData, { rejectWithValue }) => {
+    try {
+      const token = localStorage.getItem("token");
+      const response = await axios.put(
+        "http://localhost:8080/api/newuser/67dd1fd49276c3d9f3b0fb69/image",
+        updatedData,
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
+
+      // Update local storage with the new user data
+      localStorage.setItem("user", JSON.stringify(response.data.user));
+
+      return response.data.user; // Return the updated user object
+    } catch (error) {
+      return rejectWithValue(error.response?.data || "Failed to update profile");
+    }
+  }
+);
 
 const userSlice = createSlice({
   name: "user",
@@ -78,7 +103,6 @@ const userSlice = createSlice({
       state.token = null;
       localStorage.removeItem("token");
       localStorage.removeItem("user");
-
     },
   },
   extraReducers: (builder) => {
@@ -92,10 +116,39 @@ const userSlice = createSlice({
         state.loading = false;
         state.token = action.payload.token;
         state.user = action.payload.user;
-      })      
+      })
       .addCase(loginUser.rejected, (state, action) => {
         state.loading = false;
         state.error = action.payload?.message || "Login failed";
+      })
+
+      // Register User
+      .addCase(registerUser.pending, (state) => {
+        state.loading = true;
+        state.error = null;
+      })
+      .addCase(registerUser.fulfilled, (state, action) => {
+        state.loading = false;
+        state.user = action.payload.user;
+        state.token = action.payload.token;
+      })
+      .addCase(registerUser.rejected, (state, action) => {
+        state.loading = false;
+        state.error = action.payload?.message || "Registration failed";
+      })
+
+      // Update User Profile
+      .addCase(updateUserProfile.pending, (state) => {
+        state.loading = true;
+        state.error = null;
+      })
+      .addCase(updateUserProfile.fulfilled, (state, action) => {
+        state.loading = false;
+        state.user = action.payload; // Update the user object in the state
+      })
+      .addCase(updateUserProfile.rejected, (state, action) => {
+        state.loading = false;
+        state.error = action.payload?.message || "Failed to update profile";
       });
   },
 });
