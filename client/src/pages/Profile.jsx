@@ -7,7 +7,7 @@ const Profile = () => {
   const { user } = useSelector((state) => state.user);
   const dispatch = useDispatch();
   const navigate = useNavigate();
-  const [isSidebarOpen, setIsSidebarOpen] = useState(false); // Sidebar toggle state
+  const [isSidebarOpen, setIsSidebarOpen] = useState(false); 
 
   const [formData, setFormData] = useState({
     name: user?.UserName || "",

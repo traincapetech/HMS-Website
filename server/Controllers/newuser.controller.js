@@ -12,8 +12,12 @@ const registerNewuser = async (req, res) => {
             return res.status(400).json({ errors: errors.array() });
         }
         const{
-            UserName, FirstName, LastName, Email, Phone, Password, DOB, Gender, Country, State, City, Address
+            UserName, FirstName, LastName, Email, Phone, Password, DOB, Gender, BloodGroup,Country, State, City, Address, Pincode, ExtraPhone, Language
         } = req.body;   
+
+        //log the password
+        console.log('Request body:', req.body);
+        console.log('Password:', Password);
 
         //check if the Email is already in use
         const existingnewuser = await Newuser.findOne({Email});
@@ -21,14 +25,29 @@ const registerNewuser = async (req, res) => {
             return res.status(400).json({message: "Email is already in use"});
         }
 
+         //Log the files to see their content 
+         console.log('uploaded Image:', req.files['image']);
+
+         //Ensure files are uploaded and exists in req.files
+        const image = req.files['image'] && req.files['image'][0];
+
+        if(!image){
+            return res.status(400).json({message: "Image are required"});
+        }
+
+        
         //hashing the password
         const hashedPassword = await bcrypt.hash(Password, 10);
 
         //create new user
         const newUser = new Newuser({
-            UserName, FirstName, LastName, Email, Phone, Password: hashedPassword, DOB, Gender, Country, State, City, Address
+            UserName, FirstName, LastName, Email, Phone, Password: hashedPassword, DOB, Gender, BloodGroup,Country, State, City, Address, Pincode, ExtraPhone, Language,
+            image: {
+                data: image.buffer,
+                contentType: image.mimetype,
+            },
         });
-
+       
         //save the new user
         await newUser.save();
 
@@ -42,32 +61,28 @@ const registerNewuser = async (req, res) => {
 
 //login a user
 const loginNewuser = async (req, res) => {
-    try {
-        const { Email, Password } = req.body;
+    try{
+        const {Email, Password} = req.body;
 
-        // Check if the user exists
-        const user = await Newuser.findOne({ Email });
-        if (!user) {
-            return res.status(404).json({ message: "User not found" });
-        }
-
-        // Compare the password with the stored hashed password
+        //check if the user exists
+        const user = await Newuser.findOne({Email});
+        if(!user) {
+            return res.status(404).json({message: "User not found"});
+        } 
+        //compare the password with the store hashed password
         const isMatch = await bcrypt.compare(Password, user.Password);
-        if (!isMatch) {
-            return res.status(401).json({ message: "Invalid Password" });
-        }
-
-        // Generate a JWT token 
+        if(!isMatch){
+            return res.status(401).json({message: "Invalid Password"});
+        } 
+        
+        //generate a JWT token 
         const token = jwt.sign(
-            { userId: user._id, Email: user.Email },
+            {userId: user._id, Email: user.Email},
             process.env.JWT_SECRET,
-            { expiresIn: "1h" }
+            {expiresIn: "1h"}
         );
 
-        // Respond with both the token and user details
-        res.status(200).json({
-            message: "Login successful",
-            token,
+        res.status(200).json({ message: "Login successful", token,
             user: {
                 UserName: user.UserName,
                 FirstName: user.FirstName,
@@ -75,20 +90,22 @@ const loginNewuser = async (req, res) => {
                 Email: user.Email,
                 Phone: user.Phone,
                 DOB: user.DOB,
+                BloodGroup: user.BloodGroup,
                 Gender: user.Gender,
                 Country: user.Country,
                 State: user.State,
                 City: user.City,
                 Address: user.Address,
+                Pincode: user.Pincode,
+                ExtraPhone: user.ExtraPhone,
+                Language: user.Language,
             }
         });
-
-    } catch (error) {
+    }catch(error){
         console.error(error);
-        res.status(500).json({ message: "An error occurred during login" });
+        res.status(500).json({ message: "An error occured during login"});
     }
 };
-
 
 //get all newuser's data
 const getnewUser = async (req, res) => {
@@ -107,14 +124,34 @@ const getnewUserById = async (req, res) => {
     try{
         const newuser = await Newuser.findById(req.params.id);
         if(!newuser){
-            return res.status(404).json({message: "newuser not found"});
+            return res.status(404).json({message: "User not found"});
     }
     res.status(200).json({newuser});
 }
     catch (error){
         console.error(error);
-        res.status(500).json({message: "An error occurred while fetching new user data"});
+        res.status(500).json({message: "An error occurred while fetching User data"});
     }
 };
 
-export {registerNewuser, loginNewuser, getnewUser, getnewUserById};
+//serve the newuser's image
+const getNewuserImage = async(req, res) => {
+    try {
+        const newuser = await Newuser.findById(req.params.id);
+        if(!newuser || !newuser.image || !newuser.image.data) {
+            return res.status(404).json({ message: 'Image not found'});
+        }
+        
+        //set headers for image
+        res.setHeader('Content-Type', newuser.image.contentType);
+        res.setHeader('Content-Disposition', 'inline; filename = "newuser-image.png"');
+
+        //send the buffer as response
+        res.send(newuser.image.data);
+    }catch (error){
+        console.error(error);
+        res.status(500).json({ message: "An error occurred while fetching the image "});
+    }
+};
+
+export {registerNewuser, loginNewuser, getnewUser, getnewUserById, getNewuserImage};

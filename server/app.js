@@ -5,6 +5,8 @@ import dotenv from "dotenv";
 import connectdb from "./db.js";
 import newuserRouter from "./Routes/newuser.route.js";
 import doctorRouter from  "./Routes/doctor.route.js";
+import appointRouter from "./Routes/appoint.route.js";
+import zoomRouter from "./Routes/zoom.route.js";
 
 dotenv.config();
 
@@ -24,6 +26,9 @@ app.use(express.json());
 //Routes
 app.use('/api/newuser', newuserRouter);
 app.use('/api/doctor', doctorRouter);
+app.use('/api/appoint', appointRouter);
+app.use('/api/zoom', zoomRouter);
+
 
 app.get('/', (req, res) => {
     res.send("HELLO WORLD");
@@ -34,3 +39,4 @@ app.listen(port, () => {
 });
 
 export default app;
+

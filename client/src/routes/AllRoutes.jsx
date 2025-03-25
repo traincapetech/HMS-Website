@@ -55,6 +55,8 @@ import AdminLogin from '../pages/AdminLogin'
 import AdminDashboard from '../pages/AdminDashboard'
 import AdminDoctors from '../pages/AdminDoctors'
 import AdminPricing from '../pages/AdminPricing'
+import AdminPatients from '../pages/AdminPatients'
+import AdminAnalytics from '../pages/AdminAnalytics'
 import ProtectedAdminRoute from '../components/ProtectedAdminRoute'
 import TAMDHealthFeed from '../pages/TAMDHealthFeed'
 
@@ -176,6 +178,22 @@ const AllRoutes = () => {
           </ProtectedAdminRoute>
         }
       />
+      <Route
+        path="/admin/patients"
+        element={
+          <ProtectedAdminRoute>
+            <AdminPatients />
+          </ProtectedAdminRoute>
+        }
+      />
+      <Route 
+      path="/admin/analytics" 
+      element={
+        <ProtectedAdminRoute>
+          <AdminAnalytics />
+        </ProtectedAdminRoute>
+      } 
+    />
     </Routes>
   )
 }
