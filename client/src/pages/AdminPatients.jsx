@@ -1,8 +1,35 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
-import { FaUserInjured, FaEdit, FaTrash, FaPlus, FaSearch } from 'react-icons/fa';
+import { FaUserInjured, FaEdit, FaTrash, FaPlus, FaSearch, FaFilter } from 'react-icons/fa';
 import { toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
+
+const specialtiesList = [
+  "Covid Treatment",
+  "Sexual Health",
+  "Eye Specialist",
+  "Womens Health",
+  "Diet & Nutrition",
+  "Skin & Hair",
+  "Bones and Joints",
+  "Child Specialist",
+  "Dental Care",
+  "Heart",
+  "Kidney Issues",
+  "Cancer",
+  "Ayurveda",
+  "General Physician",
+  "Mental Wellness",
+  "Homoeopath",
+  "General Surgery",
+  "Urinary Issues",
+  "Lungs and Breathing",
+  "Physiotherapy",
+  "Ear, Nose, Throat",
+  "Brain and Nerves",
+  "Diabetes Management",
+  "Veterinary",
+];
 
 const AdminPatients = () => {
     const [patients, setPatients] = useState([]);
@@ -12,33 +39,58 @@ const AdminPatients = () => {
     const [searchTerm, setSearchTerm] = useState('');
     const [currentPage, setCurrentPage] = useState(1);
     const [totalPages, setTotalPages] = useState(1);
+    const [showFilters, setShowFilters] = useState(false);
+    const [countries, setCountries] = useState([]);
+    
+    const [filters, setFilters] = useState({
+        gender: '',
+        bloodGroup: '',
+        status: '',
+        ageRange: '',
+        specialization: '',
+        country: ''
+    });
+    
     const [formData, setFormData] = useState({
         firstName: '',
         lastName: '',
         email: '',
         phone: '',
         address: '',
+        country: '',
         dateOfBirth: '',
         gender: 'male',
         bloodGroup: 'A+',
         medicalHistory: '',
-        isActive: true
+        isActive: true,
+        specializations: []
     });
 
     const patientsPerPage = 10;
 
     useEffect(() => {
         fetchPatients();
-    }, [currentPage]);
+        fetchCountries();
+    }, [currentPage, filters]);
 
     const fetchPatients = async () => {
         try {
             setLoading(true);
             const token = localStorage.getItem('adminToken');
-            const response = await axios.get(`/api/patients?page=${currentPage}&limit=${patientsPerPage}`, {
+            let url = `/api/patients?page=${currentPage}&limit=${patientsPerPage}`;
+            
+            // Add filters to the URL if they exist
+            if (filters.gender) url += `&gender=${filters.gender}`;
+            if (filters.bloodGroup) url += `&bloodGroup=${filters.bloodGroup}`;
+            if (filters.status) url += `&status=${filters.status}`;
+            if (filters.ageRange) url += `&ageRange=${filters.ageRange}`;
+            if (filters.specialization) url += `&specialization=${filters.specialization}`;
+            if (filters.country) url += `&country=${filters.country}`;
+
+            const response = await axios.get(url, {
                 headers: { Authorization: `Bearer ${token}` }
             });
-            
+
             setPatients(response.data.patients || []);
             setTotalPages(response.data.totalPages || 1);
         } catch (error) {
@@ -47,6 +99,28 @@ const AdminPatients = () => {
             setPatients([]);
         } finally {
             setLoading(false);
+        }
+    };
+
+    const fetchCountries = async () => {
+        try {
+            const response = await axios.get('https://restcountries.com/v3.1/all');
+            const countryList = response.data.map(country => ({
+                code: country.cca2,
+                name: country.name.common
+            })).sort((a, b) => a.name.localeCompare(b.name));
+            setCountries(countryList);
+        } catch (error) {
+            console.error('Error fetching countries:', error);
+            toast.error('Failed to load countries');
+            // Fallback to a basic list if API fails
+            setCountries([
+                { code: 'US', name: 'United States' },
+                { code: 'GB', name: 'United Kingdom' },
+                { code: 'CA', name: 'Canada' },
+                { code: 'AU', name: 'Australia' },
+                { code: 'IN', name: 'India' }
+            ]);
         }
     };
 
@@ -82,11 +156,13 @@ const AdminPatients = () => {
             email: patient.email,
             phone: patient.phone,
             address: patient.address,
+            country: patient.country || '',
             dateOfBirth: patient.dateOfBirth.split('T')[0],
             gender: patient.gender,
             bloodGroup: patient.bloodGroup,
             medicalHistory: patient.medicalHistory || '',
-            isActive: patient.isActive
+            isActive: patient.isActive,
+            specializations: patient.specializations || []
         });
         setShowModal(true);
     };
@@ -99,7 +175,7 @@ const AdminPatients = () => {
                     headers: { Authorization: `Bearer ${token}` }
                 });
                 toast.success('Patient deleted successfully');
-                
+
                 if (patients.length === 1 && currentPage > 1) {
                     setCurrentPage(currentPage - 1);
                 } else {
@@ -119,11 +195,13 @@ const AdminPatients = () => {
             email: '',
             phone: '',
             address: '',
+            country: '',
             dateOfBirth: '',
             gender: 'male',
             bloodGroup: 'A+',
             medicalHistory: '',
-            isActive: true
+            isActive: true,
+            specializations: []
         });
         setEditingPatient(null);
     };
@@ -145,6 +223,42 @@ const AdminPatients = () => {
         } finally {
             setLoading(false);
         }
+    };
+
+    const handleFilterChange = (e) => {
+        const { name, value } = e.target;
+        setFilters(prev => ({
+            ...prev,
+            [name]: value
+        }));
+    };
+
+    const handleSpecializationChange = (e) => {
+        const { value, checked } = e.target;
+        setFormData(prev => {
+            let updatedSpecializations;
+            if (checked) {
+                updatedSpecializations = [...prev.specializations, value];
+            } else {
+                updatedSpecializations = prev.specializations.filter(s => s !== value);
+            }
+            return {
+                ...prev,
+                specializations: updatedSpecializations
+            };
+        });
+    };
+
+    const resetFilters = () => {
+        setFilters({
+            gender: '',
+            bloodGroup: '',
+            status: '',
+            ageRange: '',
+            specialization: '',
+            country: ''
+        });
+        setSearchTerm('');
     };
 
     const filteredPatients = patients.filter(patient => {
@@ -186,25 +300,159 @@ const AdminPatients = () => {
                 </button>
             </div>
 
-            {/* Search Bar */}
-            <div className="mb-6 relative flex">
-                <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                    <FaSearch className="text-gray-400" />
+            {/* Search and Filter Bar */}
+            <div className="mb-6">
+                <div className="flex flex-col md:flex-row gap-4">
+                    {/* Search Input */}
+                    <div className="relative flex-1">
+                        <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                            <FaSearch className="text-gray-400" />
+                        </div>
+                        <input
+                            type="text"
+                            placeholder="Search patients..."
+                            className="pl-10 pr-4 py-2 border rounded-lg w-full focus:outline-none focus:ring-2 focus:ring-blue-500"
+                            value={searchTerm}
+                            onChange={(e) => setSearchTerm(e.target.value)}
+                            onKeyPress={(e) => e.key === 'Enter' && handleSearch()}
+                        />
+                    </div>
+                    
+                    {/* Filter Button */}
+                    <div className="flex gap-2">
+                        <button
+                            onClick={() => setShowFilters(!showFilters)}
+                            className="bg-gray-200 text-gray-700 px-4 py-2 rounded-lg flex items-center hover:bg-gray-300 transition-colors"
+                        >
+                            <FaFilter className="mr-2" />
+                            Filters
+                        </button>
+                        <button
+                            onClick={handleSearch}
+                            className="bg-blue-500 text-white px-4 py-2 rounded-lg hover:bg-blue-600 transition-colors"
+                        >
+                            Search
+                        </button>
+                    </div>
                 </div>
-                <input
-                    type="text"
-                    placeholder="Search patients..."
-                    className="pl-10 pr-4 py-2 border rounded-l-lg w-full max-w-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-                    value={searchTerm}
-                    onChange={(e) => setSearchTerm(e.target.value)}
-                    onKeyPress={(e) => e.key === 'Enter' && handleSearch()}
-                />
-                <button
-                    onClick={handleSearch}
-                    className="bg-blue-500 text-white px-4 py-2 rounded-r-lg hover:bg-blue-600 transition-colors"
-                >
-                    Search
-                </button>
+                
+                {/* Filter Panel */}
+                {showFilters && (
+                    <div className="mt-4 p-4 bg-gray-50 rounded-lg">
+                        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-4">
+                            {/* Gender Filter */}
+                            <div>
+                                <label className="block text-sm font-medium text-gray-700 mb-1">Gender</label>
+                                <select
+                                    name="gender"
+                                    value={filters.gender}
+                                    onChange={handleFilterChange}
+                                    className="w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
+                                >
+                                    <option value="">All Genders</option>
+                                    <option value="male">Male</option>
+                                    <option value="female">Female</option>
+                                    <option value="other">Other</option>
+                                </select>
+                            </div>
+                            
+                            {/* Blood Group Filter */}
+                            <div>
+                                <label className="block text-sm font-medium text-gray-700 mb-1">Blood Group</label>
+                                <select
+                                    name="bloodGroup"
+                                    value={filters.bloodGroup}
+                                    onChange={handleFilterChange}
+                                    className="w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
+                                >
+                                    <option value="">All Blood Groups</option>
+                                    <option value="A+">A+</option>
+                                    <option value="A-">A-</option>
+                                    <option value="B+">B+</option>
+                                    <option value="B-">B-</option>
+                                    <option value="AB+">AB+</option>
+                                    <option value="AB-">AB-</option>
+                                    <option value="O+">O+</option>
+                                    <option value="O-">O-</option>
+                                </select>
+                            </div>
+                            
+                            {/* Status Filter */}
+                            <div>
+                                <label className="block text-sm font-medium text-gray-700 mb-1">Status</label>
+                                <select
+                                    name="status"
+                                    value={filters.status}
+                                    onChange={handleFilterChange}
+                                    className="w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
+                                >
+                                    <option value="">All Statuses</option>
+                                    <option value="active">Active</option>
+                                    <option value="inactive">Inactive</option>
+                                </select>
+                            </div>
+                            
+                            {/* Age Range Filter */}
+                            <div>
+                                <label className="block text-sm font-medium text-gray-700 mb-1">Age Range</label>
+                                <select
+                                    name="ageRange"
+                                    value={filters.ageRange}
+                                    onChange={handleFilterChange}
+                                    className="w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
+                                >
+                                    <option value="">All Ages</option>
+                                    <option value="0-18">0-18</option>
+                                    <option value="19-30">19-30</option>
+                                    <option value="31-45">31-45</option>
+                                    <option value="46-60">46-60</option>
+                                    <option value="61+">61+</option>
+                                </select>
+                            </div>
+
+                            {/* Specialization Filter */}
+                            <div>
+                                <label className="block text-sm font-medium text-gray-700 mb-1">Specialization</label>
+                                <select
+                                    name="specialization"
+                                    value={filters.specialization}
+                                    onChange={handleFilterChange}
+                                    className="w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
+                                >
+                                    <option value="">All Specializations</option>
+                                    {specialtiesList.map((spec, index) => (
+                                        <option key={index} value={spec}>{spec}</option>
+                                    ))}
+                                </select>
+                            </div>
+
+                            {/* Country Filter */}
+                            <div>
+                                <label className="block text-sm font-medium text-gray-700 mb-1">Country</label>
+                                <select
+                                    name="country"
+                                    value={filters.country}
+                                    onChange={handleFilterChange}
+                                    className="w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
+                                >
+                                    <option value="">All Countries</option>
+                                    {countries.map(country => (
+                                        <option key={country.code} value={country.name}>{country.name}</option>
+                                    ))}
+                                </select>
+                            </div>
+                        </div>
+                        
+                        <div className="flex justify-end mt-4">
+                            <button
+                                onClick={resetFilters}
+                                className="px-4 py-2 text-sm font-medium text-gray-700 bg-gray-200 rounded-md hover:bg-gray-300 transition-colors"
+                            >
+                                Reset Filters
+                            </button>
+                        </div>
+                    </div>
+                )}
             </div>
 
             {/* Patients Table */}
@@ -215,6 +463,7 @@ const AdminPatients = () => {
                             <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Patient</th>
                             <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Contact</th>
                             <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Details</th>
+                            <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Specializations</th>
                             <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Status</th>
                             <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Actions</th>
                         </tr>
@@ -244,12 +493,27 @@ const AdminPatients = () => {
                                     </td>
                                     <td className="px-6 py-4 whitespace-nowrap">
                                         <div className="text-sm text-gray-900">{patient.bloodGroup}</div>
-                                        <div className="text-sm text-gray-500 truncate max-w-xs">{patient.address}</div>
+                                        <div className="text-sm text-gray-500 truncate max-w-xs">
+                                            {patient.country && <span className="mr-2">{patient.country}</span>}
+                                            {patient.address}
+                                        </div>
+                                    </td>
+                                    <td className="px-6 py-4">
+                                        <div className="flex flex-wrap gap-1">
+                                            {patient.specializations?.length > 0 ? (
+                                                patient.specializations.map((spec, index) => (
+                                                    <span key={index} className="px-2 py-1 text-xs rounded-full bg-blue-100 text-blue-800">
+                                                        {spec}
+                                                    </span>
+                                                ))
+                                            ) : (
+                                                <span className="text-sm text-gray-500">None</span>
+                                            )}
+                                        </div>
                                     </td>
                                     <td className="px-6 py-4 whitespace-nowrap">
-                                        <span className={`px-2 inline-flex text-xs leading-5 font-semibold rounded-full ${
-                                            patient.isActive ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'
-                                        }`}>
+                                        <span className={`px-2 inline-flex text-xs leading-5 font-semibold rounded-full ${patient.isActive ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'
+                                            }`}>
                                             {patient.isActive ? 'Active' : 'Inactive'}
                                         </span>
                                     </td>
@@ -273,8 +537,8 @@ const AdminPatients = () => {
                             ))
                         ) : (
                             <tr>
-                                <td colSpan="5" className="px-6 py-4 text-center text-gray-500">
-                                    {searchTerm ? 'No matching patients found' : 'No patients found. Click "Add Patient" to create one.'}
+                                <td colSpan="6" className="px-6 py-4 text-center text-gray-500">
+                                    {searchTerm || Object.values(filters).some(f => f) ? 'No matching patients found' : 'No patients found. Click "Add Patient" to create one.'}
                                 </td>
                             </tr>
                         )}
@@ -313,7 +577,7 @@ const AdminPatients = () => {
                 </div>
             )}
 
-            {/* Add/Edit Patient Modal - Updated to prevent navbar overlap */}
+            {/* Add/Edit Patient Modal */}
             {showModal && (
                 <div className="fixed inset-0 bg-gray-600 bg-opacity-50 overflow-y-auto h-full w-full flex items-start justify-center pt-16 z-50">
                     <div className="relative bg-white rounded-lg shadow-xl w-full max-w-2xl mx-4 my-8">
@@ -404,6 +668,19 @@ const AdminPatients = () => {
                                         </select>
                                     </div>
                                     <div>
+                                        <label className="block text-sm font-medium text-gray-700">Country</label>
+                                        <select
+                                            value={formData.country}
+                                            onChange={(e) => setFormData({ ...formData, country: e.target.value })}
+                                            className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
+                                        >
+                                            <option value="">Select Country</option>
+                                            {countries.map(country => (
+                                                <option key={country.code} value={country.name}>{country.name}</option>
+                                            ))}
+                                        </select>
+                                    </div>
+                                    <div>
                                         <label className="block text-sm font-medium text-gray-700">Status</label>
                                         <div className="mt-1 flex items-center">
                                             <input
@@ -433,6 +710,26 @@ const AdminPatients = () => {
                                         className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
                                         rows="3"
                                     />
+                                </div>
+                                <div>
+                                    <label className="block text-sm font-medium text-gray-700 mb-2">Specializations</label>
+                                    <div className="grid grid-cols-2 md:grid-cols-3 gap-2">
+                                        {specialtiesList.map((spec, index) => (
+                                            <div key={index} className="flex items-center">
+                                                <input
+                                                    type="checkbox"
+                                                    id={`spec-${index}`}
+                                                    value={spec}
+                                                    checked={formData.specializations.includes(spec)}
+                                                    onChange={handleSpecializationChange}
+                                                    className="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded"
+                                                />
+                                                <label htmlFor={`spec-${index}`} className="ml-2 text-sm text-gray-700">
+                                                    {spec}
+                                                </label>
+                                            </div>
+                                        ))}
+                                    </div>
                                 </div>
                                 <div className="flex justify-end space-x-3 pt-4">
                                     <button
