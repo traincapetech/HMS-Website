@@ -52,6 +52,7 @@ import DoctorLogin from '../pages/DoctorLogin'
 import DoctorRegister from '../pages/DoctorRegister'
 import ProtectedDoctorRoute from '../components/ProtectedDoctorRoute'
 import SpecialtyDetail from '../pages/SpecialtyDetail'
+import Razorpay from '../components/Razorpay'
 
 const AllRoutes = () => {
   return (
@@ -114,6 +115,7 @@ const AllRoutes = () => {
       <Route path='/ProfilePage' element={<ProfilePage />} />
       <Route path='/TAMDReachPage' element={<TAMDReachPage />} />
       <Route path='/HelpPage' element={<HelpPage />} />
+      <Route path='/RazorPay' element={<Razorpay />} />
 
       {/* Doctor Panel Routes */}
       <Route
