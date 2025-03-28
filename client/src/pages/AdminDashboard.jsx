@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { 
   FaUserMd, 
@@ -8,7 +8,9 @@ import {
   FaChartLine,
   FaBars,
   FaBell,
-  FaSearch
+  FaSearch,
+  FaCog,
+  FaUser
 } from 'react-icons/fa';
 import api from '../utils/app.api';
 
@@ -29,6 +31,8 @@ const StatCard = ({ icon, title, value, bgColor, textColor }) => (
 const AdminDashboard = () => {
     const [activeTab, setActiveTab] = useState('overview');
     const [sidebarOpen, setSidebarOpen] = useState(true);
+    const [showNotifications, setShowNotifications] = useState(false);
+    const [showProfileDropdown, setShowProfileDropdown] = useState(false);
     const navigate = useNavigate();
     const [stats, setStats] = useState({
         totalDoctors: 0,
@@ -36,6 +40,27 @@ const AdminDashboard = () => {
         totalAppointments: 0,
         totalRevenue: 0
     });
+
+    // Refs for dropdowns
+    const notificationRef = useRef(null);
+    const profileRef = useRef(null);
+
+    // Close dropdowns when clicking outside
+    useEffect(() => {
+        const handleClickOutside = (event) => {
+            if (notificationRef.current && !notificationRef.current.contains(event.target)) {
+                setShowNotifications(false);
+            }
+            if (profileRef.current && !profileRef.current.contains(event.target)) {
+                setShowProfileDropdown(false);
+            }
+        };
+
+        document.addEventListener('mousedown', handleClickOutside);
+        return () => {
+            document.removeEventListener('mousedown', handleClickOutside);
+        };
+    }, []);
 
     useEffect(() => {
         const token = localStorage.getItem('adminToken');
@@ -74,6 +99,25 @@ const AdminDashboard = () => {
     const toggleSidebar = () => {
         setSidebarOpen(!sidebarOpen);
     };
+
+    const toggleNotifications = () => {
+        setShowNotifications(!showNotifications);
+        setShowProfileDropdown(false);
+    };
+
+    const toggleProfileDropdown = () => {
+        setShowProfileDropdown(!showProfileDropdown);
+        setShowNotifications(false);
+    };
+
+    // Mock notifications data
+    const notifications = [
+        { id: 1, message: 'New appointment scheduled with Dr. Smith', time: '10 mins ago', read: false },
+        { id: 2, message: 'Patient John Doe completed his profile', time: '2 hours ago', read: false },
+        { id: 3, message: 'System maintenance scheduled for tonight', time: '1 day ago', read: true },
+    ];
+
+    const unreadCount = notifications.filter(n => !n.read).length;
 
     return (
         <div className="flex h-screen bg-gray-100 overflow-hidden">
@@ -132,6 +176,15 @@ const AdminDashboard = () => {
                         <FaChartLine className={`${sidebarOpen ? 'mr-3' : ''}`} />
                         {sidebarOpen && "Analytics"}
                     </Link>
+                    {/* <Link
+                        to="/admin/settings"
+                        className={`flex items-center px-6 py-3 text-white hover:bg-blue-700 ${
+                            activeTab === 'settings' ? 'bg-blue-700' : ''
+                        } ${!sidebarOpen ? 'justify-center' : ''}`}
+                    >
+                        <FaCog className={`${sidebarOpen ? 'mr-3' : ''}`} />
+                        {sidebarOpen && "Settings"}
+                    </Link> */}
                 </nav>
 
                 {/* Sidebar Footer */}
@@ -154,12 +207,6 @@ const AdminDashboard = () => {
                 <header className="bg-white shadow-sm z-10">
                     <div className="flex items-center justify-between px-6 py-4">
                         <div className="flex items-center">
-                            {/* <button 
-                                onClick={toggleSidebar}
-                                className="mr-4 text-gray-600 hover:text-blue-600 focus:outline-none"
-                            >
-                                <FaBars />
-                            </button> */}
                             <div className="relative">
                                 <FaSearch className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" />
                                 <input
@@ -170,16 +217,106 @@ const AdminDashboard = () => {
                             </div>
                         </div>
                         <div className="flex items-center space-x-4">
-                            <button className="relative text-gray-600 hover:text-blue-600">
-                                <FaBell />
-                                <span className="absolute top-0 right-0 w-2 h-2 bg-red-500 rounded-full"></span>
-                            </button>
-                            <div className="flex items-center">
-                                <div className="w-8 h-8 rounded-full bg-blue-500 flex items-center justify-center text-white font-semibold">
-                                    A
-                                </div>
-                                {sidebarOpen && (
-                                    <span className="ml-2 text-gray-700">Admin</span>
+                            {/* Notification Dropdown */}
+                            <div className="relative" ref={notificationRef}>
+                                <button 
+                                    onClick={toggleNotifications}
+                                    className="relative p-2 text-gray-600 hover:text-blue-600 rounded-full hover:bg-gray-100"
+                                >
+                                    <FaBell />
+                                    {unreadCount > 0 && (
+                                        <span className="absolute -top-1 -right-1 bg-red-500 text-white rounded-full w-4 h-4 flex items-center justify-center text-xs">
+                                            {unreadCount}
+                                        </span>
+                                    )}
+                                </button>
+                                
+                                {showNotifications && (
+                                    <div className="absolute right-0 mt-2 w-80 bg-white rounded-md shadow-lg overflow-hidden z-20">
+                                        <div className="py-1">
+                                            <div className="px-4 py-2 border-b border-gray-200 bg-gray-50">
+                                                <h3 className="text-sm font-medium text-gray-700">Notifications ({unreadCount} new)</h3>
+                                            </div>
+                                            <div className="max-h-96 overflow-y-auto">
+                                                {notifications.length > 0 ? (
+                                                    notifications.map((notification) => (
+                                                        <div 
+                                                            key={notification.id} 
+                                                            className={`px-4 py-3 hover:bg-gray-50 ${!notification.read ? 'bg-blue-50' : ''}`}
+                                                        >
+                                                            <div className="flex items-start">
+                                                                <div className="flex-shrink-0 pt-0.5">
+                                                                    <div className={`h-2 w-2 rounded-full ${!notification.read ? 'bg-blue-500' : 'bg-transparent'}`}></div>
+                                                                </div>
+                                                                <div className="ml-3 flex-1">
+                                                                    <p className="text-sm text-gray-800">{notification.message}</p>
+                                                                    <p className="text-xs text-gray-500 mt-1">{notification.time}</p>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                    ))
+                                                ) : (
+                                                    <div className="px-4 py-3 text-center text-sm text-gray-500">
+                                                        No new notifications
+                                                    </div>
+                                                )}
+                                            </div>
+                                            <div className="px-4 py-2 border-t border-gray-200 bg-gray-50 text-center">
+                                                <Link to="/admin/notifications" className="text-xs text-blue-600 hover:text-blue-800">
+                                                    View all notifications
+                                                </Link>
+                                            </div>
+                                        </div>
+                                    </div>
+                                )}
+                            </div>
+
+                            {/* Profile Dropdown */}
+                            <div className="relative" ref={profileRef}>
+                                <button 
+                                    onClick={toggleProfileDropdown}
+                                    className="flex items-center space-x-2 focus:outline-none"
+                                >
+                                    <div className="w-8 h-8 rounded-full bg-blue-500 flex items-center justify-center text-white font-semibold">
+                                        A
+                                    </div>
+                                    {sidebarOpen && (
+                                        <span className="text-gray-700">Admin</span>
+                                    )}
+                                </button>
+                                
+                                {showProfileDropdown && (
+                                    <div className="absolute right-0 mt-2 w-48 bg-white rounded-md shadow-lg z-20">
+                                        <div className="py-1">
+                                            {/* <Link
+                                                to="/admin/settings"
+                                                className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
+                                                onClick={() => setShowProfileDropdown(false)}
+                                            >
+                                                <div className="flex items-center">
+                                                    <FaUser className="mr-2" /> Profile
+                                                </div>
+                                            </Link> */}
+                                            <Link
+                                                to="/admin/settings"
+                                                className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
+                                                onClick={() => setShowProfileDropdown(false)}
+                                            >
+                                                <div className="flex items-center">
+                                                    <FaCog className="mr-2" /> Settings
+                                                </div>
+                                            </Link>
+                                            <div className="border-t border-gray-200"></div>
+                                            <button
+                                                onClick={handleLogout}
+                                                className="block w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
+                                            >
+                                                <div className="flex items-center">
+                                                    <FaSignOutAlt className="mr-2" /> Logout
+                                                </div>
+                                            </button>
+                                        </div>
+                                    </div>
                                 )}
                             </div>
                         </div>
@@ -191,12 +328,7 @@ const AdminDashboard = () => {
                     <div className="flex justify-between items-center mb-8">
                         <h1 className="text-3xl font-bold text-gray-800">Dashboard</h1>
                         <div className="flex items-center space-x-4">
-                            {/* <button className="relative p-2 bg-white rounded-full shadow-md hover:bg-gray-100">
-                                <FaBell className="text-gray-600" />
-                                <span className="absolute -top-1 -right-1 bg-red-500 text-white rounded-full px-1.5 py-0.5 text-xs">
-                                    3
-                                </span>
-                            </button> */}
+                            {/* Additional header buttons can go here */}
                         </div>
                     </div>
 

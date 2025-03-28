@@ -57,6 +57,7 @@ import AdminDoctors from '../pages/AdminDoctors'
 import AdminPricing from '../pages/AdminPricing'
 import AdminPatients from '../pages/AdminPatients'
 import AdminAnalytics from '../pages/AdminAnalytics'
+import AdminSettings from '../pages/AdminSettings'
 import ProtectedAdminRoute from '../components/ProtectedAdminRoute'
 import TAMDHealthFeed from '../pages/TAMDHealthFeed'
 
@@ -191,6 +192,14 @@ const AllRoutes = () => {
       element={
         <ProtectedAdminRoute>
           <AdminAnalytics />
+        </ProtectedAdminRoute>
+      } 
+    />
+    <Route 
+      path="/admin/settings" 
+      element={
+        <ProtectedAdminRoute>
+          <AdminSettings />
         </ProtectedAdminRoute>
       } 
     />
