@@ -9,20 +9,19 @@ import {
   FaBars,
   FaBell,
   FaSearch,
-  FaCog,
-  FaUser
+  FaCog
 } from 'react-icons/fa';
 import api from '../utils/app.api';
 
 const StatCard = ({ icon, title, value, bgColor, textColor }) => (
-  <div className="bg-white rounded-xl shadow p-6 hover:shadow-md transition-shadow">
+  <div className="bg-white rounded-xl shadow p-4 sm:p-6 hover:shadow-md transition-shadow">
     <div className="flex items-center">
-      <div className={`p-3 rounded-full ${bgColor} ${textColor}`}>
+      <div className={`p-2 sm:p-3 rounded-full ${bgColor} ${textColor}`}>
         {icon}
       </div>
-      <div className="ml-4">
-        <h2 className="text-gray-500 text-sm font-medium">{title}</h2>
-        <p className="text-2xl font-semibold text-gray-800">{value}</p>
+      <div className="ml-3 sm:ml-4">
+        <h2 className="text-gray-500 text-xs sm:text-sm font-medium">{title}</h2>
+        <p className="text-xl sm:text-2xl font-semibold text-gray-800">{value}</p>
       </div>
     </div>
   </div>
@@ -31,6 +30,7 @@ const StatCard = ({ icon, title, value, bgColor, textColor }) => (
 const AdminDashboard = () => {
     const [activeTab, setActiveTab] = useState('overview');
     const [sidebarOpen, setSidebarOpen] = useState(true);
+    const [mobileSidebarOpen, setMobileSidebarOpen] = useState(false);
     const [showNotifications, setShowNotifications] = useState(false);
     const [showProfileDropdown, setShowProfileDropdown] = useState(false);
     const navigate = useNavigate();
@@ -100,6 +100,10 @@ const AdminDashboard = () => {
         setSidebarOpen(!sidebarOpen);
     };
 
+    const toggleMobileSidebar = () => {
+        setMobileSidebarOpen(!mobileSidebarOpen);
+    };
+
     const toggleNotifications = () => {
         setShowNotifications(!showNotifications);
         setShowProfileDropdown(false);
@@ -108,6 +112,11 @@ const AdminDashboard = () => {
     const toggleProfileDropdown = () => {
         setShowProfileDropdown(!showProfileDropdown);
         setShowNotifications(false);
+    };
+
+    const handleViewAllNotifications = () => {
+        setShowNotifications(false);
+        navigate('/admin/notifications');
     };
 
     // Mock notifications data
@@ -121,8 +130,19 @@ const AdminDashboard = () => {
 
     return (
         <div className="flex h-screen bg-gray-100 overflow-hidden">
+            {/* Mobile Sidebar Overlay */}
+            {mobileSidebarOpen && (
+                <div 
+                    className="fixed inset-0 bg-black bg-opacity-50 z-40 lg:hidden"
+                    onClick={toggleMobileSidebar}
+                ></div>
+            )}
+
             {/* Sidebar */}
-            <div className={`${sidebarOpen ? 'w-64' : 'w-20'} bg-gray-700 text-white transition-all duration-300 ease-in-out flex flex-col`}>
+            <div className={`${sidebarOpen ? 'w-64' : 'w-20'} 
+                ${mobileSidebarOpen ? 'fixed inset-y-0 left-0 z-50' : 'hidden lg:flex'} 
+                bg-gray-700 text-white transition-all duration-300 ease-in-out flex flex-col`}>
+                
                 {/* Sidebar Header */}
                 <div className="p-4 flex items-center justify-between border-b border-white h-16">
                     {sidebarOpen ? (
@@ -132,7 +152,7 @@ const AdminDashboard = () => {
                     )}
                     <button 
                         onClick={toggleSidebar}
-                        className="text-white hover:text-blue-200 focus:outline-none"
+                        className="text-white hover:text-blue-200 focus:outline-none hidden lg:block"
                     >
                         <FaBars />
                     </button>
@@ -141,50 +161,55 @@ const AdminDashboard = () => {
                 {/* Sidebar Navigation */}
                 <nav className="flex-1 overflow-y-auto">
                     <Link
+                        to="/admin/dashboard"
+                        className={`flex items-center px-4 sm:px-6 py-3 text-white hover:bg-blue-700 ${
+                            activeTab === 'overview' ? 'bg-blue-700' : ''
+                        } ${!sidebarOpen ? 'justify-center' : ''}`}
+                        onClick={() => setMobileSidebarOpen(false)}
+                    >
+                        <FaChartLine className={`${sidebarOpen ? 'mr-3' : ''}`} />
+                        {sidebarOpen && "Overview"}
+                    </Link>
+                    <Link
                         to="/admin/doctors"
-                        className={`flex items-center px-6 py-3 text-white hover:bg-blue-700 ${
+                        className={`flex items-center px-4 sm:px-6 py-3 text-white hover:bg-blue-700 ${
                             activeTab === 'doctors' ? 'bg-blue-700' : ''
                         } ${!sidebarOpen ? 'justify-center' : ''}`}
+                        onClick={() => setMobileSidebarOpen(false)}
                     >
                         <FaUserMd className={`${sidebarOpen ? 'mr-3' : ''}`} />
                         {sidebarOpen && "Doctors"}
                     </Link>
                     <Link
                         to="/admin/patients"
-                        className={`flex items-center px-6 py-3 text-white hover:bg-blue-700 ${
+                        className={`flex items-center px-4 sm:px-6 py-3 text-white hover:bg-blue-700 ${
                             activeTab === 'patients' ? 'bg-blue-700' : ''
                         } ${!sidebarOpen ? 'justify-center' : ''}`}
+                        onClick={() => setMobileSidebarOpen(false)}
                     >
                         <FaUsers className={`${sidebarOpen ? 'mr-3' : ''}`} />
                         {sidebarOpen && "Patients"}
                     </Link>
                     <Link
                         to="/admin/pricing"
-                        className={`flex items-center px-6 py-3 text-white hover:bg-blue-700 ${
+                        className={`flex items-center px-4 sm:px-6 py-3 text-white hover:bg-blue-700 ${
                             activeTab === 'pricing' ? 'bg-blue-700' : ''
                         } ${!sidebarOpen ? 'justify-center' : ''}`}
+                        onClick={() => setMobileSidebarOpen(false)}
                     >
                         <FaDollarSign className={`${sidebarOpen ? 'mr-3' : ''}`} />
                         {sidebarOpen && "Pricing"}
                     </Link>
                     <Link
                         to="/admin/analytics"
-                        className={`flex items-center px-6 py-3 text-white hover:bg-blue-700 ${
-                            activeTab === 'analytics' ? 'bg-blue-700' : ''
+                        className={`flex items-center px-4 sm:px-6 py-3 text-white hover:bg-blue-700 ${
+                            activeTab === 'pricing' ? 'bg-blue-700' : ''
                         } ${!sidebarOpen ? 'justify-center' : ''}`}
+                        onClick={() => setMobileSidebarOpen(false)}
                     >
-                        <FaChartLine className={`${sidebarOpen ? 'mr-3' : ''}`} />
+                        <FaDollarSign className={`${sidebarOpen ? 'mr-3' : ''}`} />
                         {sidebarOpen && "Analytics"}
                     </Link>
-                    {/* <Link
-                        to="/admin/settings"
-                        className={`flex items-center px-6 py-3 text-white hover:bg-blue-700 ${
-                            activeTab === 'settings' ? 'bg-blue-700' : ''
-                        } ${!sidebarOpen ? 'justify-center' : ''}`}
-                    >
-                        <FaCog className={`${sidebarOpen ? 'mr-3' : ''}`} />
-                        {sidebarOpen && "Settings"}
-                    </Link> */}
                 </nav>
 
                 {/* Sidebar Footer */}
@@ -205,18 +230,28 @@ const AdminDashboard = () => {
             <div className="flex-1 flex flex-col overflow-hidden">
                 {/* Navbar */}
                 <header className="bg-white shadow-sm z-10">
-                    <div className="flex items-center justify-between px-6 py-4">
-                        <div className="flex items-center">
-                            <div className="relative">
+                    <div className="flex items-center justify-between px-4 sm:px-6 py-3">
+                        {/* Mobile menu button */}
+                        <button
+                            onClick={toggleMobileSidebar}
+                            className="lg:hidden p-2 text-gray-600 hover:text-blue-600 rounded-full hover:bg-gray-100"
+                        >
+                            <FaBars />
+                        </button>
+                        
+                        {/* Search bar - hidden on mobile */}
+                        <div className="hidden md:flex items-center flex-1 max-w-md mx-4">
+                            <div className="relative w-full">
                                 <FaSearch className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" />
                                 <input
                                     type="text"
                                     placeholder="Search..."
-                                    className="pl-10 pr-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                                    className="pl-10 pr-4 py-2 border rounded-lg w-full focus:outline-none focus:ring-2 focus:ring-blue-500"
                                 />
                             </div>
                         </div>
-                        <div className="flex items-center space-x-4">
+                        
+                        <div className="flex items-center space-x-2 sm:space-x-4">
                             {/* Notification Dropdown */}
                             <div className="relative" ref={notificationRef}>
                                 <button 
@@ -232,7 +267,7 @@ const AdminDashboard = () => {
                                 </button>
                                 
                                 {showNotifications && (
-                                    <div className="absolute right-0 mt-2 w-80 bg-white rounded-md shadow-lg overflow-hidden z-20">
+                                    <div className="absolute right-0 mt-2 w-72 sm:w-80 bg-white rounded-md shadow-lg overflow-hidden z-20">
                                         <div className="py-1">
                                             <div className="px-4 py-2 border-b border-gray-200 bg-gray-50">
                                                 <h3 className="text-sm font-medium text-gray-700">Notifications ({unreadCount} new)</h3>
@@ -262,9 +297,12 @@ const AdminDashboard = () => {
                                                 )}
                                             </div>
                                             <div className="px-4 py-2 border-t border-gray-200 bg-gray-50 text-center">
-                                                <Link to="/admin/notifications" className="text-xs text-blue-600 hover:text-blue-800">
+                                                <button 
+                                                    onClick={handleViewAllNotifications}
+                                                    className="text-xs text-blue-600 hover:text-blue-800"
+                                                >
                                                     View all notifications
-                                                </Link>
+                                                </button>
                                             </div>
                                         </div>
                                     </div>
@@ -281,22 +319,13 @@ const AdminDashboard = () => {
                                         A
                                     </div>
                                     {sidebarOpen && (
-                                        <span className="text-gray-700">Admin</span>
+                                        <span className="text-gray-700 hidden sm:inline">Admin</span>
                                     )}
                                 </button>
                                 
                                 {showProfileDropdown && (
                                     <div className="absolute right-0 mt-2 w-48 bg-white rounded-md shadow-lg z-20">
                                         <div className="py-1">
-                                            {/* <Link
-                                                to="/admin/settings"
-                                                className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
-                                                onClick={() => setShowProfileDropdown(false)}
-                                            >
-                                                <div className="flex items-center">
-                                                    <FaUser className="mr-2" /> Profile
-                                                </div>
-                                            </Link> */}
                                             <Link
                                                 to="/admin/settings"
                                                 className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
@@ -324,39 +353,39 @@ const AdminDashboard = () => {
                 </header>
 
                 {/* Dashboard Content */}
-                <main className="flex-1 overflow-y-auto p-6 bg-gray-50">
-                    <div className="flex justify-between items-center mb-8">
-                        <h1 className="text-3xl font-bold text-gray-800">Dashboard</h1>
-                        <div className="flex items-center space-x-4">
+                <main className="flex-1 overflow-y-auto p-4 sm:p-6 bg-gray-50">
+                    <div className="flex justify-between items-center mb-6">
+                        <h1 className="text-2xl sm:text-3xl font-bold text-gray-800">Dashboard</h1>
+                        <div className="flex items-center space-x-2 sm:space-x-4">
                             {/* Additional header buttons can go here */}
                         </div>
                     </div>
 
                     {/* Stats Grid */}
-                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+                    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6 mb-6 sm:mb-8">
                         <StatCard 
-                            icon={<FaUserMd className="text-2xl" />}
+                            icon={<FaUserMd className="text-xl sm:text-2xl" />}
                             title="Total Doctors"
                             value={stats.totalDoctors}
                             bgColor="bg-blue-100"
                             textColor="text-blue-500"
                         />
                         <StatCard 
-                            icon={<FaUsers className="text-2xl" />}
+                            icon={<FaUsers className="text-xl sm:text-2xl" />}
                             title="Total Patients"
                             value={stats.totalPatients}
                             bgColor="bg-green-100"
                             textColor="text-green-500"
                         />
                         <StatCard 
-                            icon={<FaChartLine className="text-2xl" />}
+                            icon={<FaChartLine className="text-xl sm:text-2xl" />}
                             title="Appointments"
                             value={stats.totalAppointments}
                             bgColor="bg-purple-100"
                             textColor="text-purple-500"
                         />
                         <StatCard 
-                            icon={<FaDollarSign className="text-2xl" />}
+                            icon={<FaDollarSign className="text-xl sm:text-2xl" />}
                             title="Total Revenue"
                             value={`$${stats.totalRevenue}`}
                             bgColor="bg-yellow-100"
@@ -365,21 +394,21 @@ const AdminDashboard = () => {
                     </div>
 
                     {/* Recent Activity and Quick Actions */}
-                    <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+                    <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 sm:gap-8">
                         {/* Recent Activity */}
-                        <div className="bg-white rounded-xl shadow-md p-6">
-                            <h2 className="text-xl font-semibold mb-4 text-gray-800">Recent Activity</h2>
-                            <div className="space-y-4">
+                        <div className="bg-white rounded-xl shadow-md p-4 sm:p-6">
+                            <h2 className="text-lg sm:text-xl font-semibold mb-3 sm:mb-4 text-gray-800">Recent Activity</h2>
+                            <div className="space-y-3 sm:space-y-4">
                                 {[
                                     { title: "New patient registered", desc: "John Doe", time: "2 hours ago" },
                                     { title: "Appointment completed", desc: "Dr. Smith with Jane Doe", time: "4 hours ago" },
                                     { title: "New doctor registered", desc: "Dr. Johnson", time: "1 day ago" }
                                 ].map((activity, index) => (
-                                    <div key={index} className="border-b pb-3 last:border-b-0">
+                                    <div key={index} className="border-b pb-2 sm:pb-3 last:border-b-0">
                                         <div className="flex justify-between items-center">
                                             <div>
-                                                <p className="font-medium text-gray-700">{activity.title}</p>
-                                                <p className="text-sm text-gray-500">{activity.desc}</p>
+                                                <p className="text-sm sm:text-base font-medium text-gray-700">{activity.title}</p>
+                                                <p className="text-xs sm:text-sm text-gray-500">{activity.desc}</p>
                                             </div>
                                             <span className="text-xs text-gray-400">{activity.time}</span>
                                         </div>
@@ -389,21 +418,21 @@ const AdminDashboard = () => {
                         </div>
 
                         {/* Quick Actions */}
-                        <div className="bg-white rounded-xl shadow-md p-6">
-                            <h2 className="text-xl font-semibold mb-4 text-gray-800">Quick Actions</h2>
-                            <div className="grid grid-cols-2 gap-4">
+                        <div className="bg-white rounded-xl shadow-md p-4 sm:p-6">
+                            <h2 className="text-lg sm:text-xl font-semibold mb-3 sm:mb-4 text-gray-800">Quick Actions</h2>
+                            <div className="grid grid-cols-2 gap-3 sm:gap-4">
                                 {[
-                                    { icon: <FaUserMd />, label: "Add Doctor", color: "bg-blue-500" },
-                                    { icon: <FaUsers />, label: "Add Patient", color: "bg-green-500" },
-                                    { icon: <FaChartLine />, label: "Generate Report", color: "bg-purple-500" },
-                                    { icon: <FaDollarSign />, label: "Billing", color: "bg-yellow-500" }
+                                    { icon: <FaUserMd className="text-lg sm:text-xl" />, label: "Add Doctor", color: "bg-blue-500" },
+                                    { icon: <FaUsers className="text-lg sm:text-xl" />, label: "Add Patient", color: "bg-green-500" },
+                                    { icon: <FaChartLine className="text-lg sm:text-xl" />, label: "Generate Report", color: "bg-purple-500" },
+                                    { icon: <FaDollarSign className="text-lg sm:text-xl" />, label: "Billing", color: "bg-yellow-500" }
                                 ].map((action, index) => (
                                     <button 
                                         key={index} 
-                                        className={`flex flex-col items-center justify-center p-4 rounded-lg ${action.color} text-white hover:opacity-90 transition-opacity`}
+                                        className={`flex flex-col items-center justify-center p-3 sm:p-4 rounded-lg ${action.color} text-white hover:opacity-90 transition-opacity`}
                                     >
                                         {action.icon}
-                                        <span className="mt-2 text-sm">{action.label}</span>
+                                        <span className="mt-1 sm:mt-2 text-xs sm:text-sm">{action.label}</span>
                                     </button>
                                 ))}
                             </div>

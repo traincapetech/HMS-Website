@@ -17,6 +17,7 @@ const Layout = () => {
     "/admin/patients",
     "/admin/analytics",
     "/admin/settings",
+    "/admin/notifications",
   ];
 
   const shouldHideNavbar = hideNavbarRoutes.includes(location.pathname);
