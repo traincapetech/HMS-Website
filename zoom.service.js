@@ -56,7 +56,7 @@ const generateZoomAccessToken = async() => {
                     account_id: ZoomAccountId,
                 })
             }
-        );
+        ); 
 
         const jsonResponse = await response.json();
         // console.log("GenerateZoomAccessToken JsonResponse --> ", jsonResponse);

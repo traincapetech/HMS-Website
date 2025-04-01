@@ -1,5 +1,8 @@
 .env    
 node_modules 
+add_patient.controller.js
+add_patient.model.js
+add_patient.router.js
 
 //delete appointment api 
 http://localhost:8080/api/appoint/67d91c477cdc12d97b61383e

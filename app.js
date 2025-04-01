@@ -7,6 +7,7 @@ import newuserRouter from "./Routes/newuser.route.js";
 import doctorRouter from  "./Routes/doctor.route.js";
 import appointRouter from "./Routes/appoint.route.js";
 import zoomRouter from "./Routes/zoom.route.js";
+import add_docrouter from "./Routes/add_doc.route.js";
 
 dotenv.config();
 
@@ -28,6 +29,7 @@ app.use('/api/newuser', newuserRouter);
 app.use('/api/doctor', doctorRouter);
 app.use('/api/appoint', appointRouter);
 app.use('/api/zoom', zoomRouter);
+app.use('/api/add_doc', add_docrouter);
 
 
 app.get('/', (req, res) => {
