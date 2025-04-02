@@ -65,6 +65,8 @@ const AdminDoctors = () => {
     const [sidebarOpen, setSidebarOpen] = useState(true);
     const [mobileSidebarOpen, setMobileSidebarOpen] = useState(false);
     const navigate = useNavigate();
+    const [formErrors, setFormErrors] = useState({});
+    const [isSubmitting, setIsSubmitting] = useState(false);
     
     const [filters, setFilters] = useState({
         status: '',
@@ -81,6 +83,7 @@ const AdminDoctors = () => {
         phone: '',
         address: '',
         country: '',
+        status: 'active', 
         isActive: true
     });
 
@@ -101,17 +104,26 @@ const AdminDoctors = () => {
         try {
             setLoading(true);
             const token = localStorage.getItem('adminToken');
-            let url = `/api/doctors?page=${currentPage}&limit=${doctorsPerPage}`;
-            
-            if (filters.status) url += `&status=${filters.status}`;
-            if (filters.specialization) url += `&specialization=${filters.specialization}`;
-            if (filters.experience) url += `&experience=${filters.experience}`;
-            if (filters.country) url += `&country=${filters.country}`;
-
+            let url = `http://localhost:8080/api/add_doc/all?page=${currentPage}&limit=${doctorsPerPage}`; 
+    
+            // Construct query parameters
+            const params = new URLSearchParams();
+            if (filters.status) params.append('status', filters.status);
+            if (filters.specialization) params.append('specialization', filters.specialization);
+            if (filters.experience) params.append('experience', filters.experience);
+            if (filters.country) params.append('country', filters.country);
+    
+            // Append query parameters only if they exist
+            if (params.toString()) {
+                url += `?${params.toString()}`;
+            }
+    
+            console.log("Fetching doctors from:", url); // Debugging
+    
             const response = await axios.get(url, {
                 headers: { Authorization: `Bearer ${token}` }
             });
-
+    
             setDoctors(response.data.doctors || []);
             setTotalPages(response.data.totalPages || 1);
         } catch (error) {
@@ -122,6 +134,7 @@ const AdminDoctors = () => {
             setLoading(false);
         }
     };
+    
 
     const fetchCountries = async () => {
         try {
@@ -144,35 +157,69 @@ const AdminDoctors = () => {
         }
     };
 
+    const validateForm = () => {
+        const errors = {};
+        if (!formData.name.trim()) errors.name = 'Name is required';
+        if (!formData.email.trim()) {
+            errors.email = 'Email is required';
+        } else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(formData.email)) {
+            errors.email = 'Email is invalid';
+        }
+        if (!formData.specialization) errors.specialization = 'Specialization is required';
+        if (!formData.experience) errors.experience = 'Experience is required';
+        if (!formData.phone) {
+            errors.phone = 'Phone is required';
+        } else if (String(formData.phone).length < 10) {
+            errors.phone = 'Phone must be 10 digits';
+        }
+
+        setFormErrors(errors);
+        return Object.keys(errors).length === 0;
+    };
+
     const handleSubmit = async (e) => {
         e.preventDefault();
+    
+        if (!validateForm()) return;
+    
+        setIsSubmitting(true);
         try {
             const token = localStorage.getItem('adminToken');
+            const doctorData = {
+                ...formData,
+                phone: String(formData.phone).replace(/\D/g, ''), // Ensure phone is string and clean
+                status: formData.status || 'active' // Ensure status is always set
+            };
+    
             if (editingDoctor) {
-                await axios.put(`/api/doctors/${editingDoctor._id}`, {
-                    ...formData,
-                    phone: formData.phone.replace(/\D/g, '')
-                }, {
-                    headers: { Authorization: `Bearer ${token}` }
-                });
+                // Update existing doctor
+                await axios.put(
+                    `http://localhost:8080/api/add_doc/${editingDoctor._id}`,
+                    doctorData,
+                    { headers: { Authorization: `Bearer ${token}` } }
+                );
                 toast.success('Doctor updated successfully');
             } else {
-                await axios.post('/api/doctors', {
-                    ...formData,
-                    phone: formData.phone.replace(/\D/g, '')
-                }, {
-                    headers: { Authorization: `Bearer ${token}` }
-                });
+                // Add new doctor
+                await axios.post(
+                    'http://localhost:8080/api/add_doc/add', 
+                    doctorData,
+                    { headers: { Authorization: `Bearer ${token}` } }
+                );
                 toast.success('Doctor added successfully');
             }
+    
             setShowModal(false);
-            await fetchDoctors();
             resetForm();
+            await fetchDoctors();
         } catch (error) {
-            console.error('Error saving doctor:', error);
-            toast.error(error.response?.data?.message || 'Failed to save doctor');
+            console.error('Error:', error.response?.data || error.message);
+            toast.error(error.response?.data?.message || 'Operation failed');
+        } finally {
+            setIsSubmitting(false);
         }
     };
+    
 
     const handleEdit = (doctor) => {
         setEditingDoctor(doctor);
@@ -181,9 +228,10 @@ const AdminDoctors = () => {
             email: doctor.email,
             specialization: doctor.specialization,
             experience: doctor.experience,
-            phone: doctor.phone,
+            phone: doctor.phone ? String(doctor.phone) : '', // Ensure phone is string
             address: doctor.address,
             country: doctor.country || '',
+            status: doctor.status || 'active',
             isActive: doctor.isActive
         });
         setShowModal(true);
@@ -193,19 +241,28 @@ const AdminDoctors = () => {
         if (window.confirm('Are you sure you want to delete this doctor?')) {
             try {
                 const token = localStorage.getItem('adminToken');
-                await axios.delete(`/api/doctors/${id}`, {
+                await axios.delete(`http://localhost:8080/api/add_doc/67ed0e29f7f273bd2ae47917`, {
                     headers: { Authorization: `Bearer ${token}` }
                 });
                 toast.success('Doctor deleted successfully');
-
+    
+                // Optimistic UI update - remove the doctor from local state immediately
+                setDoctors(prevDoctors => prevDoctors.filter(doctor => doctor._id !== id));
+    
+                // If we're on the last page with only one doctor, go back a page
                 if (doctors.length === 1 && currentPage > 1) {
                     setCurrentPage(currentPage - 1);
-                } else {
-                    await fetchDoctors();
                 }
+                
+                // Optional: Refetch data to ensure consistency with server
+                // await fetchDoctors();
             } catch (error) {
                 console.error('Error deleting doctor:', error);
-                toast.error('Failed to delete doctor. Please try again.');
+                
+                // Revert the optimistic update if deletion failed
+                await fetchDoctors();
+                
+                toast.error(error.response?.data?.message || 'Failed to delete doctor. Please try again.');
             }
         }
     };
@@ -219,24 +276,44 @@ const AdminDoctors = () => {
             phone: '',
             address: '',
             country: '',
+            status: 'active',
             isActive: true
         });
         setEditingDoctor(null);
+        setFormErrors({});
     };
 
-    const handleSearch = async () => {
+    const handleSearch = () => {
         try {
             setLoading(true);
-            const token = localStorage.getItem('adminToken');
-            const response = await axios.get(`/api/doctors/search?query=${searchTerm}`, {
-                headers: { Authorization: `Bearer ${token}` }
+            
+            if (!searchTerm.trim()) {
+                // If search term is empty, reset to show all doctors
+                fetchDoctors(); // This will fetch all doctors again
+                return;
+            }
+    
+            // Convert search term to lowercase for case-insensitive search
+            const term = searchTerm.toLowerCase();
+            
+            // Filter doctors based on search term
+            const filteredDoctors = doctors.filter(doctor => {
+                return (
+                    doctor.name.toLowerCase().includes(term) ||
+                    doctor.email.toLowerCase().includes(term) ||
+                    doctor.specialization.toLowerCase().includes(term) ||
+                    (doctor.phone && String(doctor.phone).toLowerCase().includes(term)) ||
+                    (doctor.country && doctor.country.toLowerCase().includes(term)) ||
+                    (doctor.address && doctor.address.toLowerCase().includes(term))
+                );
             });
-            setDoctors(response.data.doctors || []);
+    
+            setDoctors(filteredDoctors);
             setCurrentPage(1);
             setTotalPages(1);
         } catch (error) {
             console.error('Error searching doctors:', error);
-            toast.error('Failed to search doctors. Please try again.');
+            toast.error('Error during search. Please try again.');
             setDoctors([]);
         } finally {
             setLoading(false);
@@ -250,8 +327,54 @@ const AdminDoctors = () => {
             [name]: value
         }));
     };
-
-    const resetFilters = () => {
+    
+    // Add this useEffect to apply filters whenever filters state changes
+    useEffect(() => {
+        const applyFilters = () => {
+            if (!doctors.length) return;
+    
+            const filteredDoctors = doctors.filter(doctor => {
+                // Status filter
+                if (filters.status && doctor.status !== filters.status) {
+                    return false;
+                }
+                
+                // Specialization filter
+                if (filters.specialization && doctor.specialization !== filters.specialization) {
+                    return false;
+                }
+                
+                // Experience filter
+                if (filters.experience) {
+                    const [minExp, maxExp] = filters.experience.split('-').map(Number);
+                    const doctorExp = parseInt(doctor.experience) || 0;
+                    
+                    if (maxExp) {
+                        if (doctorExp < minExp || doctorExp > maxExp) return false;
+                    } else {
+                        // Handle "20+ years" case
+                        if (doctorExp < minExp) return false;
+                    }
+                }
+                
+                // Country filter
+                if (filters.country && doctor.country !== filters.country) {
+                    return false;
+                }
+                
+                return true;
+            });
+    
+            setDoctors(filteredDoctors);
+            setCurrentPage(1);
+            setTotalPages(Math.ceil(filteredDoctors.length / doctorsPerPage) || 1);
+        };
+    
+        applyFilters();
+    }, [filters, doctors]);
+    
+    // Update your resetFilters function to also reset the doctors list
+    const resetFilters = async () => {
         setFilters({
             status: '',
             specialization: '',
@@ -259,6 +382,7 @@ const AdminDoctors = () => {
             country: ''
         });
         setSearchTerm('');
+        await fetchDoctors(); // This will refetch the original unfiltered list
     };
 
     const handlePageChange = (newPage) => {
@@ -582,7 +706,7 @@ const AdminDoctors = () => {
                                                 </td>
                                                 <td className="px-4 py-4 whitespace-nowrap sm:px-6">
                                                     <div className="text-sm text-gray-900">
-                                                        {doctor.phone?.replace(/(\d{3})(\d{3})(\d{4})/, '($1) $2-$3')}
+                                                        {doctor.phone ? String(doctor.phone).replace(/(\d{3})(\d{3})(\d{4})/, '($1) $2-$3') : 'N/A'}
                                                     </div>
                                                     <div className="text-sm text-gray-500 truncate max-w-xs">
                                                         {doctor.country && <span className="mr-2">{doctor.country}</span>}
@@ -590,9 +714,8 @@ const AdminDoctors = () => {
                                                     </div>
                                                 </td>
                                                 <td className="px-4 py-4 whitespace-nowrap sm:px-6">
-                                                    <span className={`px-2 inline-flex text-xs leading-5 font-semibold rounded-full ${doctor.isActive ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'
-                                                        }`}>
-                                                        {doctor.isActive ? 'Active' : 'Inactive'}
+                                                    <span className={`px-2 inline-flex text-xs leading-5 font-semibold rounded-full ${doctor.status === 'active' ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'}`}>
+                                                        {doctor.status === 'active' ? 'Active' : 'Inactive'}
                                                     </span>
                                                 </td>
                                                 <td className="px-4 py-4 whitespace-nowrap text-sm font-medium sm:px-6">
@@ -670,28 +793,37 @@ const AdminDoctors = () => {
                                                 <label className="block text-sm font-medium text-gray-700">Name*</label>
                                                 <input
                                                     type="text"
+                                                    name="name"
                                                     value={formData.name}
                                                     onChange={(e) => setFormData({ ...formData, name: e.target.value })}
-                                                    className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
+                                                    className={`mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 ${formErrors.name ? 'border-red-500' : ''}`}
                                                     required
                                                 />
+                                                {formErrors.name && (
+                                                    <p className="mt-1 text-sm text-red-600">{formErrors.name}</p>
+                                                )}
                                             </div>
                                             <div>
                                                 <label className="block text-sm font-medium text-gray-700">Email*</label>
                                                 <input
                                                     type="email"
+                                                    name="email"
                                                     value={formData.email}
                                                     onChange={(e) => setFormData({ ...formData, email: e.target.value })}
-                                                    className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
+                                                    className={`mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 ${formErrors.email ? 'border-red-500' : ''}`}
                                                     required
                                                 />
+                                                {formErrors.email && (
+                                                    <p className="mt-1 text-sm text-red-600">{formErrors.email}</p>
+                                                )}
                                             </div>
                                             <div>
                                                 <label className="block text-sm font-medium text-gray-700">Specialization*</label>
                                                 <select
+                                                    name="specialization"
                                                     value={formData.specialization}
                                                     onChange={(e) => setFormData({ ...formData, specialization: e.target.value })}
-                                                    className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
+                                                    className={`mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 ${formErrors.specialization ? 'border-red-500' : ''}`}
                                                     required
                                                 >
                                                     <option value="">Select Specialization</option>
@@ -699,38 +831,50 @@ const AdminDoctors = () => {
                                                         <option key={index} value={spec}>{spec}</option>
                                                     ))}
                                                 </select>
+                                                {formErrors.specialization && (
+                                                    <p className="mt-1 text-sm text-red-600">{formErrors.specialization}</p>
+                                                )}
                                             </div>
                                             <div>
                                                 <label className="block text-sm font-medium text-gray-700">Experience (years)*</label>
                                                 <input
                                                     type="number"
+                                                    name="experience"
                                                     value={formData.experience}
                                                     onChange={(e) => setFormData({ ...formData, experience: e.target.value })}
-                                                    className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
+                                                    className={`mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 ${formErrors.experience ? 'border-red-500' : ''}`}
                                                     required
                                                     min="0"
                                                 />
+                                                {formErrors.experience && (
+                                                    <p className="mt-1 text-sm text-red-600">{formErrors.experience}</p>
+                                                )}
                                             </div>
                                             <div>
                                                 <label className="block text-sm font-medium text-gray-700">Phone*</label>
                                                 <input
                                                     type="tel"
+                                                    name="phone"
                                                     value={formData.phone}
                                                     onChange={(e) => {
                                                         // Remove all non-digit characters and limit to 10 digits
                                                         const numbersOnly = e.target.value.replace(/\D/g, '').slice(0, 10);
                                                         setFormData({ ...formData, phone: numbersOnly });
                                                     }}
-                                                    className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
+                                                    className={`mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 ${formErrors.phone ? 'border-red-500' : ''}`}
                                                     required
                                                     pattern="[0-9]{10}"
                                                     inputMode="numeric"
                                                     maxLength={10}
                                                 />
+                                                {formErrors.phone && (
+                                                    <p className="mt-1 text-sm text-red-600">{formErrors.phone}</p>
+                                                )}
                                             </div>
                                             <div>
                                                 <label className="block text-sm font-medium text-gray-700">Country</label>
                                                 <select
+                                                    name="country"
                                                     value={formData.country}
                                                     onChange={(e) => setFormData({ ...formData, country: e.target.value })}
                                                     className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
@@ -743,26 +887,29 @@ const AdminDoctors = () => {
                                             </div>
                                             <div>
                                                 <label className="block text-sm font-medium text-gray-700">Status</label>
-                                                <div className="mt-1 flex items-center">
-                                                    <input
-                                                        type="checkbox"
-                                                        checked={formData.isActive}
-                                                        onChange={(e) => setFormData({ ...formData, isActive: e.target.checked })}
-                                                        className="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded"
-                                                    />
-                                                    <label className="ml-2 block text-sm text-gray-900">Active</label>
-                                                </div>
+                                                <select
+                                                    name="status"
+                                                    value={formData.status}
+                                                    onChange={(e) => setFormData({ ...formData, status: e.target.value })}
+                                                    className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
+                                                >
+                                                    <option value="active">Active</option>
+                                                    <option value="inactive">Inactive</option>
+                                                </select>
                                             </div>
                                         </div>
+                                        
                                         <div>
                                             <label className="block text-sm font-medium text-gray-700">Address</label>
                                             <textarea
+                                                name="address"
                                                 value={formData.address}
                                                 onChange={(e) => setFormData({ ...formData, address: e.target.value })}
                                                 className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
                                                 rows="3"
                                             />
                                         </div>
+                                        
                                         <div className="flex justify-end space-x-3 pt-4">
                                             <button
                                                 type="button"
@@ -777,8 +924,19 @@ const AdminDoctors = () => {
                                             <button
                                                 type="submit"
                                                 className="px-4 py-2 text-sm font-medium text-white bg-blue-600 rounded-md hover:bg-blue-700 transition-colors"
+                                                disabled={isSubmitting}
                                             >
-                                                {editingDoctor ? 'Update Doctor' : 'Add Doctor'}
+                                                {isSubmitting ? (
+                                                    <span className="flex items-center justify-center">
+                                                        <svg className="animate-spin -ml-1 mr-2 h-4 w-4 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                                                            <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                                                            <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                                                        </svg>
+                                                        {editingDoctor ? 'Updating...' : 'Adding...'}
+                                                    </span>
+                                                ) : (
+                                                    editingDoctor ? 'Update Doctor' : 'Add Doctor'
+                                                )}
                                             </button>
                                         </div>
                                     </form>

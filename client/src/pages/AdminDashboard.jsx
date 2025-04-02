@@ -207,13 +207,13 @@ const AdminDashboard = () => {
                         } ${!sidebarOpen ? 'justify-center' : ''}`}
                         onClick={() => setMobileSidebarOpen(false)}
                     >
-                        <FaDollarSign className={`${sidebarOpen ? 'mr-3' : ''}`} />
+                        <FaChartLine className={`${sidebarOpen ? 'mr-3' : ''}`} />
                         {sidebarOpen && "Analytics"}
                     </Link>
                 </nav>
 
                 {/* Sidebar Footer */}
-                <div className="p-4 border-t border-white">
+                {/* <div className="p-4 border-t border-white">
                     <button
                         onClick={handleLogout}
                         className={`flex items-center w-full text-gray-300 hover:text-white ${
@@ -223,7 +223,7 @@ const AdminDashboard = () => {
                         <FaSignOutAlt className={`${sidebarOpen ? 'mr-3' : ''}`} />
                         {sidebarOpen && "Logout"}
                     </button>
-                </div>
+                </div> */}
             </div>
 
             {/* Main Content Area */}

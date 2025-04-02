@@ -4,13 +4,13 @@ import { toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 
 const AdminNotifications = () => {
-    // Sample notification data
+    // Sample notification data with more recent timestamps
     const [notifications, setNotifications] = useState([
         {
             id: 1,
             title: 'New Appointment Booking',
             message: 'John Doe has booked an appointment for tomorrow at 10:00 AM',
-            timestamp: '2023-06-15T10:30:00',
+            timestamp: new Date(Date.now() - 3600000).toISOString(), // 1 hour ago
             isRead: false,
             type: 'appointment'
         },
@@ -18,7 +18,7 @@ const AdminNotifications = () => {
             id: 2,
             title: 'System Update Available',
             message: 'A new system update (v2.1.0) is available for installation',
-            timestamp: '2023-06-14T15:45:00',
+            timestamp: new Date(Date.now() - 86400000 * 2).toISOString(), // 2 days ago
             isRead: true,
             type: 'system'
         },
@@ -26,7 +26,7 @@ const AdminNotifications = () => {
             id: 3,
             title: 'Payment Received',
             message: 'Payment of $150 received from Jane Smith for service #4582',
-            timestamp: '2023-06-14T09:20:00',
+            timestamp: new Date(Date.now() - 86400000 * 5).toISOString(), // 5 days ago
             isRead: false,
             type: 'payment'
         },
@@ -34,7 +34,7 @@ const AdminNotifications = () => {
             id: 4,
             title: 'New Patient Registration',
             message: 'New patient Michael Brown has registered in the system',
-            timestamp: '2023-06-13T14:10:00',
+            timestamp: new Date(Date.now() - 86400000 * 6).toISOString(), // 6 days ago
             isRead: true,
             type: 'registration'
         },
@@ -42,7 +42,7 @@ const AdminNotifications = () => {
             id: 5,
             title: 'Urgent: Server Maintenance',
             message: 'Scheduled server maintenance tonight from 1:00 AM to 3:00 AM',
-            timestamp: '2023-06-12T11:05:00',
+            timestamp: new Date(Date.now() - 86400000 * 7).toISOString(), // 7 days ago (will show exact date)
             isRead: false,
             type: 'alert'
         }
@@ -102,16 +102,24 @@ const AdminNotifications = () => {
         }
     };
 
-    // Format timestamp to relative time (e.g., "2 hours ago")
+    // Updated formatTime function to show exact date for older notifications
     const formatTime = (timestamp) => {
         const now = new Date();
         const notificationDate = new Date(timestamp);
         const diffInSeconds = Math.floor((now - notificationDate) / 1000);
+        const diffInDays = Math.floor(diffInSeconds / 86400);
         
         if (diffInSeconds < 60) return 'Just now';
         if (diffInSeconds < 3600) return `${Math.floor(diffInSeconds / 60)} minutes ago`;
         if (diffInSeconds < 86400) return `${Math.floor(diffInSeconds / 3600)} hours ago`;
-        return `${Math.floor(diffInSeconds / 86400)} days ago`;
+        if (diffInDays <= 6) return `${diffInDays} days ago`;
+        
+        // For notifications older than 6 days, show the exact date
+        return notificationDate.toLocaleDateString('en-US', {
+            month: 'short',
+            day: 'numeric',
+            year: 'numeric'
+        });
     };
 
     // Get badge color based on notification type

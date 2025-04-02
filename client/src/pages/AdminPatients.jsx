@@ -61,6 +61,8 @@ const AdminPatients = () => {
     const [sidebarOpen, setSidebarOpen] = useState(true);
     const [mobileSidebarOpen, setMobileSidebarOpen] = useState(false);
     const navigate = useNavigate();
+    const [formErrors, setFormErrors] = useState({});
+    const [isSubmitting, setIsSubmitting] = useState(false);
     
     const [filters, setFilters] = useState({
         gender: '',
@@ -103,14 +105,21 @@ const AdminPatients = () => {
         try {
             setLoading(true);
             const token = localStorage.getItem('adminToken');
-            let url = `/api/patients?page=${currentPage}&limit=${patientsPerPage}`;
+            let url = `http://localhost:8080/api/add_patient/all?page=${currentPage}&limit=${patientsPerPage}`;
             
-            if (filters.gender) url += `&gender=${filters.gender}`;
-            if (filters.bloodGroup) url += `&bloodGroup=${filters.bloodGroup}`;
-            if (filters.status) url += `&status=${filters.status}`;
-            if (filters.ageRange) url += `&ageRange=${filters.ageRange}`;
-            if (filters.specialization) url += `&specialization=${filters.specialization}`;
-            if (filters.country) url += `&country=${filters.country}`;
+            // Construct query parameters
+            const params = new URLSearchParams();
+            if (filters.gender) params.append('gender', filters.gender);
+            if (filters.bloodGroup) params.append('bloodGroup', filters.bloodGroup);
+            if (filters.status) params.append('status', filters.status);
+            if (filters.ageRange) params.append('ageRange', filters.ageRange);
+            if (filters.specialization) params.append('specialization', filters.specialization);
+            if (filters.country) params.append('country', filters.country);
+
+            // Append query parameters if they exist
+            if (params.toString()) {
+                url += `&${params.toString()}`;
+            }
 
             const response = await axios.get(url, {
                 headers: { Authorization: `Bearer ${token}` }
@@ -148,50 +157,134 @@ const AdminPatients = () => {
         }
     };
 
+    const validateForm = () => {
+        const errors = {};
+        if (!formData.firstName.trim()) errors.firstName = 'First name is required';
+        if (!formData.lastName.trim()) errors.lastName = 'Last name is required';
+        
+        if (!formData.email.trim()) {
+            errors.email = 'Email is required';
+        } else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(formData.email)) {
+            errors.email = 'Email is invalid';
+        }
+        
+        if (!formData.phone) {
+            errors.phone = 'Phone is required';
+        } else if (String(formData.phone).replace(/\D/g, '').length < 10) {
+            errors.phone = 'Phone must be 10 digits';
+        }
+        
+        if (!formData.dateOfBirth) {
+            errors.dateOfBirth = 'Date of birth is required';
+        } else {
+            const dob = new Date(formData.dateOfBirth);
+            const today = new Date();
+            if (dob >= today) {
+                errors.dateOfBirth = 'Date of birth must be in the past';
+            }
+        }
+    
+        setFormErrors(errors);
+        return Object.keys(errors).length === 0;
+    };
+
     const handleSubmit = async (e) => {
         e.preventDefault();
+        
+        if (!validateForm()) return;
+        
+        setIsSubmitting(true);
         try {
             const token = localStorage.getItem('adminToken');
+            const patientData = {
+                firstName: formData.firstName,
+                lastName: formData.lastName,
+                email: formData.email,
+                phone: String(formData.phone).replace(/\D/g, ''),
+                address: formData.address,
+                country: formData.country,
+                dateOfBirth: formData.dateOfBirth,
+                gender: formData.gender,
+                bloodGroup: formData.bloodGroup,
+                medicalHistory: formData.medicalHistory,
+                isActive: formData.isActive,
+                specializations: formData.specializations
+            };
+    
+            let response;
             if (editingPatient) {
-                await axios.put(`/api/patients/${editingPatient._id}`, {
-                    ...formData,
-                    phone: formData.phone.replace(/\D/g, '')
-                }, {
-                    headers: { Authorization: `Bearer ${token}` }
-                });
+                response = await axios.put(
+                    `http://localhost:8080/api/add_patient/${editingPatient._id}`,
+                    patientData,
+                    { 
+                        headers: { 
+                            Authorization: `Bearer ${token}`,
+                            'Content-Type': 'application/json'
+                        } 
+                    }
+                );
                 toast.success('Patient updated successfully');
             } else {
-                await axios.post('/api/patients', {
-                    ...formData,
-                    phone: formData.phone.replace(/\D/g, '')
-                }, {
-                    headers: { Authorization: `Bearer ${token}` }
-                });
+                response = await axios.post(
+                    'http://localhost:8080/api/add_patient/add', 
+                    patientData,
+                    { 
+                        headers: { 
+                            Authorization: `Bearer ${token}`,
+                            'Content-Type': 'application/json'
+                        } 
+                    }
+                );
                 toast.success('Patient added successfully');
             }
+    
+            console.log('API Response:', response.data); // Debug log
+            
             setShowModal(false);
             await fetchPatients();
             resetForm();
         } catch (error) {
-            console.error('Error saving patient:', error);
-            toast.error(error.response?.data?.message || 'Failed to save patient');
+            console.error('Detailed error:', {
+                message: error.message,
+                response: error.response?.data,
+                config: error.config
+            });
+            
+            let errorMessage = 'Failed to save patient. Please try again.';
+            if (error.response) {
+                // Server responded with a status code outside 2xx
+                errorMessage = error.response.data.message || 
+                             `Server error: ${error.response.status}`;
+            } else if (error.request) {
+                // Request was made but no response received
+                errorMessage = 'No response from server. Please check your connection.';
+            }
+            
+            toast.error(errorMessage);
+        } finally {
+            setIsSubmitting(false);
         }
     };
 
     const handleEdit = (patient) => {
         setEditingPatient(patient);
+        // Format date for input[type="date"]
+        const formattedDate = patient.dateOfBirth 
+            ? new Date(patient.dateOfBirth).toISOString().split('T')[0]
+            : '';
+            
         setFormData({
             firstName: patient.firstName,
             lastName: patient.lastName,
             email: patient.email,
-            phone: patient.phone,
+            phone: patient.phone ? String(patient.phone) : '',
             address: patient.address,
             country: patient.country || '',
-            dateOfBirth: patient.dateOfBirth.split('T')[0],
-            gender: patient.gender,
-            bloodGroup: patient.bloodGroup,
+            dateOfBirth: formattedDate,
+            gender: patient.gender || 'male',
+            bloodGroup: patient.bloodGroup || 'A+',
             medicalHistory: patient.medicalHistory || '',
-            isActive: patient.isActive,
+            isActive: patient.isActive !== undefined ? patient.isActive : true,
             specializations: patient.specializations || []
         });
         setShowModal(true);
@@ -201,7 +294,7 @@ const AdminPatients = () => {
         if (window.confirm('Are you sure you want to delete this patient?')) {
             try {
                 const token = localStorage.getItem('adminToken');
-                await axios.delete(`/api/patients/${id}`, {
+                await axios.delete(`http://localhost:8080/api/add_patient/${id}`, {
                     headers: { Authorization: `Bearer ${token}` }
                 });
                 toast.success('Patient deleted successfully');
@@ -234,13 +327,14 @@ const AdminPatients = () => {
             specializations: []
         });
         setEditingPatient(null);
+        setFormErrors({});
     };
 
     const handleSearch = async () => {
         try {
             setLoading(true);
             const token = localStorage.getItem('adminToken');
-            const response = await axios.get(`/api/patients/search?query=${searchTerm}`, {
+            const response = await axios.get(`http://localhost:8080/api/add_patient/search?query=${searchTerm}`, {
                 headers: { Authorization: `Bearer ${token}` }
             });
             setPatients(response.data.patients || []);
@@ -401,18 +495,6 @@ const AdminPatients = () => {
                         {sidebarOpen && "Analytics"}
                     </Link>
                 </nav>
-
-                {/* <div className="p-4 border-t border-white">
-                    <button
-                        onClick={handleLogout}
-                        className={`flex items-center w-full text-gray-300 hover:text-white ${
-                            !sidebarOpen ? 'justify-center' : ''
-                        }`}
-                    >
-                        <FaSignOutAlt className={`${sidebarOpen ? 'mr-3' : ''}`} />
-                        {sidebarOpen && "Logout"}
-                    </button>
-                </div> */}
             </div>
 
             <div className="flex-1 flex flex-col overflow-hidden">
@@ -615,7 +697,7 @@ const AdminPatients = () => {
                                                 <td className="px-4 py-4 whitespace-nowrap sm:px-6">
                                                     <div className="text-sm text-gray-900">{patient.email}</div>
                                                     <div className="text-sm text-gray-500">
-                                                        {patient.phone?.replace(/(\d{3})(\d{3})(\d{4})/, '($1) $2-$3')}
+                                                        {patient.phone ? String(patient.phone).replace(/(\d{3})(\d{3})(\d{4})/, '($1) $2-$3') : 'N/A'}
                                                     </div>
                                                 </td>
                                                 <td className="px-4 py-4 whitespace-nowrap sm:px-6">
@@ -639,8 +721,7 @@ const AdminPatients = () => {
                                                     </div>
                                                 </td>
                                                 <td className="px-4 py-4 whitespace-nowrap sm:px-6">
-                                                    <span className={`px-2 inline-flex text-xs leading-5 font-semibold rounded-full ${patient.isActive ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'
-                                                        }`}>
+                                                    <span className={`px-2 inline-flex text-xs leading-5 font-semibold rounded-full ${patient.isActive ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'}`}>
                                                         {patient.isActive ? 'Active' : 'Inactive'}
                                                     </span>
                                                 </td>
@@ -717,61 +798,82 @@ const AdminPatients = () => {
                                                 <label className="block text-sm font-medium text-gray-700">First Name*</label>
                                                 <input
                                                     type="text"
+                                                    name="firstName"
                                                     value={formData.firstName}
                                                     onChange={(e) => setFormData({ ...formData, firstName: e.target.value })}
-                                                    className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
+                                                    className={`mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 ${formErrors.firstName ? 'border-red-500' : ''}`}
                                                     required
                                                 />
+                                                {formErrors.firstName && (
+                                                    <p className="mt-1 text-sm text-red-600">{formErrors.firstName}</p>
+                                                )}
                                             </div>
                                             <div>
                                                 <label className="block text-sm font-medium text-gray-700">Last Name*</label>
                                                 <input
                                                     type="text"
+                                                    name="lastName"
                                                     value={formData.lastName}
                                                     onChange={(e) => setFormData({ ...formData, lastName: e.target.value })}
-                                                    className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
+                                                    className={`mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 ${formErrors.lastName ? 'border-red-500' : ''}`}
                                                     required
                                                 />
+                                                {formErrors.lastName && (
+                                                    <p className="mt-1 text-sm text-red-600">{formErrors.lastName}</p>
+                                                )}
                                             </div>
                                             <div>
                                                 <label className="block text-sm font-medium text-gray-700">Email*</label>
                                                 <input
                                                     type="email"
+                                                    name="email"
                                                     value={formData.email}
                                                     onChange={(e) => setFormData({ ...formData, email: e.target.value })}
-                                                    className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
+                                                    className={`mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 ${formErrors.email ? 'border-red-500' : ''}`}
                                                     required
                                                 />
+                                                {formErrors.email && (
+                                                    <p className="mt-1 text-sm text-red-600">{formErrors.email}</p>
+                                                )}
                                             </div>
                                             <div>
                                                 <label className="block text-sm font-medium text-gray-700">Phone*</label>
                                                 <input
                                                     type="tel"
+                                                    name="phone"
                                                     value={formData.phone}
                                                     onChange={(e) => {
                                                         const numbersOnly = e.target.value.replace(/\D/g, '').slice(0, 10);
                                                         setFormData({ ...formData, phone: numbersOnly });
                                                     }}
-                                                    className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
+                                                    className={`mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 ${formErrors.phone ? 'border-red-500' : ''}`}
                                                     required
                                                     pattern="[0-9]{10}"
                                                     inputMode="numeric"
                                                     maxLength={10}
                                                 />
+                                                {formErrors.phone && (
+                                                    <p className="mt-1 text-sm text-red-600">{formErrors.phone}</p>
+                                                )}
                                             </div>
                                             <div>
                                                 <label className="block text-sm font-medium text-gray-700">Date of Birth*</label>
                                                 <input
                                                     type="date"
+                                                    name="dateOfBirth"
                                                     value={formData.dateOfBirth}
                                                     onChange={(e) => setFormData({ ...formData, dateOfBirth: e.target.value })}
-                                                    className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
+                                                    className={`mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 ${formErrors.dateOfBirth ? 'border-red-500' : ''}`}
                                                     required
                                                 />
+                                                {formErrors.dateOfBirth && (
+                                                    <p className="mt-1 text-sm text-red-600">{formErrors.dateOfBirth}</p>
+                                                )}
                                             </div>
                                             <div>
                                                 <label className="block text-sm font-medium text-gray-700">Gender*</label>
                                                 <select
+                                                    name="gender"
                                                     value={formData.gender}
                                                     onChange={(e) => setFormData({ ...formData, gender: e.target.value })}
                                                     className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
@@ -785,6 +887,7 @@ const AdminPatients = () => {
                                             <div>
                                                 <label className="block text-sm font-medium text-gray-700">Blood Group</label>
                                                 <select
+                                                    name="bloodGroup"
                                                     value={formData.bloodGroup}
                                                     onChange={(e) => setFormData({ ...formData, bloodGroup: e.target.value })}
                                                     className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
@@ -797,6 +900,7 @@ const AdminPatients = () => {
                                             <div>
                                                 <label className="block text-sm font-medium text-gray-700">Country</label>
                                                 <select
+                                                    name="country"
                                                     value={formData.country}
                                                     onChange={(e) => setFormData({ ...formData, country: e.target.value })}
                                                     className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
@@ -812,6 +916,7 @@ const AdminPatients = () => {
                                                 <div className="mt-1 flex items-center">
                                                     <input
                                                         type="checkbox"
+                                                        name="isActive"
                                                         checked={formData.isActive}
                                                         onChange={(e) => setFormData({ ...formData, isActive: e.target.checked })}
                                                         className="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded"
@@ -824,6 +929,7 @@ const AdminPatients = () => {
                                             <label className="block text-sm font-medium text-gray-700">Address</label>
                                             <input
                                                 type="text"
+                                                name="address"
                                                 value={formData.address}
                                                 onChange={(e) => setFormData({ ...formData, address: e.target.value })}
                                                 className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
@@ -832,6 +938,7 @@ const AdminPatients = () => {
                                         <div>
                                             <label className="block text-sm font-medium text-gray-700">Medical History</label>
                                             <textarea
+                                                name="medicalHistory"
                                                 value={formData.medicalHistory}
                                                 onChange={(e) => setFormData({ ...formData, medicalHistory: e.target.value })}
                                                 className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
@@ -872,8 +979,19 @@ const AdminPatients = () => {
                                             <button
                                                 type="submit"
                                                 className="px-4 py-2 text-sm font-medium text-white bg-blue-600 rounded-md hover:bg-blue-700 transition-colors"
+                                                disabled={isSubmitting}
                                             >
-                                                {editingPatient ? 'Update Patient' : 'Add Patient'}
+                                                {isSubmitting ? (
+                                                    <span className="flex items-center justify-center">
+                                                        <svg className="animate-spin -ml-1 mr-2 h-4 w-4 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                                                            <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                                                            <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                                                        </svg>
+                                                        {editingPatient ? 'Updating...' : 'Adding...'}
+                                                    </span>
+                                                ) : (
+                                                    editingPatient ? 'Update Patient' : 'Add Patient'
+                                                )}
                                             </button>
                                         </div>
                                     </form>
