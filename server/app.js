@@ -11,6 +11,7 @@ import appointRouter from "./Routes/appoint.route.js";
 import zoomRouter from "./Routes/zoom.route.js";
 import add_docrouter from "./Routes/add_doc.route.js";
 import add_patientrouter from "./Routes/add_patient.route.js";
+import add_paymentrouter from "./Routes/add_payments.js";
 
 dotenv.config();
 
@@ -41,6 +42,7 @@ app.use('/api/appoint', appointRouter);
 app.use('/api/zoom', zoomRouter);
 app.use('/api/add_doc', add_docrouter);
 app.use('/api/add_patient', add_patientrouter);
+app.use('/api/payments', add_paymentrouter);
 
 // API health check endpoint
 app.get('/api/health', (req, res) => {
