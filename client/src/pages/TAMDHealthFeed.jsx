@@ -6,7 +6,7 @@ import EducateImage from "../assets/educate.webp";
 import EditorImage from "../assets/editor.jpg";
 import PractoProImage from "../assets/TAMD.png";
 import {useNavigate} from 'react-router-dom';
-const PractoHealthFeed = () => {
+const TAMDHealthFeed = () => {
     useEffect(() => {
         window.scrollTo(0, 0);
       }, []);
@@ -111,4 +111,4 @@ const PractoHealthFeed = () => {
     );
 };
 
-export default PractoHealthFeed;
+export default TAMDHealthFeed;

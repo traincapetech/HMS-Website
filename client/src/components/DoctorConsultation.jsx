@@ -1,17 +1,18 @@
 import React, { useState, useEffect } from "react";
-import { useParams, useNavigate } from "react-router-dom";
+import { useParams, useNavigate, Link } from "react-router-dom";
 import { useSelector } from "react-redux";
-import { FaNotesMedical, FaSave, FaDownload, FaClipboardList } from "react-icons/fa";
+import { FaNotesMedical, FaSave, FaDownload, FaClipboardList, FaArrowLeft, FaTimes } from "react-icons/fa";
 import api from "../utils/app.api";
 
 const DoctorConsultation = () => {
   const { appointmentId } = useParams();
   const navigate = useNavigate();
-  const { doctor } = useSelector((state) => state.doctor);
+  const { doctor } = useSelector((state) => state.doctor || {});
   
   // State for patient data
   const [patient, setPatient] = useState({});
   const [loading, setLoading] = useState(false);
+  const [error, setError] = useState(null);
 
   // State for consultation form
   const [subjective, setSubjective] = useState("");
@@ -40,6 +41,26 @@ const DoctorConsultation = () => {
       setLoading(true);
       // Mock API call with timeout
       setTimeout(() => {
+        try {
+          setPatient({
+            id: "P12345",
+            name: "John Doe",
+            age: 45,
+            gender: "Male",
+            contact: "+1-234-567-8900",
+            email: "john.doe@example.com",
+            address: "123 Main St, New York, NY 10001",
+            appointmentDate: new Date().toISOString().split("T")[0],
+          });
+          setLoading(false);
+        } catch (err) {
+          console.error("Error loading patient data:", err);
+          setError("Failed to load patient data. Please try again.");
+          setLoading(false);
+        }
+      }, 1000);
+    } else {
+      try {
         setPatient({
           id: "P12345",
           name: "John Doe",
@@ -50,61 +71,116 @@ const DoctorConsultation = () => {
           address: "123 Main St, New York, NY 10001",
           appointmentDate: new Date().toISOString().split("T")[0],
         });
-        setLoading(false);
-      }, 1000);
-    } else {
-      setPatient({
-        id: "P12345",
-        name: "John Doe",
-        age: 45,
-        gender: "Male",
-        contact: "+1-234-567-8900",
-        email: "john.doe@example.com",
-        address: "123 Main St, New York, NY 10001",
-        appointmentDate: new Date().toISOString().split("T")[0],
-      });
+      } catch (err) {
+        console.error("Error setting default patient data:", err);
+        setError("Failed to initialize patient data. Please try again.");
+      }
     }
   }, [appointmentId]);
 
   // Handle change in objective data
   const handleObjectiveChange = (field, value) => {
-    setObjective({
-      ...objective,
-      [field]: value,
-    });
+    try {
+      setObjective({
+        ...objective,
+        [field]: value,
+      });
+    } catch (err) {
+      console.error("Error updating objective data:", err);
+      setError("Failed to update examination data. Please try again.");
+    }
   };
 
   // Handle change in plan data
   const handlePlanChange = (field, value) => {
-    setPlan({
-      ...plan,
-      [field]: value,
-    });
+    try {
+      setPlan({
+        ...plan,
+        [field]: value,
+      });
+    } catch (err) {
+      console.error("Error updating plan data:", err);
+      setError("Failed to update treatment plan. Please try again.");
+    }
   };
 
   // Handle form submission
   const handleSubmit = async (e) => {
     e.preventDefault();
     
-    // Here we would normally save the consultation to the database
-    // For now we'll just show a success message
-    alert("Consultation notes saved successfully!");
-    
-    // Navigate back to dashboard
-    // navigate('/doctor/dashboard');
+    try {
+      // Here we would normally save the consultation to the database
+      // For now we'll just show a success message
+      alert("Consultation notes saved successfully!");
+      
+      // Navigate back to dashboard
+      navigate('/doctor/dashboard');
+    } catch (err) {
+      console.error("Error submitting consultation notes:", err);
+      setError("Failed to save consultation notes. Please try again.");
+    }
   };
 
   // Export as PDF
   const exportPDF = () => {
-    // Since we don't have html2pdf.js, we'll just simulate export
-    alert("PDF Export functionality requires the html2pdf.js library. In a real implementation, this would download a PDF of the consultation notes.");
-    
-    // Original implementation would be:
-    // const element = document.getElementById('consultation-document');
-    // html2pdf()
-    //   .from(element)
-    //   .save(`Consultation_${patient.id}_${new Date().toISOString().slice(0, 10)}.pdf`);
+    try {
+      // Since we don't have html2pdf.js, we'll just simulate export
+      alert("PDF Export functionality requires the html2pdf.js library. In a real implementation, this would download a PDF of the consultation notes.");
+      
+      // Original implementation would be:
+      // const element = document.getElementById('consultation-document');
+      // html2pdf()
+      //   .from(element)
+      //   .save(`Consultation_${patient.id}_${new Date().toISOString().slice(0, 10)}.pdf`);
+    } catch (err) {
+      console.error("Error exporting PDF:", err);
+      setError("Failed to export PDF. Please try again.");
+    }
   };
+
+  // Handle back button
+  const handleBack = () => {
+    try {
+      navigate('/doctor/dashboard');
+    } catch (err) {
+      console.error("Navigation error:", err);
+      // If navigation fails, try a direct window location change
+      window.location.href = '/doctor/dashboard';
+    }
+  };
+
+  useEffect(() => {
+    window.scrollTo(0, 0);
+  }, []);
+
+  // Error display
+  if (error) {
+    return (
+      <div className="min-h-screen bg-gray-100 flex flex-col items-center justify-center p-4">
+        <div className="bg-white rounded-lg shadow-lg p-8 max-w-md w-full text-center">
+          <div className="text-red-600 text-5xl mb-6">
+            <FaTimes className="mx-auto" />
+          </div>
+          <h2 className="text-2xl font-bold text-gray-800 mb-4">Something Went Wrong</h2>
+          <p className="text-gray-600 mb-6">{error}</p>
+          <div className="flex flex-col sm:flex-row justify-center space-y-3 sm:space-y-0 sm:space-x-3">
+            <button
+              onClick={() => window.location.reload()}
+              className="bg-blue-600 text-white px-4 py-2 rounded-md hover:bg-blue-700 transition-colors"
+            >
+              Refresh Page
+            </button>
+            <button
+              onClick={handleBack}
+              className="bg-gray-600 text-white px-4 py-2 rounded-md hover:bg-gray-700 transition-colors"
+            >
+              Return to Dashboard
+            </button>
+          </div>
+        </div>
+      </div>
+    );
+  }
 
   // Loading indicator
   if (loading) {
@@ -114,12 +190,19 @@ const DoctorConsultation = () => {
       </div>
     );
   }
-  useEffect(() => {
-    window.scrollTo(0, 0);
-  }, []);
+
   return (
     <div className="bg-gray-100 min-h-screen py-12 px-4 sm:px-6 lg:px-8">
       <div className="max-w-4xl mx-auto">
+        {/* Back Button */}
+        <button
+          onClick={handleBack}
+          className="mb-6 flex items-center text-gray-600 hover:text-gray-900"
+        >
+          <FaArrowLeft className="mr-2" />
+          Back to Dashboard
+        </button>
+
         <div className="flex justify-between items-center mb-8">
           <h1 className="text-3xl font-bold text-gray-900 flex items-center">
             <FaNotesMedical className="mr-2 text-red-600" />

@@ -18,6 +18,37 @@ import {
   FaImage,
   FaFilePdf,
 } from "react-icons/fa";
+import { ToastContainer, toast } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
+import axios from 'axios';
+
+// List of medical specialties for the dropdown
+const specialtiesList = [
+  "Covid Treatment",
+  "Sexual Health",
+  "Eye Specialist",
+  "Womens Health",
+  "Diet & Nutrition",
+  "Skin & Hair",
+  "Bones and Joints",
+  "Child Specialist",
+  "Dental Care",
+  "Heart",
+  "Kidney Issues",
+  "Cancer",
+  "Ayurveda",
+  "General Physician",
+  "Mental Wellness",
+  "Homoeopath",
+  "General Surgery",
+  "Urinary Issues",
+  "Lungs and Breathing",
+  "Physiotherapy",
+  "Ear, Nose, Throat",
+  "Brain and Nerves",
+  "Diabetes Management",
+  "Veterinary",
+];
 
 const DoctorRegister = () => {
   const dispatch = useDispatch();
@@ -50,10 +81,21 @@ const DoctorRegister = () => {
 
   const handleChange = (e) => {
     const { name, value } = e.target;
-    setFormData((prev) => ({
-      ...prev,
-      [name]: value,
-    }));
+    
+    // Special handling for phone numbers - only allow digits, +, -, and spaces
+    if (name === "Phone") {
+      const sanitizedValue = value.replace(/[^\d+\s()-]/g, '');
+      setFormData((prev) => ({
+        ...prev,
+        [name]: sanitizedValue,
+      }));
+    } else {
+      setFormData((prev) => ({
+        ...prev,
+        [name]: value,
+      }));
+    }
+
     // Clear validation error when user types
     if (validationErrors[name]) {
       setValidationErrors((prev) => ({
@@ -65,74 +107,271 @@ const DoctorRegister = () => {
 
   const validateForm = () => {
     const errors = {};
+    
+    // Name validation - more strict
     if (!formData.Name) {
       errors.Name = "Name is required";
+    } else if (formData.Name.trim().length < 3) {
+      errors.Name = "Name must be at least 3 characters long";
+    } else if (!/^[A-Za-z\s.'-]+$/.test(formData.Name)) {
+      errors.Name = "Please enter a valid name (letters, spaces, and common punctuation only)";
     }
+    
+    // Email validation - more comprehensive 
     if (!formData.Email) {
       errors.Email = "Email is required";
-    } else if (!/\S+@\S+\.\S+/.test(formData.Email)) {
-      errors.Email = "Please enter a valid Email address";
+    } else if (!/^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/.test(formData.Email)) {
+      errors.Email = "Please enter a valid email address";
     }
+    
+    // Password validation - stronger requirements
     if (!formData.Password) {
       errors.Password = "Password is required";
-    } else if (formData.Password.length < 6) {
-      errors.Password = "Password must be at least 6 characters long";
+    } else if (formData.Password.length < 8) {
+      errors.Password = "Password must be at least 8 characters long";
+    } else if (!/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)/.test(formData.Password)) {
+      errors.Password = "Password must include at least one uppercase letter, one lowercase letter, and one number";
     }
-    if (formData.Password !== formData.confirmPassword) {
+    
+    // Confirm password
+    if (!formData.confirmPassword) {
+      errors.confirmPassword = "Please confirm your password";
+    } else if (formData.Password !== formData.confirmPassword) {
       errors.confirmPassword = "Passwords do not match";
     }
+    
+    // Phone validation - now only numbers can be entered due to the handleChange function
     if (!formData.Phone) {
       errors.Phone = "Phone number is required";
+    } else if (!/^(\+\d{1,3}[- ]?)?\d{10,15}$/.test(formData.Phone.replace(/[-()\s]/g, ''))) {
+      errors.Phone = "Please enter a valid phone number (10-15 digits)";
     }
+    
+    // Speciality validation
     if (!formData.Speciality) {
       errors.Speciality = "Speciality is required";
     }
+    
+    // License number validation
     if (!formData.LicenseNo) {
       errors.LicenseNo = "License number is required";
+    } else if (!/^[A-Z0-9-]{5,}$/.test(formData.LicenseNo)) {
+      errors.LicenseNo = "Please enter a valid license number (minimum 5 characters, letters, numbers, and hyphens)";
     }
+    
+    // Experience validation
     if (!formData.Experience) {
       errors.Experience = "Years of Experience is required";
+    } else if (isNaN(formData.Experience) || parseInt(formData.Experience) < 0) {
+      errors.Experience = "Please enter a valid number of years";
+    } else if (parseInt(formData.Experience) > 70) {
+      errors.Experience = "Please verify your years of experience";
     }
+    
+    // Education validation
     if (!formData.Education) {
       errors.Education = "Education details are required";
+    } else if (formData.Education.trim().length < 10) {
+      errors.Education = "Please provide more details about your education";
     }
+    
+    // City validation
     if (!formData.City) {
       errors.City = "City is required";
+    } else if (!/^[A-Za-z\s.-]{2,}$/.test(formData.City)) {
+      errors.City = "Please enter a valid city name";
     }
+    
+    // State validation
     if (!formData.State) {
       errors.State = "State/Province is required";
+    } else if (!/^[A-Za-z\s.-]{2,}$/.test(formData.State)) {
+      errors.State = "Please enter a valid state/province name";
     }
+    
+    // Country validation
     if (!formData.Country) {
       errors.Country = "Country is required";
+    } else if (!/^[A-Za-z\s.-]{2,}$/.test(formData.Country)) {
+      errors.Country = "Please enter a valid country name";
     }
+    
+    // Image validation
     if (!formData.image) {
       errors.image = "Profile Image is required";
+    } else {
+      // Check file size (limit to 5MB)
+      if (formData.image.size > 5 * 1024 * 1024) {
+        errors.image = "Image size should be less than 5MB";
+      }
+      // Check file type
+      const allowedTypes = ['image/jpeg', 'image/png', 'image/jpg', 'image/gif'];
+      if (!allowedTypes.includes(formData.image.type)) {
+        errors.image = "Please upload a valid image file (JPEG, JPG, PNG, or GIF)";
+      }
     }
+    
+    // Document validation
     if (!formData.document) {
       errors.document = "Medical Credentials are required";
+    } else {
+      // Check file size (limit to 10MB)
+      if (formData.document.size > 10 * 1024 * 1024) {
+        errors.document = "Document size should be less than 10MB";
+      }
+      // Check file type
+      if (formData.document.type !== 'application/pdf') {
+        errors.document = "Please upload a PDF document";
+      }
     }
+    
     setValidationErrors(errors);
     return Object.keys(errors).length === 0;
   };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    if (!validateForm()) return;
+    if (!validateForm()) {
+      // Show toast for validation errors
+      toast.error("Please fix the form errors before submitting.");
+      return;
+    }
 
     try {
+      // Check and log files first
+      logFileDetails();
+      
+      toast.info("Submitting your registration...", { autoClose: false, toastId: "registering" });
       console.log("FORMATTED DATA BEING SUBMITTED --->", formData);
 
-      await dispatch(registerDoctor(formData)).unwrap();
-      navigate("/doctor/login");
+      const result = await dispatch(registerDoctor(formData)).unwrap();
+      
+      // Close the info toast
+      toast.dismiss("registering");
+      
+      // Show success message
+      toast.success("Registration successful! Redirecting to login...");
+      
+      // Redirect after a short delay to let the user see the success message
+      setTimeout(() => {
+        navigate("/doctor/login");
+      }, 2000);
     } catch (error) {
+      // Close the info toast
+      toast.dismiss("registering");
+      
       console.error("Registration failed:", error);
+      
+      // Handle different error formats
+      let errorMessage = "Registration failed. Please try again.";
+      if (typeof error === 'string') {
+        errorMessage = error;
+      } else if (error?.message) {
+        errorMessage = error.message;
+      } else if (error?.response?.data?.message) {
+        errorMessage = error.response.data.message;
+      }
+      
+      // Display error toast
+      toast.error(errorMessage);
+      
+      // Store validation error for rendering in the UI
+      setValidationErrors(prev => ({ ...prev, general: errorMessage }));
     }
   };
+  
+  // Debug function to check file objects
+  const logFileDetails = () => {
+    if (formData.image) {
+      console.log("Image file details:", {
+        name: formData.image.name,
+        type: formData.image.type,
+        size: formData.image.size,
+        lastModified: formData.image.lastModified
+      });
+    } else {
+      console.warn("No image file selected");
+    }
+    
+    if (formData.document) {
+      console.log("Document file details:", {
+        name: formData.document.name,
+        type: formData.document.type,
+        size: formData.document.size,
+        lastModified: formData.document.lastModified
+      });
+    } else {
+      console.warn("No document file selected");
+    }
+  };
+  
+  // Special file input handler
+  const handleFileChange = (e) => {
+    const { name, files } = e.target;
+    const file = files[0];
+    
+    if (file) {
+      console.log(`Selected ${name} file:`, file.name, file.type, file.size);
+      setFormData(prev => ({
+        ...prev,
+        [name]: file
+      }));
+      
+      // Clear validation error when user selects a file
+      if (validationErrors[name]) {
+        setValidationErrors(prev => ({
+          ...prev,
+          [name]: ""
+        }));
+      }
+    }
+  };
+
+  const savePrescription = async (appointmentId, prescriptionData) => {
+    try {
+      await axios.post(`/api/prescriptions`, {
+        appointmentId,
+        doctorId,
+        patientId: currentPatient._id,
+        medications: prescriptionData.medications,
+        instructions: prescriptionData.instructions,
+        notes: prescriptionData.notes
+      });
+      
+      toast.success("Prescription saved successfully");
+      // Update UI or redirect
+    } catch (error) {
+      console.error('Error saving prescription:', error);
+      toast.error('Failed to save prescription');
+    }
+  };
+
+  const updateAppointmentStatus = async (appointmentId, newStatus) => {
+    try {
+      await axios.put(`/api/appointments/${appointmentId}/status`, { 
+        status: newStatus 
+      });
+      
+      // Update local state to reflect change
+      setAppointments(prevAppointments => 
+        prevAppointments.map(apt => 
+          apt._id === appointmentId ? {...apt, status: newStatus} : apt
+        )
+      );
+      
+      toast.success(`Appointment status updated to ${newStatus}`);
+    } catch (error) {
+      console.error('Error updating status:', error);
+      toast.error('Failed to update appointment status');
+    }
+  };
+
   useEffect(() => {
     window.scrollTo(0, 0);
   }, []);
   return (
     <div className="min-h-screen bg-gray-100 flex flex-col justify-center py-12 sm:px-6 lg:px-8">
+      <ToastContainer position="top-right" autoClose={5000} />
       <div className="sm:mx-auto sm:w-full sm:max-w-md">
         <div className="flex justify-center">
           <FaUserMd className="h-12 w-12 text-red-600" />
@@ -235,7 +474,7 @@ const DoctorRegister = () => {
                       ? "border-red-300"
                       : "border-gray-300"
                   }`}
-                  placeholder="Enter your Phone number"
+                  placeholder="Enter digits only (e.g., 1234567890)"
                 />
               </div>
               {validationErrors.Phone && (
@@ -250,16 +489,15 @@ const DoctorRegister = () => {
                 htmlFor="Speciality"
                 className="block text-sm font-medium text-gray-700"
               >
-                specialization
+                Specialization
               </label>
               <div className="mt-1 relative rounded-md shadow-sm">
                 <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
                   <FaUserMd className="h-5 w-5 text-gray-400" />
                 </div>
-                <input
+                <select
                   id="Speciality"
                   name="Speciality"
-                  type="text"
                   required
                   value={formData.Speciality}
                   onChange={handleChange}
@@ -268,8 +506,14 @@ const DoctorRegister = () => {
                       ? "border-red-300"
                       : "border-gray-300"
                   }`}
-                  placeholder="Enter your specialization"
-                />
+                >
+                  <option value="">Select your specialization</option>
+                  {specialtiesList.map((specialty, index) => (
+                    <option key={index} value={specialty}>
+                      {specialty}
+                    </option>
+                  ))}
+                </select>
               </div>
               {validationErrors.Speciality && (
                 <p className="mt-1 text-sm text-red-600 flex items-center">
@@ -328,6 +572,7 @@ const DoctorRegister = () => {
                   type="number"
                   required
                   min="0"
+                  max="70"
                   value={formData.Experience}
                   onChange={handleChange}
                   onKeyDown={(e) => {
@@ -483,7 +728,7 @@ const DoctorRegister = () => {
                 htmlFor="image"
                 className="block text-sm font-medium text-gray-700"
               >
-                Profile Image
+                Profile Image (Max 5MB)
               </label>
               <div className="mt-1 relative rounded-md shadow-sm">
                 <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
@@ -494,14 +739,7 @@ const DoctorRegister = () => {
                   name="image"
                   type="file"
                   accept="image/*"
-                  onChange={(e) => {
-                    handleChange({
-                      target: {
-                        name: "image",
-                        value: e.target.files ? e.target.files[0] : null,
-                      },
-                    });
-                  }}
+                  onChange={handleFileChange}
                   className={`block w-full pl-10 pr-3 py-2 border rounded-md shadow-sm focus:outline-none focus:ring-red-500 focus:border-red-500 sm:text-sm ${
                     validationErrors.image
                       ? "border-red-300"
@@ -521,7 +759,7 @@ const DoctorRegister = () => {
                 htmlFor="document"
                 className="block text-sm font-medium text-gray-700"
               >
-                Medical Credentials (PDF)
+                Medical Credentials (PDF, Max 10MB)
               </label>
               <div className="mt-1 relative rounded-md shadow-sm">
                 <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
@@ -532,14 +770,7 @@ const DoctorRegister = () => {
                   name="document"
                   type="file"
                   accept=".pdf"
-                  onChange={(e) => {
-                    handleChange({
-                      target: {
-                        name: "document",
-                        value: e.target.files ? e.target.files[0] : null,
-                      },
-                    });
-                  }}
+                  onChange={handleFileChange}
                   className={`block w-full pl-10 pr-3 py-2 border rounded-md shadow-sm focus:outline-none focus:ring-red-500 focus:border-red-500 sm:text-sm ${
                     validationErrors.document
                       ? "border-red-300"
@@ -647,7 +878,7 @@ const DoctorRegister = () => {
                 </p>
               )}
             </div>
-            {error && (
+            {validationErrors.general && (
               <div className="rounded-md bg-red-50 p-4">
                 <div className="flex">
                   <div className="flex-shrink-0">
@@ -655,7 +886,7 @@ const DoctorRegister = () => {
                   </div>
                   <div className="ml-3">
                     <h3 className="text-sm font-medium text-red-800">
-                      {error}
+                      {validationErrors.general}
                     </h3>
                   </div>
                 </div>

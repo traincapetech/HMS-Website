@@ -1,288 +1,432 @@
-import React, { useState, useEffect } from "react";
-import { Link, useNavigate } from "react-router-dom";
-import { useSelector } from "react-redux";
-import { FaUser, FaClipboardList, FaCalendarCheck, FaFilePrescription, FaNotesMedical, FaSignature, FaUserMd } from "react-icons/fa";
+import React, { useState, useEffect } from 'react';
+import { useSelector } from 'react-redux';
+import { Link, useNavigate } from 'react-router-dom';
+import { toast } from 'react-toastify';
+import { FaUserMd, FaCalendarCheck, FaFilePrescription, FaSpinner, FaExclamationTriangle, FaUser, FaUserTie } from 'react-icons/fa';
+import { getCurrentDoctor } from '../utils/authUtils';
+import { 
+  getDoctorStatistics, 
+  getDoctorTodayAppointments, 
+  getDoctorPatients, 
+  getDoctorPendingPrescriptions 
+} from '../api/doctorApi';
 
 const DoctorDashboard = () => {
-  const { doctor } = useSelector((state) => state.doctor) || {};
   const navigate = useNavigate();
-  const [appointments, setAppointments] = useState([]);
-  const [stats, setStats] = useState({
+  const { doctor } = useSelector((state) => state.doctor);
+  
+  const [statistics, setStatistics] = useState({
     totalPatients: 0,
     todayAppointments: 0,
-    pendingPrescriptions: 0,
+    pendingPrescriptions: 0
   });
-  const [activeTab, setActiveTab] = useState("dashboard");
+  
+  const [loading, setLoading] = useState({
+    stats: true,
+    patients: true,
+    appointments: true,
+    prescriptions: true
+  });
+  
+  const [error, setError] = useState({
+    stats: null,
+    patients: null,
+    appointments: null,
+    prescriptions: null
+  });
 
-  // Mock data - replace with actual API calls
+  // Get current doctor data from Redux or localStorage
+  const [currentDoctor, setCurrentDoctor] = useState(null);
+
   useEffect(() => {
-    // Simulating API calls
-    const fetchAppointments = async () => {
-      try {
-        // Replace with actual API call
-        // const response = await api.get("/api/doctor/appointments");
-        // setAppointments(response.data);
-        
-        // Mock data
-        setAppointments([
-          {
-            id: 1,
-            patientName: "John Smith",
-            patientEmail: "john@example.com",
-            date: "2023-07-15",
-            time: "10:00 AM",
-            status: "Completed",
-            reason: "Regular checkup",
-          },
-          {
-            id: 2,
-            patientName: "Sarah Johnson",
-            patientEmail: "sarah@example.com",
-            date: "2023-07-16",
-            time: "11:30 AM",
-            status: "Pending",
-            reason: "Fever and headache",
-          },
-          {
-            id: 3,
-            patientName: "Mike Wilson",
-            patientEmail: "mike@example.com",
-            date: "2023-07-16",
-            time: "2:00 PM",
-            status: "Pending",
-            reason: "Follow-up after surgery",
-          },
-        ]);
+    // Try to get doctor from Redux first, then from localStorage
+    const doctorData = doctor || getCurrentDoctor();
+    
+    if (doctorData) {
+      console.log("Using doctor data:", doctorData.Name, doctorData._id || '(no ID)');
+      setCurrentDoctor(doctorData);
+    } else {
+      console.warn("No doctor data found, using fallback");
+      // Provide a fallback doctor for demo
+      setCurrentDoctor({
+        Name: "Doctor",
+        Speciality: "General Medicine",
+        Email: "doctor@example.com",
+        _id: null
+      });
+      
+      // Show warning toast only once
+      toast.warning("Limited functionality: Doctor data incomplete.", {
+        toastId: 'missing-doctor-data',
+      });
+    }
+  }, [doctor]);
 
-        // Mock stats
-        setStats({
-          totalPatients: 45,
-          todayAppointments: 8,
-          pendingPrescriptions: 3,
-        });
-      } catch (error) {
-        console.error("Error fetching appointments:", error);
+  useEffect(() => {
+    // Fetch data when currentDoctor updates
+    if (currentDoctor) {
+      fetchDashboardData();
+    }
+  }, [currentDoctor]);
+
+  const fetchDashboardData = async () => {
+    if (!currentDoctor) return;
+
+    // Reset all loading states
+    setLoading({
+      stats: true,
+      patients: true,
+      appointments: true, 
+      prescriptions: true
+    });
+
+    // Reset errors
+    setError({
+      stats: null,
+      patients: null,
+      appointments: null,
+      prescriptions: null
+    });
+
+    // Get doctor ID for API calls - if not available, use email to identify
+    const doctorId = currentDoctor._id;
+    const doctorEmail = currentDoctor.Email;
+
+    // Log the fetch attempt with available info
+    console.log(`Fetching dashboard data for doctor: ID=${doctorId || 'undefined'}, Email=${doctorEmail || 'undefined'}`);
+
+    // Fetch each metric independently so one failure doesn't block others
+    fetchTotalPatients(doctorId, doctorEmail);
+    fetchTodayAppointments(doctorId, doctorEmail);
+    fetchPendingPrescriptions(doctorId, doctorEmail);
+  };
+
+  // Fetch total unique patients for this doctor
+  const fetchTotalPatients = async (doctorId, doctorEmail) => {
+    try {
+      // First try the endpoint for combined statistics
+      const statsResponse = await getDoctorStatistics(doctorId);
+      
+      if (statsResponse && statsResponse.data) {
+        // Update all statistics at once if available
+        setStatistics(prev => ({
+          ...prev,
+          totalPatients: statsResponse.data.totalPatients || 0,
+          todayAppointments: statsResponse.data.todayAppointments || 0,
+          pendingPrescriptions: statsResponse.data.pendingPrescriptions || 0
+        }));
+        
+        // All stats loaded at once
+        setLoading(prev => ({
+          ...prev,
+          stats: false,
+          patients: false,
+          appointments: false,
+          prescriptions: false
+        }));
+        
+        return;
       }
-    };
+      
+      // Fallback: Get just patients if combined endpoint doesn't work
+      const response = await getDoctorPatients(doctorId);
+      
+      // Count unique patients
+      if (response && response.data) {
+        const uniquePatients = response.data.length;
+        setStatistics(prev => ({ ...prev, totalPatients: uniquePatients }));
+      }
+    } catch (err) {
+      console.error('Error fetching patient count:', err);
+      setError(prev => ({ ...prev, patients: 'Failed to load patient data' }));
+      
+      // Fallback to a reasonable estimate
+      setStatistics(prev => ({ ...prev, totalPatients: 0 }));
+    } finally {
+      setLoading(prev => ({ ...prev, patients: false, stats: false }));
+    }
+  };
 
-    fetchAppointments();
-  }, []);
+  // Fetch today's appointments
+  const fetchTodayAppointments = async (doctorId, doctorEmail) => {
+    try {
+      const response = await getDoctorTodayAppointments(doctorId);
+      
+      if (response && (response.appointments || response.data)) {
+        const appointments = response.appointments || response.data || [];
+        setStatistics(prev => ({ 
+          ...prev, 
+          todayAppointments: Array.isArray(appointments) ? appointments.length : 0
+        }));
+      }
+    } catch (err) {
+      console.error('Error fetching today appointments:', err);
+      setError(prev => ({ ...prev, appointments: 'Failed to load appointment data' }));
+      
+      // Fallback to zero
+      setStatistics(prev => ({ ...prev, todayAppointments: 0 }));
+    } finally {
+      setLoading(prev => ({ ...prev, appointments: false }));
+    }
+  };
 
-  const renderDashboard = () => (
-    <div>
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
-        <div className="bg-green-100 p-6 rounded-lg shadow">
-          <div className="flex justify-between items-center">
-            <div>
-              <p className="text-sm font-medium text-green-600">Total Patients</p>
-              <p className="text-2xl font-bold text-green-800">{stats.totalPatients}</p>
-            </div>
-            <FaUser className="text-4xl text-green-500" />
-          </div>
-        </div>
-        
-        <div className="bg-blue-100 p-6 rounded-lg shadow">
-          <div className="flex justify-between items-center">
-            <div>
-              <p className="text-sm font-medium text-blue-600">Today's Appointments</p>
-              <p className="text-2xl font-bold text-blue-800">{stats.todayAppointments}</p>
-            </div>
-            <FaCalendarCheck className="text-4xl text-blue-500" />
-          </div>
-        </div>
-        
-        <div className="bg-yellow-100 p-6 rounded-lg shadow">
-          <div className="flex justify-between items-center">
-            <div>
-              <p className="text-sm font-medium text-yellow-600">Pending Prescriptions</p>
-              <p className="text-2xl font-bold text-yellow-800">{stats.pendingPrescriptions}</p>
-            </div>
-            <FaFilePrescription className="text-4xl text-yellow-500" />
-          </div>
-        </div>
+  // Fetch pending prescriptions
+  const fetchPendingPrescriptions = async (doctorId, doctorEmail) => {
+    try {
+      const response = await getDoctorPendingPrescriptions(doctorId);
+      
+      if (response && (response.prescriptions || response.data)) {
+        const prescriptions = response.prescriptions || response.data || [];
+        setStatistics(prev => ({ 
+          ...prev, 
+          pendingPrescriptions: Array.isArray(prescriptions) ? prescriptions.length : 0
+        }));
+      }
+    } catch (err) {
+      console.error('Error fetching pending prescriptions:', err);
+      setError(prev => ({ ...prev, prescriptions: 'Failed to load prescription data' }));
+      
+      // Fallback to zero
+      setStatistics(prev => ({ ...prev, pendingPrescriptions: 0 }));
+    } finally {
+      setLoading(prev => ({ ...prev, prescriptions: false }));
+    }
+  };
+
+  // Check if all data is loaded
+  const isAllLoaded = !loading.stats && !loading.patients && 
+                      !loading.appointments && !loading.prescriptions;
+
+  // If we're still loading everything and no doctor data
+  if (Object.values(loading).every(l => l) && !currentDoctor) {
+    return (
+      <div className="flex flex-col items-center justify-center min-h-screen bg-gray-100">
+        <FaSpinner className="animate-spin text-red-600 text-4xl mb-4" />
+        <p className="text-gray-600">Loading dashboard...</p>
       </div>
+    );
+  }
 
-      <h3 className="text-xl font-semibold mb-4">Upcoming Appointments</h3>
-      <div className="bg-white rounded-lg shadow overflow-hidden">
-        <table className="min-w-full divide-y divide-gray-200">
-          <thead className="bg-gray-50">
-            <tr>
-              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Patient</th>
-              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Date & Time</th>
-              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Reason</th>
-              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Status</th>
-              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Actions</th>
-            </tr>
-          </thead>
-          <tbody className="bg-white divide-y divide-gray-200">
-            {appointments.map((appointment) => (
-              <tr key={appointment.id}>
-                <td className="px-6 py-4 whitespace-nowrap">
-                  <div className="flex items-center">
-                    <div className="ml-4">
-                      <div className="text-sm font-medium text-gray-900">{appointment.patientName}</div>
-                      <div className="text-sm text-gray-500">{appointment.patientEmail}</div>
-                    </div>
-                  </div>
-                </td>
-                <td className="px-6 py-4 whitespace-nowrap">
-                  <div className="text-sm text-gray-900">{appointment.date}</div>
-                  <div className="text-sm text-gray-500">{appointment.time}</div>
-                </td>
-                <td className="px-6 py-4 whitespace-nowrap">
-                  <div className="text-sm text-gray-900">{appointment.reason}</div>
-                </td>
-                <td className="px-6 py-4 whitespace-nowrap">
-                  <span className={`px-2 inline-flex text-xs leading-5 font-semibold rounded-full ${
-                    appointment.status === "Completed" 
-                      ? "bg-green-100 text-green-800" 
-                      : "bg-yellow-100 text-yellow-800"
-                  }`}>
-                    {appointment.status}
-                  </span>
-                </td>
-                <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                  <button 
-                    onClick={() => navigate(`/doctor/prescriptions/new/${appointment.id}`)}
-                    className="text-indigo-600 hover:text-indigo-900 mr-3"
-                  >
-                    Prescribe
-                  </button>
-                  <button 
-                    onClick={() => navigate(`/doctor/consultations/new/${appointment.id}`)}
-                    className="text-green-600 hover:text-green-900"
-                  >
-                    Add Notes
-                  </button>
-                </td>
-              </tr>
-            ))}
-          </tbody>
-        </table>
-      </div>
-    </div>
-  );
-  useEffect(() => {
-    window.scrollTo(0, 0);
-  }, []);
   return (
-    <div className="min-h-screen bg-gray-100">
+    <div className="bg-gray-100 min-h-screen">
+      {/* Header section */}
       <div className="bg-white shadow">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex justify-between h-16">
-            <div className="flex">
-              <div className="flex-shrink-0 flex items-center">
-                <FaUserMd className="h-8 w-8 text-red-700" />
-                <span className="ml-2 text-2xl font-bold text-red-700">TAMD Doctor Portal</span>
-              </div>
+        <div className="max-w-7xl mx-auto py-6 px-4 sm:px-6 lg:px-8">
+          <div className="flex items-center">
+            <div className="bg-red-100 p-3 rounded-full mr-4">
+              <FaUserTie className="text-red-600 text-2xl" />
             </div>
-            <div className="flex items-center">
-              <span className="text-gray-700 mr-2">Dr. {doctor?.Name || "User"}</span>
-              <button className="ml-4 px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-red-600 hover:bg-red-700">
-                Logout
-              </button>
+            <div>
+              <h1 className="text-3xl font-bold text-gray-900">
+                Welcome, Dr. {currentDoctor?.Name || 'Doctor'}
+              </h1>
+              <p className="mt-1 text-sm text-gray-500">
+                {currentDoctor?.Speciality || 'Specialist'}
+              </p>
+              {currentDoctor?.Email && (
+                <p className="mt-1 text-sm text-gray-500">
+                  {currentDoctor.Email}
+                </p>
+              )}
             </div>
           </div>
         </div>
       </div>
 
+      {/* Dashboard content */}
       <div className="max-w-7xl mx-auto py-6 sm:px-6 lg:px-8">
-        <div className="flex flex-col md:flex-row">
-          {/* Sidebar */}
-          <div className="w-full md:w-1/5 bg-white p-4 rounded-lg shadow mb-6 md:mb-0 md:mr-6">
-            <ul>
-              <li>
-                <button
-                  onClick={() => setActiveTab("dashboard")}
-                  className={`w-full text-left mb-2 p-3 flex items-center rounded-md ${
-                    activeTab === "dashboard" ? "bg-red-100 text-red-700" : "hover:bg-gray-100"
-                  }`}
-                >
-                  <FaClipboardList className="mr-3" />
-                  Dashboard
-                </button>
-              </li>
-              <li>
-                <button
-                  onClick={() => setActiveTab("prescriptions")}
-                  className={`w-full text-left mb-2 p-3 flex items-center rounded-md ${
-                    activeTab === "prescriptions" ? "bg-red-100 text-red-700" : "hover:bg-gray-100"
-                  }`}
-                >
-                  <FaFilePrescription className="mr-3" />
-                  Prescriptions
-                </button>
-              </li>
-              <li>
-                <button
-                  onClick={() => setActiveTab("consultations")}
-                  className={`w-full text-left mb-2 p-3 flex items-center rounded-md ${
-                    activeTab === "consultations" ? "bg-red-100 text-red-700" : "hover:bg-gray-100"
-                  }`}
-                >
-                  <FaNotesMedical className="mr-3" />
-                  Consultation Notes
-                </button>
-              </li>
-              <li>
-                <button
-                  onClick={() => setActiveTab("signature")}
-                  className={`w-full text-left mb-2 p-3 flex items-center rounded-md ${
-                    activeTab === "signature" ? "bg-red-100 text-red-700" : "hover:bg-gray-100"
-                  }`}
-                >
-                  <FaSignature className="mr-3" />
-                  E-Signature
-                </button>
-              </li>
-            </ul>
+        {/* Statistics cards */}
+        <div className="grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-3">
+          {/* Total Patients Card */}
+          <div className="bg-white overflow-hidden shadow rounded-lg">
+            <div className="p-5">
+              <div className="flex items-center">
+                <div className="flex-shrink-0 bg-blue-100 rounded-md p-3">
+                  <FaUser className="h-6 w-6 text-blue-600" />
+                </div>
+                <div className="ml-5 w-0 flex-1">
+                  <dl>
+                    <dt className="text-sm font-medium text-gray-500 truncate">
+                      Total Patients
+                    </dt>
+                    <dd>
+                      {loading.patients ? (
+                        <FaSpinner className="animate-spin h-5 w-5 text-gray-400" />
+                      ) : (
+                        <div className="flex items-center">
+                          <div className="text-lg font-medium text-gray-900">
+                            {statistics.totalPatients}
+                          </div>
+                          {error.patients && (
+                            <FaExclamationTriangle className="h-4 w-4 text-yellow-500 ml-2" title={error.patients} />
+                          )}
+                        </div>
+                      )}
+                    </dd>
+                  </dl>
+                </div>
+              </div>
+            </div>
+            <div className="bg-gray-50 px-5 py-3">
+              <div className="text-sm">
+                <Link to="/doctor/patients" className="font-medium text-blue-700 hover:text-blue-900">
+                  View all patients
+                </Link>
+              </div>
+            </div>
           </div>
 
-          {/* Main Content */}
-          <div className="w-full md:w-4/5 bg-white p-6 rounded-lg shadow">
-            {activeTab === "dashboard" && renderDashboard()}
-            {activeTab === "prescriptions" && (
-              <div>
-                <h2 className="text-2xl font-bold mb-6">Prescriptions</h2>
-                <Link 
-                  to="/doctor/prescriptions/new"
-                  className="bg-red-600 text-white px-4 py-2 rounded hover:bg-red-700 inline-block mb-6"
-                >
-                  Create New Prescription
-                </Link>
-                <p className="text-gray-600">Use this section to manage your patient prescriptions. Click on "Create New Prescription" to create a new prescription for a patient.</p>
+          {/* Today's Appointments Card */}
+          <div className="bg-white overflow-hidden shadow rounded-lg">
+            <div className="p-5">
+              <div className="flex items-center">
+                <div className="flex-shrink-0 bg-green-100 rounded-md p-3">
+                  <FaCalendarCheck className="h-6 w-6 text-green-600" />
+                </div>
+                <div className="ml-5 w-0 flex-1">
+                  <dl>
+                    <dt className="text-sm font-medium text-gray-500 truncate">
+                      Today's Appointments
+                    </dt>
+                    <dd>
+                      {loading.appointments ? (
+                        <FaSpinner className="animate-spin h-5 w-5 text-gray-400" />
+                      ) : (
+                        <div className="flex items-center">
+                          <div className="text-lg font-medium text-gray-900">
+                            {statistics.todayAppointments}
+                          </div>
+                          {error.appointments && (
+                            <FaExclamationTriangle className="h-4 w-4 text-yellow-500 ml-2" title={error.appointments} />
+                          )}
+                        </div>
+                      )}
+                    </dd>
+                  </dl>
+                </div>
               </div>
-            )}
-            {activeTab === "consultations" && (
-              <div>
-                <h2 className="text-2xl font-bold mb-6">Consultation Notes</h2>
-                <Link 
-                  to="/doctor/consultations/new"
-                  className="bg-red-600 text-white px-4 py-2 rounded hover:bg-red-700 inline-block mb-6"
-                >
-                  Create New Consultation Note
+            </div>
+            <div className="bg-gray-50 px-5 py-3">
+              <div className="text-sm">
+                <Link to="/doctor/appointments" className="font-medium text-green-700 hover:text-green-900">
+                  View appointments
                 </Link>
-                <p className="text-gray-600">Create and manage detailed consultation notes for patient visits. These notes can help track patient progress over time.</p>
               </div>
-            )}
-            {activeTab === "signature" && (
-              <div>
-                <h2 className="text-2xl font-bold mb-6">E-Signature Setup</h2>
-                <div className="mb-6 p-4 border border-gray-300 rounded-lg">
-                  <p className="text-gray-700 mb-4">Upload or create your digital signature to use on prescriptions and medical documents.</p>
-                  <div className="flex flex-col sm:flex-row gap-4">
-                    <button className="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700">Upload Signature Image</button>
-                    <button className="bg-green-600 text-white px-4 py-2 rounded hover:bg-green-700">Draw Signature</button>
+            </div>
+          </div>
+
+          {/* Pending Prescriptions Card */}
+          <div className="bg-white overflow-hidden shadow rounded-lg">
+            <div className="p-5">
+              <div className="flex items-center">
+                <div className="flex-shrink-0 bg-red-100 rounded-md p-3">
+                  <FaFilePrescription className="h-6 w-6 text-red-600" />
+                </div>
+                <div className="ml-5 w-0 flex-1">
+                  <dl>
+                    <dt className="text-sm font-medium text-gray-500 truncate">
+                      Pending Prescriptions
+                    </dt>
+                    <dd>
+                      {loading.prescriptions ? (
+                        <FaSpinner className="animate-spin h-5 w-5 text-gray-400" />
+                      ) : (
+                        <div className="flex items-center">
+                          <div className="text-lg font-medium text-gray-900">
+                            {statistics.pendingPrescriptions}
+                          </div>
+                          {error.prescriptions && (
+                            <FaExclamationTriangle className="h-4 w-4 text-yellow-500 ml-2" title={error.prescriptions} />
+                          )}
+                        </div>
+                      )}
+                    </dd>
+                  </dl>
+                </div>
+              </div>
+            </div>
+            <div className="bg-gray-50 px-5 py-3">
+              <div className="text-sm">
+                <Link to="/doctor/prescriptions" className="font-medium text-red-700 hover:text-red-900">
+                  View prescriptions
+                </Link>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        {/* Quick Actions */}
+        <div className="mt-8">
+          <h2 className="text-lg leading-6 font-medium text-gray-900">Quick Actions</h2>
+          <div className="mt-2 grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-3">
+            {/* Quick Action Cards */}
+            <Link to="/doctor/appointments/new" className="bg-white overflow-hidden shadow rounded-lg hover:bg-gray-50">
+              <div className="px-4 py-5 sm:p-6">
+                <div className="flex items-center">
+                  <div className="flex-shrink-0 bg-blue-100 rounded-md p-3">
+                    <FaCalendarCheck className="h-6 w-6 text-blue-600" />
+                  </div>
+                  <div className="ml-5 w-0 flex-1">
+                    <h3 className="text-base font-medium text-gray-900">Schedule Appointment</h3>
+                    <p className="mt-1 text-sm text-gray-500">Create a new appointment for a patient</p>
                   </div>
                 </div>
-                <p className="text-gray-600">Your signature will be securely stored and used to authenticate prescriptions and other medical documents you issue.</p>
               </div>
-            )}
+            </Link>
+            
+            <Link to="/doctor/consultations/new" className="bg-white overflow-hidden shadow rounded-lg hover:bg-gray-50">
+              <div className="px-4 py-5 sm:p-6">
+                <div className="flex items-center">
+                  <div className="flex-shrink-0 bg-green-100 rounded-md p-3">
+                    <FaUserMd className="h-6 w-6 text-green-600" />
+                  </div>
+                  <div className="ml-5 w-0 flex-1">
+                    <h3 className="text-base font-medium text-gray-900">Start Consultation</h3>
+                    <p className="mt-1 text-sm text-gray-500">Begin a new patient consultation</p>
+                  </div>
+                </div>
+              </div>
+            </Link>
+            
+            <Link to="/doctor/prescriptions/new" className="bg-white overflow-hidden shadow rounded-lg hover:bg-gray-50">
+              <div className="px-4 py-5 sm:p-6">
+                <div className="flex items-center">
+                  <div className="flex-shrink-0 bg-red-100 rounded-md p-3">
+                    <FaFilePrescription className="h-6 w-6 text-red-600" />
+                  </div>
+                  <div className="ml-5 w-0 flex-1">
+                    <h3 className="text-base font-medium text-gray-900">Write Prescription</h3>
+                    <p className="mt-1 text-sm text-gray-500">Create a new prescription for a patient</p>
+                  </div>
+                </div>
+              </div>
+            </Link>
           </div>
         </div>
+
+        {/* Show fallback notice if doctor ID is missing */}
+        {!currentDoctor?._id && (
+          <div className="mt-8 bg-yellow-50 border-l-4 border-yellow-400 p-4">
+            <div className="flex">
+              <div className="flex-shrink-0">
+                <FaExclamationTriangle className="h-5 w-5 text-yellow-400" />
+              </div>
+              <div className="ml-3">
+                <p className="text-sm text-yellow-700">
+                  <span className="font-medium">Notice:</span> Some features may be limited as you are using demo mode or have incomplete doctor profile data.
+                </p>
+                <div className="mt-2">
+                  <Link to="/api-diagnostics" className="text-sm font-medium text-yellow-800 hover:text-yellow-900">
+                    Run API Diagnostics to troubleshoot issues →
+                  </Link>
+                </div>
+              </div>
+            </div>
+          </div>
+        )}
       </div>
     </div>
   );
 };
 
-export default DoctorDashboard; 
+export default DoctorDashboard;

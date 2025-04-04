@@ -13,7 +13,6 @@ import TAMDCareClinics from '../pages/TAMDCareClinic'
 import ReadHealthArticles from '../pages/ReadHealthArticles'
 import ReadAboutMedicines from '../pages/ReadAboutMedicines'
 import TAMDDrive from '../pages/TAMDDrive'
-import TAMDHealthFeed from '../pages/TAMDHealthFeed'
 import WellnessPlans from '../pages/WellnessPlans'
 import FAQPage from "../pages/FAQPage"
 import InstaByTAMD from '../pages/InstaByTAMD'
@@ -25,6 +24,7 @@ import DoctorPage from '../pages/DoctorPage'
 import VideoConsult from '../components/VideoConsult'
 import ConsultationDetail from '../pages/ConsultationDetail'
 import Appointments from '../components/Appointment'
+import AppointmentConfirmed from '../pages/AppointmentConfirmed'
 import VideoCall from '../components/VideoCall'
 import Dashboard from '../components/app.dashboard'
 import VideoCallControls from '../components/videocallcontrols'
@@ -52,7 +52,16 @@ import DoctorLogin from '../pages/DoctorLogin'
 import DoctorRegister from '../pages/DoctorRegister'
 import ProtectedDoctorRoute from '../components/ProtectedDoctorRoute'
 import SpecialtyDetail from '../pages/SpecialtyDetail'
-import Razorpay from '../components/Razorpay'
+import AdminLogin from '../pages/AdminLogin'
+import AdminDashboard from '../pages/AdminDashboard'
+import AdminDoctors from '../pages/AdminDoctors'
+import AdminPricing from '../pages/AdminPricing'
+import AdminPatients from '../pages/AdminPatients'
+import AdminAnalytics from '../pages/AdminAnalytics'
+import AdminSettings from '../pages/AdminSettings'
+import ProtectedAdminRoute from '../components/ProtectedAdminRoute'
+import TAMDHealthFeed from '../pages/TAMDHealthFeed'
+import ApiDiagnostics from '../pages/ApiDiagnostics'
 
 const AllRoutes = () => {
   return (
@@ -97,10 +106,12 @@ const AllRoutes = () => {
       <Route path="/consultation/:id" element={<ConsultationDetail />} />
       <Route path='/ConsultTopDoctors' element={<ConsultTopDoctors />} />
       <Route path='/Appointments' element={<Appointments />} />
+      <Route path='/appointment-confirmed' element={<AppointmentConfirmed />} />
       <Route path='/VideoCall' element={<VideoCall />} />
       <Route path='/Dashboard' element={<Dashboard />} />
       <Route path='/VideoCallControls' element={<VideoCallControls />} />
       <Route path='/MyAppointments' element={<MyAppointments />} />
+      <Route path='/api-diagnostics' element={<ApiDiagnostics />} />
       <Route path='/MyFeedback' element={<MyFeedback />} />
       <Route path='/MyMedicalRecords' element={<MyMedicalRecords />} />
       <Route path='/OnlineConsultations' element={<OnlineConsultations />} />
@@ -115,7 +126,7 @@ const AllRoutes = () => {
       <Route path='/ProfilePage' element={<ProfilePage />} />
       <Route path='/TAMDReachPage' element={<TAMDReachPage />} />
       <Route path='/HelpPage' element={<HelpPage />} />
-      <Route path='/RazorPay' element={<Razorpay />} />
+      <Route path='/AdminLogin' element={<AdminLogin />} />
 
       {/* Doctor Panel Routes */}
       <Route
@@ -146,6 +157,57 @@ const AllRoutes = () => {
       {/* Doctor Authentication Routes */}
       <Route path="/doctor/login" element={<DoctorLogin />} />
       <Route path="/doctor/register" element={<DoctorRegister />} />
+
+      {/* Admin Routes */}
+      <Route path="/admin/login" element={<AdminLogin />} />
+      <Route
+        path="/admin/dashboard"
+        element={
+          <ProtectedAdminRoute>
+            <AdminDashboard />
+          </ProtectedAdminRoute>
+        }
+      />
+      <Route
+        path="/admin/doctors"
+        element={
+          <ProtectedAdminRoute>
+            <AdminDoctors />
+          </ProtectedAdminRoute>
+        }
+      />
+      <Route
+        path="/admin/pricing"
+        element={
+          <ProtectedAdminRoute>
+            <AdminPricing />
+          </ProtectedAdminRoute>
+        }
+      />
+      <Route
+        path="/admin/patients"
+        element={
+          <ProtectedAdminRoute>
+            <AdminPatients />
+          </ProtectedAdminRoute>
+        }
+      />
+      <Route
+        path="/admin/analytics"
+        element={
+          <ProtectedAdminRoute>
+            <AdminAnalytics />
+          </ProtectedAdminRoute>
+        }
+      />
+      <Route
+        path="/admin/settings"
+        element={
+          <ProtectedAdminRoute>
+            <AdminSettings />
+          </ProtectedAdminRoute>
+        }
+      />
     </Routes>
   )
 }
