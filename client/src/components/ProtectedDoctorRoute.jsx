@@ -1,118 +1,73 @@
-import React, { useState, useEffect } from 'react';
-import { Navigate, useLocation, useNavigate } from 'react-router-dom';
-import { useSelector, useDispatch } from 'react-redux';
-import { FaUserMd, FaSpinner } from 'react-icons/fa';
-import { getDoctorProfile } from '../redux/doctorSlice';
+import React, { useEffect, useState } from 'react';
+import { Navigate, useLocation } from 'react-router-dom';
+import { useSelector } from 'react-redux';
+import { toast } from 'react-toastify';
+import { FaSpinner } from 'react-icons/fa';
+import { getCurrentDoctor } from '../utils/authUtils';
 
 const ProtectedDoctorRoute = ({ children }) => {
-  const location = useLocation();
-  const navigate = useNavigate();
-  const dispatch = useDispatch();
+  const { doctor, isAuthenticated } = useSelector((state) => state.doctor);
   const [isVerifying, setIsVerifying] = useState(true);
-  const [authError, setAuthError] = useState(null);
-  
-  // Get doctor authentication state from Redux
-  const { isAuthenticated, loading, doctor, error } = useSelector((state) => state.doctor || {});
-  
-  // Check for deployment environment
-  const isDevelopment = process.env.NODE_ENV === 'development';
+  const [authVerified, setAuthVerified] = useState(false);
+  const location = useLocation();
 
   useEffect(() => {
-    // Setup authentication verification
-    const verifyAuth = async () => {
+    const verifyAuthentication = async () => {
       try {
         setIsVerifying(true);
-        const doctorToken = localStorage.getItem('doctorToken');
         
-        // If already authenticated in Redux state, we're good
-        if (isAuthenticated && doctor) {
-          console.log("✅ Doctor already authenticated:", doctor.Name || "Unknown");
+        // Check if we have a token
+        const token = localStorage.getItem('doctorToken');
+        const storedDoctor = getCurrentDoctor();
+        
+        if (!token) {
+          console.log('🔴 No token found');
+          setAuthVerified(false);
           setIsVerifying(false);
           return;
         }
         
-        // If we have a token but not authenticated in Redux, verify the token
-        if (doctorToken) {
-          try {
-            // Try to get the doctor profile with the token
-            await dispatch(getDoctorProfile()).unwrap();
-            setIsVerifying(false);
-          } catch (error) {
-            console.error("🔴 Authentication failed:", error);
-            
-            // If development mode, log but allow access anyway
-            if (isDevelopment) {
-              console.warn("⚠️ Development mode: Bypassing auth check despite error");
-              setIsVerifying(false);
-            } else {
-              setAuthError("Your session has expired. Please login again.");
-              setIsVerifying(false);
-            }
-          }
+        // Verify we have doctor data either in Redux or localStorage
+        if (storedDoctor || doctor) {
+          console.log('✅ Doctor authenticated:', storedDoctor?.Name || doctor?.Name);
+          setAuthVerified(true);
         } else {
-          // No token - show auth error or bypass in development
-          if (isDevelopment) {
-            console.warn("⚠️ Development mode: Bypassing auth check (no token)");
-            setIsVerifying(false);
-          } else {
-            setAuthError("Authentication required to access this page");
-            setIsVerifying(false);
-          }
+          console.log('🔴 Authentication failed: No doctor data');
+          setAuthVerified(false);
         }
-      } catch (err) {
-        console.error("🔴 Authentication verification error:", err);
-        setAuthError("Authentication error. Please try logging in again.");
+      } catch (error) {
+        console.log('🔴 Authentication failed:', error);
+        
+        // For development, bypass auth check
+        if (typeof window !== 'undefined' && window.location.hostname === 'https://hms-backend-1-pngp.onrender.com') {
+          console.warn('⚠️ Development mode: Bypassing auth check despite error');
+          setAuthVerified(true);
+        } else {
+          toast.error('Authentication failed. Please log in again.');
+          setAuthVerified(false);
+        }
+      } finally {
         setIsVerifying(false);
       }
     };
 
-    verifyAuth();
-  }, [isAuthenticated, doctor, location.pathname, dispatch, isDevelopment]);
+    verifyAuthentication();
+  }, [doctor]);
 
-  // Show loading spinner while verifying
-  if (isVerifying || loading) {
+  if (isVerifying) {
     return (
-      <div className="min-h-screen flex flex-col items-center justify-center bg-gray-100">
-        <FaSpinner className="animate-spin h-16 w-16 text-red-600 mb-4" />
-        <p className="text-gray-700 text-lg">Verifying your credentials...</p>
+      <div className="flex flex-col items-center justify-center min-h-screen bg-gray-100">
+        <FaSpinner className="animate-spin text-red-600 text-4xl mb-4" />
+        <p className="text-gray-600">Verifying authentication...</p>
       </div>
     );
   }
 
-  // Handle authentication error in production
-  if (authError && !isDevelopment) {
-    return (
-      <div className="min-h-screen flex flex-col items-center justify-center bg-gray-100 p-4">
-        <div className="bg-white rounded-lg shadow-lg p-8 max-w-md w-full text-center">
-          <div className="text-blue-600 text-5xl mb-6">
-            <FaUserMd className="mx-auto" />
-          </div>
-          <h2 className="text-2xl font-bold text-gray-800 mb-4">Authentication Required</h2>
-          <p className="text-gray-600 mb-6">{authError}</p>
-          <button
-            onClick={() => navigate('/doctor/login', { state: { from: location } })}
-            className="bg-blue-600 text-white px-4 py-2 rounded-md hover:bg-blue-700 transition-colors"
-          >
-            Go to Login
-          </button>
-        </div>
-      </div>
-    );
-  }
-
-  // In development mode, allow access regardless of auth status
-  if (isDevelopment) {
-    console.log("⚠️ Development mode: Rendering protected content without authentication");
-    return children;
-  }
-
-  // In production, require authentication
-  if (!isAuthenticated) {
-    console.log("🔴 Authentication required, redirecting to login");
+  if (!authVerified && !isAuthenticated) {
+    // Redirect to login with return path
     return <Navigate to="/doctor/login" state={{ from: location }} replace />;
   }
 
-  // If authenticated, render the protected component
   return children;
 };
 

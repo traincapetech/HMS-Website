@@ -1,136 +1,118 @@
 import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
-import api from '../utils/app.api';
+import * as api from "../app/api";
 
-// Async thunks for API calls
+// Load doctor from localStorage on initial load
+const initialDoctor = localStorage.getItem("doctor")
+  ? JSON.parse(localStorage.getItem("doctor"))
+  : null;
+
+const initialState = {
+  doctor: initialDoctor,
+  isLoading: false,
+  isAuthenticated: !!initialDoctor, // true if doctor exists, false otherwise
+  error: null,
+};
+
+// Register doctor
 export const registerDoctor = createAsyncThunk(
-  'doctor/register',
-  async (doctorData, { rejectWithValue }) => {
+  "doctor/register",
+  async (formData, { rejectWithValue }) => {
     try {
-      // Create a FormData object to handle file uploads
-      const formData = new FormData();
+      const response = await api.registerDoctor(formData);
+      return response.data;
+    } catch (error) {
+      return rejectWithValue(
+        error.response?.data?.message || "Registration failed"
+      );
+    }
+  }
+);
+
+// Login doctor
+export const loginDoctor = createAsyncThunk(
+  "doctor/login",
+  async (credentials, { rejectWithValue }) => {
+    try {
+      console.log("Attempting login with:", { email: credentials.Email });
       
-      // Add all fields to formData
-      for (const key in doctorData) {
-        // Skip null values
-        if (doctorData[key] === null) continue;
+      const response = await api.loginDoctor(credentials);
+      
+      // The backend returns data in 'user' field
+      const doctorData = response.data.user;
+      
+      // Store token
+      if (response.data?.token) {
+        localStorage.setItem("doctorToken", response.data.token);
         
-        // Handle File objects specially
-        if (key === 'image' || key === 'document') {
-          if (doctorData[key] instanceof File) {
-            formData.append(key, doctorData[key]);
-            console.log(`Appending file ${key}:`, doctorData[key].name, doctorData[key].size);
-          }
+        // Store doctor data (from the 'user' field)
+        if (doctorData) {
+          console.log("Doctor data received:", doctorData.Name);
+          // Store the email separately for easy lookup
+          localStorage.setItem("doctorEmail", doctorData.Email);
+          localStorage.setItem("doctor", JSON.stringify(doctorData));
         } else {
-          formData.append(key, doctorData[key]);
+          console.warn("No doctor data in response despite successful login");
         }
       }
       
-      // Log FormData entries for debugging
-      console.log('FormData entries:');
-      for (let pair of formData.entries()) {
-        console.log(pair[0], pair[1] instanceof File ? `File: ${pair[1].name}` : pair[1]);
-      }
-      
-      // Override Content-Type header to allow multer to process the files correctly
-      const response = await api.post('/doctors/register', formData, {
-        headers: {
-          'Content-Type': 'multipart/form-data',
-        },
-      });
-      
-      return response.data;
+      // Return the correct structure
+      return {
+        token: response.data.token,
+        doctor: doctorData
+      };
     } catch (error) {
-      console.error('Doctor registration error:', error.response?.data || error.message);
-      return rejectWithValue(error.response?.data || { message: error.message });
+      console.error("Login error:", error);
+      const errorMessage = error.response?.data?.message || "Login failed";
+      return rejectWithValue(errorMessage);
     }
   }
 );
 
-export const loginDoctor = createAsyncThunk(
-  'doctor/login',
-  async (credentials, { rejectWithValue }) => {
+// Fetch doctor profile
+export const fetchDoctorProfile = createAsyncThunk(
+  "doctor/fetchProfile",
+  async (_, { rejectWithValue }) => {
     try {
-      console.log('Attempting doctor login with:', { email: credentials.Email });
-      
-      const response = await api.post('/doctors/login', credentials);
-      
-      // Store the token in localStorage for authentication
-      localStorage.setItem('doctorToken', response.data.token);
-      
-      // Store doctor info in localStorage for faster access (optional)
-      if (response.data.user) {
-        localStorage.setItem('doctorInfo', JSON.stringify(response.data.user));
-      }
-      
-      console.log('Doctor login successful:', response.data.user?.Name || 'Unknown');
-      return response.data;
-    } catch (error) {
-      console.error('Doctor login error:', error.response?.data || error.message);
-      return rejectWithValue(error.response?.data || { message: error.message || 'Login failed' });
-    }
-  }
-);
-
-export const logoutDoctor = createAsyncThunk(
-  'doctor/logout',
-  async () => {
-    localStorage.removeItem('doctorToken');
-  }
-);
-
-export const getDoctorProfile = createAsyncThunk(
-  'doctor/getProfile',
-  async (_, { rejectWithValue, getState }) => {
-    try {
-      // Check if we have a token
-      const token = localStorage.getItem('doctorToken');
+      const token = localStorage.getItem("doctorToken");
       if (!token) {
-        throw new Error('No authentication token found');
+        return rejectWithValue("No authentication token found");
       }
-
-      // Log the profile fetch attempt
-      console.log('Fetching doctor profile...');
       
-      // Get the doctor profile
-      const response = await api.get('/doctors/profile');
+      const response = await api.getDoctorProfile();
       
-      console.log('Doctor profile fetched successfully:', response.data.name);
+      // Update the stored doctor data with the latest profile info
+      if (response.data?.doctor) {
+        localStorage.setItem("doctor", JSON.stringify(response.data.doctor));
+      }
+      
       return response.data;
     } catch (error) {
-      console.error('Failed to fetch doctor profile:', error.response?.data || error.message);
-      
-      // If unauthorized (401), remove the token
-      if (error.response?.status === 401) {
-        localStorage.removeItem('doctorToken');
-      }
-      
-      return rejectWithValue(error.response?.data || { message: error.message });
+      console.log("Failed to fetch doctor profile:", error);
+      return rejectWithValue(
+        error.response?.data?.message || "Failed to fetch profile"
+      );
     }
   }
 );
 
-export const updateDoctorProfile = createAsyncThunk(
-  'doctor/updateProfile',
-  async (profileData, { rejectWithValue }) => {
+// Logout doctor
+export const logoutDoctor = createAsyncThunk(
+  "doctor/logout",
+  async (_, { rejectWithValue }) => {
     try {
-      const response = await api.put('/doctors/profile', profileData);
-      return response.data;
+      // Remove doctor data from localStorage
+      localStorage.removeItem("doctorToken");
+      localStorage.removeItem("doctor");
+      return null;
     } catch (error) {
-      return rejectWithValue(error.response.data);
+      return rejectWithValue("Logout failed");
     }
   }
 );
 
-// Doctor Slice
 const doctorSlice = createSlice({
   name: "doctor",
-  initialState: {
-    doctor: null,
-    token: localStorage.getItem('doctorToken'),
-    isAuthenticated: false,
-    loading: false,
-    error: null,
-  },
+  initialState,
   reducers: {
     clearError: (state) => {
       state.error = null;
@@ -138,69 +120,59 @@ const doctorSlice = createSlice({
   },
   extraReducers: (builder) => {
     builder
-      // Register
+      // Register cases
       .addCase(registerDoctor.pending, (state) => {
-        state.loading = true;
+        state.isLoading = true;
         state.error = null;
       })
       .addCase(registerDoctor.fulfilled, (state, action) => {
-        state.loading = false;
+        state.isLoading = false;
+        // Don't automatically log in after registration
       })
       .addCase(registerDoctor.rejected, (state, action) => {
-        state.loading = false;
-        state.error = action.payload?.message || 'Registration failed';
+        state.isLoading = false;
+        state.error = action.payload || "Registration failed";
       })
       
-      // Login
+      // Login cases
       .addCase(loginDoctor.pending, (state) => {
-        state.loading = true;
+        state.isLoading = true;
         state.error = null;
       })
       .addCase(loginDoctor.fulfilled, (state, action) => {
-        state.loading = false;
+        state.isLoading = false;
         state.isAuthenticated = true;
         state.doctor = action.payload.doctor;
-        state.token = action.payload.token;
+        state.error = null;
       })
       .addCase(loginDoctor.rejected, (state, action) => {
-        state.loading = false;
-        state.error = action.payload?.message || 'Login failed';
+        state.isLoading = false;
+        state.isAuthenticated = false;
+        state.error = action.payload || "Login failed";
       })
       
-      // Logout
+      // Fetch profile cases
+      .addCase(fetchDoctorProfile.pending, (state) => {
+        state.isLoading = true;
+        state.error = null;
+      })
+      .addCase(fetchDoctorProfile.fulfilled, (state, action) => {
+        state.isLoading = false;
+        state.doctor = action.payload.doctor;
+        state.isAuthenticated = true;
+        state.error = null;
+      })
+      .addCase(fetchDoctorProfile.rejected, (state, action) => {
+        state.isLoading = false;
+        // Don't automatically log out on profile fetch error
+        state.error = action.payload || "Failed to fetch profile";
+      })
+      
+      // Logout cases
       .addCase(logoutDoctor.fulfilled, (state) => {
         state.doctor = null;
-        state.token = null;
         state.isAuthenticated = false;
-      })
-      
-      // Get Profile
-      .addCase(getDoctorProfile.pending, (state) => {
-        state.loading = true;
         state.error = null;
-      })
-      .addCase(getDoctorProfile.fulfilled, (state, action) => {
-        state.loading = false;
-        state.doctor = action.payload;
-        state.isAuthenticated = true;
-      })
-      .addCase(getDoctorProfile.rejected, (state, action) => {
-        state.loading = false;
-        state.error = action.payload?.message || 'Failed to fetch profile';
-      })
-      
-      // Update Profile
-      .addCase(updateDoctorProfile.pending, (state) => {
-        state.loading = true;
-        state.error = null;
-      })
-      .addCase(updateDoctorProfile.fulfilled, (state, action) => {
-        state.loading = false;
-        state.doctor = action.payload;
-      })
-      .addCase(updateDoctorProfile.rejected, (state, action) => {
-        state.loading = false;
-        state.error = action.payload?.message || 'Failed to update profile';
       });
   },
 });

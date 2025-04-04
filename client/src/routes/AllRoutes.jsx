@@ -24,6 +24,7 @@ import DoctorPage from '../pages/DoctorPage'
 import VideoConsult from '../components/VideoConsult'
 import ConsultationDetail from '../pages/ConsultationDetail'
 import Appointments from '../components/Appointment'
+import AppointmentConfirmed from '../pages/AppointmentConfirmed'
 import VideoCall from '../components/VideoCall'
 import Dashboard from '../components/app.dashboard'
 import VideoCallControls from '../components/videocallcontrols'
@@ -55,8 +56,12 @@ import AdminLogin from '../pages/AdminLogin'
 import AdminDashboard from '../pages/AdminDashboard'
 import AdminDoctors from '../pages/AdminDoctors'
 import AdminPricing from '../pages/AdminPricing'
+import AdminPatients from '../pages/AdminPatients'
+import AdminAnalytics from '../pages/AdminAnalytics'
+import AdminSettings from '../pages/AdminSettings'
 import ProtectedAdminRoute from '../components/ProtectedAdminRoute'
 import TAMDHealthFeed from '../pages/TAMDHealthFeed'
+import ApiDiagnostics from '../pages/ApiDiagnostics'
 
 const AllRoutes = () => {
   return (
@@ -101,10 +106,12 @@ const AllRoutes = () => {
       <Route path="/consultation/:id" element={<ConsultationDetail />} />
       <Route path='/ConsultTopDoctors' element={<ConsultTopDoctors />} />
       <Route path='/Appointments' element={<Appointments />} />
+      <Route path='/appointment-confirmed' element={<AppointmentConfirmed />} />
       <Route path='/VideoCall' element={<VideoCall />} />
       <Route path='/Dashboard' element={<Dashboard />} />
       <Route path='/VideoCallControls' element={<VideoCallControls />} />
       <Route path='/MyAppointments' element={<MyAppointments />} />
+      <Route path='/api-diagnostics' element={<ApiDiagnostics />} />
       <Route path='/MyFeedback' element={<MyFeedback />} />
       <Route path='/MyMedicalRecords' element={<MyMedicalRecords />} />
       <Route path='/OnlineConsultations' element={<OnlineConsultations />} />
@@ -119,6 +126,7 @@ const AllRoutes = () => {
       <Route path='/ProfilePage' element={<ProfilePage />} />
       <Route path='/TAMDReachPage' element={<TAMDReachPage />} />
       <Route path='/HelpPage' element={<HelpPage />} />
+      <Route path='/AdminLogin' element={<AdminLogin />} />
 
       {/* Doctor Panel Routes */}
       <Route
@@ -173,6 +181,30 @@ const AllRoutes = () => {
         element={
           <ProtectedAdminRoute>
             <AdminPricing />
+          </ProtectedAdminRoute>
+        }
+      />
+      <Route
+        path="/admin/patients"
+        element={
+          <ProtectedAdminRoute>
+            <AdminPatients />
+          </ProtectedAdminRoute>
+        }
+      />
+      <Route
+        path="/admin/analytics"
+        element={
+          <ProtectedAdminRoute>
+            <AdminAnalytics />
+          </ProtectedAdminRoute>
+        }
+      />
+      <Route
+        path="/admin/settings"
+        element={
+          <ProtectedAdminRoute>
+            <AdminSettings />
           </ProtectedAdminRoute>
         }
       />
