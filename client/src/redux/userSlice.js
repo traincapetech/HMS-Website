@@ -1,20 +1,21 @@
 import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
 import axios from "axios";
-import {loadStripe} from '@stripe/stripe-js'
+import { loadStripe } from '@stripe/stripe-js';
+import { CardElement, Elements, useStripe, useElements } from '@stripe/react-stripe-js';
 // Async Thunk for Login
 export const loginUser = createAsyncThunk(
   "user/login",
   async (userData, { rejectWithValue }) => {
     try {
       const response = await axios.post(
-        "https://hms-backend-1-pngp.onrender.com/api/newuser/login",
+        "http://localhost:8080/api/newuser/login",
         {
           Email: userData.email, // Match the backend's expected key
           Password: userData.password, // Match the backend's expected key
         }
       );
 
-      const {token, user} = response.data;
+      const { token, user } = response.data;
       localStorage.setItem("token", token);
       localStorage.setItem("user", JSON.stringify(user));
 
@@ -26,49 +27,25 @@ export const loginUser = createAsyncThunk(
 );
 export const paymentTamdCoin = createAsyncThunk(
   "user/payment",
-  async ({paymentData}, { rejectWithValue }) => {
+  async ({ paymentData }, { rejectWithValue }) => {
     try {
       console.log("Payment data received:", paymentData);
-      let paymentResponse;
       
-      // // Determine payment type and call appropriate API
       if (paymentData.paymentMode === "Credit Card") {
-      //   // Call Stripe payment API
-      const stripe = await loadStripe("pk_test_51RA7gzR4IpVwwNdkSnaCFniqyAdSIFkPIcztaYVwuIlmUImYiPtSS2UEnDQjMS9GF2BddzsU75t1PjRqiWh0aa1E00bBEJqgio")
-        paymentResponse = await axios.post("http://localhost:8080/api/payments/stripe", {paymentData});
-        const session=await respose.json()
-        const result=stripe.redirectToCheckout({
-          sessionId:session.id
-        })
-        if (result.error){
-          console.log(result.error.message)
-        }
-      } else if (paymentData.paymentMode=== "Wallet") {
-        //   // Call wallet payment API and update wallet balance in MongoDB
-        paymentResponse = await axios.post("http://localhost:8080/api/payments/wallet", {paymentData});
+        console.log("Creditcard");
+        const stripe = await loadStripe("pk_test_51RA7gzR4IpVwwNdkSnaCFniqyAdSIFkPIcztaYVwuIlmUImYiPtSS2UEnDQjMS9GF2BddzsU75t1PjRqiWh0aa1E00bBEJqgio")
+      const body={
+        products:paymentData
+      } 
+      const headers={
+        "Content-type":"application/json"
       }
-      else{
-        console.log("invalid",paymentData.paymentMode)
+      } else if (paymentData.paymentMode === "Wallet") {
+        await axios.post("http://localhost:8080/api/payments/wallet", { paymentData });
       }
-      
-      // // If payment successful, update account regardless of payment method
-      // if (paymentResponse && paymentResponse.status === 200) {
-      //   const accountUpdate = await api.put("/user/account", {
-      //     userId: paymentData.userId,
-      //     transactionId: paymentResponse.data.transactionId,
-      //     amount: paymentData.amount,
-      //     quantity: paymentData.quantity
-      //   });
-      //   return accountUpdate.data;
-      // }
-      
-      // throw new Error("Payment processing failed");
-      
+
     } catch (error) {
-      return rejectWithValue(error.response?.data || {
-        message: "Payment processing failed",
-        error: error.message
-      });
+      return rejectWithValue(error.response?.data || error.message);
     }
   }
 );
@@ -99,7 +76,7 @@ export const registerUser = createAsyncThunk(
         "https://hms-backend-1-pngp.onrender.com/api/newuser/register",
         requestBody
       );
-      
+
       return response.data;
     } catch (error) {
       console.error("Error Response:", error.response?.data); // Debugging line
@@ -140,7 +117,7 @@ const userSlice = createSlice({
         state.loading = false;
         state.token = action.payload.token;
         state.user = action.payload.user;
-      })      
+      })
       .addCase(loginUser.rejected, (state, action) => {
         state.loading = false;
         state.error = action.payload?.message || "Login failed";
