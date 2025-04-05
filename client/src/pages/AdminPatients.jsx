@@ -4,7 +4,6 @@ import axios from 'axios';
 import { 
   FaUserInjured, 
   FaUserMd,
-  FaUsers, 
   FaDollarSign, 
   FaSignOutAlt, 
   FaChartLine,
@@ -50,6 +49,7 @@ const ageRanges = ["0-18", "19-30", "31-45", "46-60", "61+"];
 
 const AdminPatients = () => {
     const [patients, setPatients] = useState([]);
+    const [newuser, setNewUser] = useState([]);
     const [loading, setLoading] = useState(true);
     const [showModal, setShowModal] = useState(false);
     const [editingPatient, setEditingPatient] = useState(null);
@@ -105,36 +105,64 @@ const AdminPatients = () => {
         try {
             setLoading(true);
             const token = localStorage.getItem('adminToken');
-            let url = `http://localhost:8080/api/add_patient/all?page=${currentPage}&limit=${patientsPerPage}`;
-            
-            // Construct query parameters
-            const params = new URLSearchParams();
-            if (filters.gender) params.append('gender', filters.gender);
-            if (filters.bloodGroup) params.append('bloodGroup', filters.bloodGroup);
-            if (filters.status) params.append('status', filters.status);
-            if (filters.ageRange) params.append('ageRange', filters.ageRange);
-            if (filters.specialization) params.append('specialization', filters.specialization);
-            if (filters.country) params.append('country', filters.country);
-
-            // Append query parameters if they exist
-            if (params.toString()) {
-                url += `&${params.toString()}`;
+    
+            if (!token) {
+                toast.error('You are not authenticated. Please log in again.');
+                return;
             }
-
-            const response = await axios.get(url, {
-                headers: { Authorization: `Bearer ${token}` }
+    
+            const url = new URL(`http://localhost:8080/api/newuser/all`);
+            url.searchParams.append('page', currentPage);
+            url.searchParams.append('limit', patientsPerPage);
+    
+            Object.entries(filters).forEach(([key, value]) => {
+                if (value) {
+                    url.searchParams.append(key, value);
+                }
             });
-
-            setPatients(response.data.patients || []);
-            setTotalPages(response.data.totalPages || 1);
+    
+            console.log('Making request to:', url.toString());
+    
+            const response = await axios.get(url.toString(), {
+                headers: {
+                    Authorization: `Bearer ${token}`
+                },
+                timeout: 10000
+            });
+    
+            console.log('Raw API response:', response.data);
+    
+            
+            if (response.data && Array.isArray(response.data.newuser)) {
+                setNewUser(response.data.newuser); // <-- Update your state here
+                setTotalPages(response.data.totalPages || 1);
+            } else {
+                console.error('Unexpected API response structure:', response.data);
+                toast.error('Received invalid data format from server');
+                setNewUser([]); // <-- fallback
+                setTotalPages(1);
+            }
         } catch (error) {
-            console.error('Error fetching patients:', error);
-            toast.error('Failed to fetch patients. Please try again later.');
-            setPatients([]);
+            console.error('Detailed fetch error:', error);
+    
+            if (error.response) {
+                console.log('Error response data:', error.response.data);
+                toast.error(`Server error: ${error.response.data.message || error.response.status}`);
+            } else if (error.request) {
+                console.log('Error request:', error.request);
+                toast.error('No response received from server. Please check if the server is running.');
+            } else {
+                toast.error(`Error: ${error.message}`);
+            }
+    
+            setNewUser([]);
+            setTotalPages(1);
         } finally {
             setLoading(false);
         }
     };
+    
+    
 
     const fetchCountries = async () => {
         try {
@@ -214,7 +242,7 @@ const AdminPatients = () => {
             let response;
             if (editingPatient) {
                 response = await axios.put(
-                    `http://localhost:8080/api/add_patient/${editingPatient._id}`,
+                    `http://localhost:8080/api/add_patient/add`,
                     patientData,
                     { 
                         headers: { 
@@ -575,34 +603,9 @@ const AdminPatients = () => {
                                         </select>
                                     </div>
                                     
-                                    <div>
-                                        <label className="block text-sm font-medium text-gray-700 mb-1">Blood Group</label>
-                                        <select
-                                            name="bloodGroup"
-                                            value={filters.bloodGroup}
-                                            onChange={handleFilterChange}
-                                            className="w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
-                                        >
-                                            <option value="">All Blood Groups</option>
-                                            {bloodGroups.map((group, index) => (
-                                                <option key={index} value={group}>{group}</option>
-                                            ))}
-                                        </select>
-                                    </div>
                                     
-                                    <div>
-                                        <label className="block text-sm font-medium text-gray-700 mb-1">Status</label>
-                                        <select
-                                            name="status"
-                                            value={filters.status}
-                                            onChange={handleFilterChange}
-                                            className="w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
-                                        >
-                                            <option value="">All Statuses</option>
-                                            <option value="active">Active</option>
-                                            <option value="inactive">Inactive</option>
-                                        </select>
-                                    </div>
+                                    
+                                    
                                     
                                     <div>
                                         <label className="block text-sm font-medium text-gray-700 mb-1">Age Range</label>
@@ -618,22 +621,6 @@ const AdminPatients = () => {
                                             ))}
                                         </select>
                                     </div>
-
-                                    <div>
-                                        <label className="block text-sm font-medium text-gray-700 mb-1">Specialization</label>
-                                        <select
-                                            name="specialization"
-                                            value={filters.specialization}
-                                            onChange={handleFilterChange}
-                                            className="w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
-                                        >
-                                            <option value="">All Specializations</option>
-                                            {specialtiesList.map((spec, index) => (
-                                                <option key={index} value={spec}>{spec}</option>
-                                            ))}
-                                        </select>
-                                    </div>
-
                                     <div>
                                         <label className="block text-sm font-medium text-gray-700 mb-1">Country</label>
                                         <select
@@ -668,16 +655,17 @@ const AdminPatients = () => {
                                 <thead className="bg-gray-50">
                                     <tr>
                                         <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider sm:px-6">Patient</th>
-                                        <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider sm:px-6">Contact</th>
-                                        <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider sm:px-6">Details</th>
-                                        <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider sm:px-6">Specializations</th>
-                                        <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider sm:px-6">Status</th>
+                                        <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider sm:px-6">UserName</th>
+                                        <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider sm:px-6">Phone</th>
+                                        <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider sm:px-6">Gender</th>
+                                        <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider sm:px-6">Age</th>
+                                        <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider sm:px-6">Country</th>
                                         <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider sm:px-6">Actions</th>
                                     </tr>
                                 </thead>
                                 <tbody className="bg-white divide-y divide-gray-200">
-                                    {patients.length > 0 ? (
-                                        patients.map((patient) => (
+                                    {newuser.length > 0 ? (
+                                        newuser.map((patient) => (
                                             <tr key={patient._id} className="hover:bg-gray-50">
                                                 <td className="px-4 py-4 whitespace-nowrap sm:px-6">
                                                     <div className="flex items-center">
@@ -688,43 +676,35 @@ const AdminPatients = () => {
                                                             <div className="text-sm font-medium text-gray-900">
                                                                 {patient.firstName} {patient.lastName}
                                                             </div>
-                                                            <div className="text-sm text-gray-500">
-                                                                {patient.gender}, {calculateAge(patient.dateOfBirth)} yrs
-                                                            </div>
+                                                            
                                                         </div>
                                                     </div>
                                                 </td>
+                                                
                                                 <td className="px-4 py-4 whitespace-nowrap sm:px-6">
-                                                    <div className="text-sm text-gray-900">{patient.email}</div>
-                                                    <div className="text-sm text-gray-500">
-                                                        {patient.phone ? String(patient.phone).replace(/(\d{3})(\d{3})(\d{4})/, '($1) $2-$3') : 'N/A'}
-                                                    </div>
-                                                </td>
-                                                <td className="px-4 py-4 whitespace-nowrap sm:px-6">
-                                                    <div className="text-sm text-gray-900">{patient.bloodGroup}</div>
+                                                    
                                                     <div className="text-sm text-gray-500 truncate max-w-xs">
-                                                        {patient.country && <span className="mr-2">{patient.country}</span>}
+                                                        {patient.UserName && <span className="mr-2">{patient.UserName}</span>}
                                                         {patient.address}
                                                     </div>
                                                 </td>
-                                                <td className="px-4 py-4 sm:px-6">
-                                                    <div className="flex flex-wrap gap-1">
-                                                        {patient.specializations?.length > 0 ? (
-                                                            patient.specializations.map((spec, index) => (
-                                                                <span key={index} className="px-2 py-1 text-xs rounded-full bg-blue-100 text-blue-800">
-                                                                    {spec}
-                                                                </span>
-                                                            ))
-                                                        ) : (
-                                                            <span className="text-sm text-gray-500">None</span>
-                                                        )}
+                                                <td className="px-4 py-4 whitespace-nowrap sm:px-6">
+                                                    
+                                                    <div className="text-sm text-gray-500">
+                                                        {patient.Phone ? String(patient.Phone).replace(/(\d{3})(\d{3})(\d{4})/, '($1) $2-$3') : 'N/A'}
                                                     </div>
                                                 </td>
                                                 <td className="px-4 py-4 whitespace-nowrap sm:px-6">
-                                                    <span className={`px-2 inline-flex text-xs leading-5 font-semibold rounded-full ${patient.isActive ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'}`}>
-                                                        {patient.isActive ? 'Active' : 'Inactive'}
-                                                    </span>
+                                                    <div className="text-sm text-gray-500">{patient.Gender}</div>
                                                 </td>
+                                                <td className="px-4 py-4 whitespace-nowrap sm:px-6">                                                   
+                                                    <div className="text-sm text-gray-500">{calculateAge(patient.DOB)} yrs</div>                                               
+                                                </td>
+                                                <td className="px-4 py-4 whitespace-nowrap sm:px-6">
+                                                    <div className="text-sm text-gray-500">{patient.Country}</div>
+                                                </td>
+                                                
+                                                
                                                 <td className="px-4 py-4 whitespace-nowrap text-sm font-medium sm:px-6">
                                                     <button
                                                         onClick={() => handleEdit(patient)}

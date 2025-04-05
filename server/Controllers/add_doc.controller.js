@@ -1,80 +1,61 @@
-import mongoose from "mongoose";
 import Add_doc from "../Models/add_doc.model.js";
 import { validationResult } from "express-validator";
 
 const addDoc = async (req, res) => {
     try {
-        // Validate request body
+        //finding any validation error
         const errors = validationResult(req);
-        if (!errors.isEmpty()) {
-            return res.status(400).json({ errors: errors.array() });
+        if (!errors.isEmpty()){
+            return res.status(400).json({errors: errors.array()});
         }
+        const {
+            name, email, specialization, experience, phone, address, country, status
+        } = req.body;
 
-        const { name, email, specialization, experience, phone, address, country, status } = req.body;
-
-        // Ensure status is always a valid string ("active" or "inactive")
-        const validatedStatus = status === "active" ? "active" : "inactive";
-
-        // Create a new doctor record
+        //add doctor
         const newDoc = new Add_doc({
-            name, 
-            email, 
-            specialization, 
-            experience, 
-            phone, 
-            address, 
-            country, 
-            status: validatedStatus
+            name, email, specialization, experience, phone, address, country, status
         });
 
-        // Save the doctor in the database
+        //save the new doc
         await newDoc.save();
-        res.status(201).json({ message: "Doctor added successfully", doctor: newDoc });
-    } catch (error) {
-        console.error("Error in addDoc:", error);
-        res.status(500).json({ message: "An error occurred while adding the doctor" });
+        res.status(201).json({ message: "Doctor added successfully"});
+    } catch (error){
+        console.error(error);
+        res.status(500).json({ message: "An error occured while adding the doctor"});
     }
 };
 
-// Get all doctors
+//get all doctors
 const getDoc = async (req, res) => {
     try {
-        const { status, specialization, country } = req.query;
-
-        // Filter conditions
-        const filter = {};
-        if (status) filter.status = status;
-        if (specialization) filter.specialization = specialization;
-        if (country) filter.country = country;
-
-        const docs = await Add_doc.find(filter);
-        res.status(200).json({ doctors: docs });
-    } catch (error) {
-        console.error("Error in getDoc:", error);
-        res.status(500).json({ message: "An error occurred while fetching the doctors" });
+        const docs = await Add_doc.find();
+        res.status(200).json({ docs });
+    }catch{
+        res.status(500).json({ message: "An error occured while fetching the doctors"});
     }
 };
 
-// Get doctor by ID
+//get doc by id
 const getDocById = async (req, res) => {
     try {
-        const { id } = req.params;
-
-        // Validate ObjectId to prevent CastError
+        const id = req.params.id;
+        
+        // Add validation to check if id is a valid ObjectId
         if (!mongoose.Types.ObjectId.isValid(id)) {
-            return res.status(400).json({ message: "Invalid doctor ID" });
+            return res.status(400).json({ message: "Invalid doctor ID format" });
         }
-
+        
         const doc = await Add_doc.findById(id);
-        if (!doc) {
-            return res.status(404).json({ message: "Doctor not found" });
+        if(!doc){
+            return res.status(404).json({ message: "Doctor not found"});
         }
-
-        res.status(200).json({ doctor: doc });
-    } catch (error) {
-        console.error("Error in getDocById:", error);
-        res.status(500).json({ message: "An error occurred while fetching the doctor" });
+        res.status(200).json({ doc });
+    } catch(errors){
+        console.error(errors);
+        res.status(500).json({ message: "An error occured while fetching the doctor"});
     }
 };
 
-export { addDoc, getDoc, getDocById };
+
+export {addDoc, getDoc, getDocById};

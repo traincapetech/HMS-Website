@@ -1,7 +1,7 @@
 //appoint.controller.js
 import Appoint from "../Models/appoint.model.js";
 import { validationResult } from "express-validator";
-// import { generateZoomMeeting } from "../zoom.service.js";
+import { generateZoomMeeting } from "../zoom.service.js";
 
 const createAppoint = async (req, res) => {
     try{
@@ -12,37 +12,60 @@ const createAppoint = async (req, res) => {
         }
         
         //create a new appointment
-        const {Speciality, Doctor, Name, Email, AppointDate, AppointTime} = req.body;
+        const {Speciality, Doctor, Name, Email, AppointDate, AppointTime, doctorEmail} = req.body;
+
+        // Validate required fields for Zoom meeting
+        if (!doctorEmail || !Email) {
+            return res.status(400).json({ 
+                message: "Doctor email and patient email are required for video consultation" 
+            });
+        }
 
         const newAppoint = new Appoint({
-             Speciality, Doctor, Name, Email, AppointDate, AppointTime });
+             Speciality, 
+             Doctor, 
+             Name, 
+             Email, 
+             AppointDate, 
+             AppointTime,
+             Status: "Confirmed"
+        });
+        
         await newAppoint.save();
 
-        // //call the zoom meeting generation with the patient Email
-        // await generateZoomMeeting(Email);
-
-        res.status(201).json(newAppoint);
+        // Generate Zoom meeting with doctor and patient emails
+        try {
+            const zoomMeeting = await generateZoomMeeting(doctorEmail, Email);
+            
+            // Update appointment with Zoom meeting details
+            newAppoint.zoomMeetingId = zoomMeeting.meetingId;
+            newAppoint.zoomMeetingUrl = zoomMeeting.joinUrl;
+            newAppoint.zoomMeetingPassword = zoomMeeting.password;
+            
+            await newAppoint.save();
+            
+            // Return success with meeting details
+            return res.status(201).json({
+                message: "Appointment created successfully with video consultation",
+                appointmentId: newAppoint._id,
+                zoomMeetingUrl: zoomMeeting.joinUrl,
+                zoomMeetingPassword: zoomMeeting.password
+            });
+        } catch (zoomError) {
+            console.error("Error creating Zoom meeting:", zoomError);
+            
+            // Still return success but note the Zoom meeting failed
+            return res.status(201).json({
+                message: "Appointment created but video consultation setup failed",
+                appointmentId: newAppoint._id,
+                error: zoomError.message
+            });
+        }
     } catch (error){
+        console.error("Error creating appointment:", error);
         res.status(400).json({ message: error.message });
     }
 };
-
-
-
-
-// //Generate a zoom meeting with patient
-// const zoomMeeting  = await generateZoomMeeting({
-//     patientEmail: Email,
-//     startTime: AppointTime,
-//     topic: 'Appointment Meeting'
-// });
-
-// //Add the zoom meeting link to the appointment 
-// newAppoint.zoomMeetingLink = zoomMeeting.join_url;
-// await newAppoint.save();
- 
-// res.status(201).json({ appointment: newAppoint, zoomMeeting });
-// ////
 
 //get all appointment 
 const getAppointment = async(req, res) => {

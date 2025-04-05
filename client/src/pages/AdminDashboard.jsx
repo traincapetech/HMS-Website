@@ -71,24 +71,25 @@ const AdminDashboard = () => {
 
         const loadMockData = () => {
             setStats({
-                totalDoctors: 15,
-                totalPatients: 248,
-                totalAppointments: 156,
+                totalDoctors: 0,
+                totalPatients: 0,
+                totalAppointments: 0,
                 totalRevenue: 18500
             });
         };
 
         const fetchStats = async () => {
             try {
-                const response = await api.get('/admin/stats');
+                const response = await api.get('');
                 setStats(response.data);
             } catch (error) {
-                loadMockData();
+                console.error('Error fetching stats:', error);
             }
         };
 
+        loadMockData();
         fetchStats();
-    }, [navigate]);
+    }, []);
 
     const handleLogout = () => {
         localStorage.removeItem('adminToken');
@@ -212,18 +213,7 @@ const AdminDashboard = () => {
                     </Link>
                 </nav>
 
-                {/* Sidebar Footer */}
-                {/* <div className="p-4 border-t border-white">
-                    <button
-                        onClick={handleLogout}
-                        className={`flex items-center w-full text-gray-300 hover:text-white ${
-                            !sidebarOpen ? 'justify-center' : ''
-                        }`}
-                    >
-                        <FaSignOutAlt className={`${sidebarOpen ? 'mr-3' : ''}`} />
-                        {sidebarOpen && "Logout"}
-                    </button>
-                </div> */}
+                
             </div>
 
             {/* Main Content Area */}

@@ -1,55 +1,55 @@
 import React, { useState, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import axios from 'axios';
-import { 
-  FaUserMd, 
-  FaUsers, 
-  FaDollarSign, 
-  FaSignOutAlt, 
-  FaChartLine,
-  FaBars,
-  FaEdit, 
-  FaTrash, 
-  FaPlus, 
-  FaSearch, 
-  FaFilter 
+import {
+    FaUserMd,
+    FaUsers,
+    FaDollarSign,
+    FaSignOutAlt,
+    FaChartLine,
+    FaBars,
+    FaEdit,
+    FaTrash,
+    FaPlus,
+    FaSearch,
+    FaFilter
 } from 'react-icons/fa';
 import { toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 
 const specialtiesList = [
-  "Covid Treatment",
-  "Sexual Health",
-  "Eye Specialist",
-  "Womens Health",
-  "Diet & Nutrition",
-  "Skin & Hair",
-  "Bones and Joints",
-  "Child Specialist",
-  "Dental Care",
-  "Heart",
-  "Kidney Issues",
-  "Cancer",
-  "Ayurveda",
-  "General Physician",
-  "Mental Wellness",
-  "Homoeopath",
-  "General Surgery",
-  "Urinary Issues",
-  "Lungs and Breathing",
-  "Physiotherapy",
-  "Ear, Nose, Throat",
-  "Brain and Nerves",
-  "Diabetes Management",
-  "Veterinary",
+    "Covid Treatment",
+    "Sexual Health",
+    "Eye Specialist",
+    "Womens Health",
+    "Diet & Nutrition",
+    "Skin & Hair",
+    "Bones and Joints",
+    "Child Specialist",
+    "Dental Care",
+    "Heart",
+    "Kidney Issues",
+    "Cancer",
+    "Ayurveda",
+    "General Physician",
+    "Mental Wellness",
+    "Homoeopath",
+    "General Surgery",
+    "Urinary Issues",
+    "Lungs and Breathing",
+    "Physiotherapy",
+    "Ear, Nose, Throat",
+    "Brain and Nerves",
+    "Diabetes Management",
+    "Veterinary",
 ];
 
 const experienceRanges = [
-  "0-5 years",
-  "6-10 years",
-  "11-15 years",
-  "16-20 years",
-  "20+ years"
+    "0-5 years",
+    "6-10 years",
+    "11-15 years",
+    "16-20 years",
+    "20+ years"
 ];
 
 const AdminDoctors = () => {
@@ -67,14 +67,13 @@ const AdminDoctors = () => {
     const navigate = useNavigate();
     const [formErrors, setFormErrors] = useState({});
     const [isSubmitting, setIsSubmitting] = useState(false);
-    
+    const [data, setData] = useState([])
     const [filters, setFilters] = useState({
-        status: '',
-        specialization: '',
+        Speciality: '',
         experience: '',
         country: ''
     });
-    
+
     const [formData, setFormData] = useState({
         name: '',
         email: '',
@@ -83,7 +82,7 @@ const AdminDoctors = () => {
         phone: '',
         address: '',
         country: '',
-        status: 'active', 
+        status: 'active',
         isActive: true
     });
 
@@ -104,37 +103,45 @@ const AdminDoctors = () => {
         try {
             setLoading(true);
             const token = localStorage.getItem('adminToken');
-            let url = `http://localhost:8080/api/add_doc/all?page=${currentPage}&limit=${doctorsPerPage}`; 
-    
+            let url = `http://localhost:8080/api/doctor/all`;
+
             // Construct query parameters
             const params = new URLSearchParams();
-            if (filters.status) params.append('status', filters.status);
-            if (filters.specialization) params.append('specialization', filters.specialization);
-            if (filters.experience) params.append('experience', filters.experience);
-            if (filters.country) params.append('country', filters.country);
-    
-            // Append query parameters only if they exist
-            if (params.toString()) {
-                url += `?${params.toString()}`;
-            }
-    
-            console.log("Fetching doctors from:", url); // Debugging
-    
+            params.append('page', currentPage);
+            params.append('limit', doctorsPerPage);
+
+            if (filters.Speciality) params.append('Speciality', filters.Speciality);
+            if (filters.Experience) params.append('Experience', filters.Experience);
+            if (filters.State) params.append('State', filters.State);
+
+            // Append all parameters at once
+            url += `?${params.toString()}`;
+
+            console.log("Final API URL:", url); // Debugging
+
             const response = await axios.get(url, {
                 headers: { Authorization: `Bearer ${token}` }
             });
-    
+
+            console.log("API Response:", response.data); // Debug response
+            setData(response.data)
             setDoctors(response.data.doctors || []);
             setTotalPages(response.data.totalPages || 1);
         } catch (error) {
             console.error('Error fetching doctors:', error);
-            toast.error('Failed to fetch doctors. Please try again later.');
+            if (error.response) {
+                console.error('Response data:', error.response.data);
+                console.error('Response status:', error.response.status);
+                toast.error(error.response.data.message || 'Failed to fetch doctors');
+            } else {
+                toast.error('Network error. Please try again later.');
+            }
             setDoctors([]);
         } finally {
             setLoading(false);
         }
     };
-    
+
 
     const fetchCountries = async () => {
         try {
@@ -179,9 +186,9 @@ const AdminDoctors = () => {
 
     const handleSubmit = async (e) => {
         e.preventDefault();
-    
+
         if (!validateForm()) return;
-    
+
         setIsSubmitting(true);
         try {
             const token = localStorage.getItem('adminToken');
@@ -190,11 +197,11 @@ const AdminDoctors = () => {
                 phone: String(formData.phone).replace(/\D/g, ''), // Ensure phone is string and clean
                 status: formData.status || 'active' // Ensure status is always set
             };
-    
+
             if (editingDoctor) {
                 // Update existing doctor
                 await axios.put(
-                    `http://localhost:8080/api/add_doc/${editingDoctor._id}`,
+                    `http://localhost:8080/api/add_doc/add${editingDoctor._id}`,
                     doctorData,
                     { headers: { Authorization: `Bearer ${token}` } }
                 );
@@ -202,13 +209,13 @@ const AdminDoctors = () => {
             } else {
                 // Add new doctor
                 await axios.post(
-                    'http://localhost:8080/api/add_doc/add', 
+                    'http://localhost:8080/api/add_doc/add',
                     doctorData,
                     { headers: { Authorization: `Bearer ${token}` } }
                 );
                 toast.success('Doctor added successfully');
             }
-    
+
             setShowModal(false);
             resetForm();
             await fetchDoctors();
@@ -219,7 +226,7 @@ const AdminDoctors = () => {
             setIsSubmitting(false);
         }
     };
-    
+
 
     const handleEdit = (doctor) => {
         setEditingDoctor(doctor);
@@ -238,32 +245,48 @@ const AdminDoctors = () => {
     };
 
     const handleDelete = async (id) => {
-        if (window.confirm('Are you sure you want to delete this doctor?')) {
-            try {
-                const token = localStorage.getItem('adminToken');
-                await axios.delete(`http://localhost:8080/api/add_doc/67ed0e29f7f273bd2ae47917`, {
-                    headers: { Authorization: `Bearer ${token}` }
-                });
-                toast.success('Doctor deleted successfully');
-    
-                // Optimistic UI update - remove the doctor from local state immediately
-                setDoctors(prevDoctors => prevDoctors.filter(doctor => doctor._id !== id));
-    
-                // If we're on the last page with only one doctor, go back a page
-                if (doctors.length === 1 && currentPage > 1) {
-                    setCurrentPage(currentPage - 1);
-                }
-                
-                // Optional: Refetch data to ensure consistency with server
-                // await fetchDoctors();
-            } catch (error) {
-                console.error('Error deleting doctor:', error);
-                
-                // Revert the optimistic update if deletion failed
-                await fetchDoctors();
-                
-                toast.error(error.response?.data?.message || 'Failed to delete doctor. Please try again.');
+        if (!window.confirm('Are you sure you want to delete this doctor?')) {
+            return; // Early exit if user cancels
+        }
+
+        try {
+            const token = localStorage.getItem('adminToken');
+
+            // Use the dynamic ID instead of hardcoded value
+            await axios.delete(`http://localhost:8080/api/add_doc/${id}`, {
+                headers: { Authorization: `Bearer ${token}` }
+            });
+
+            toast.success('Doctor deleted successfully');
+
+            // Optimistic UI update
+            setDoctors(prevDoctors => prevDoctors.filter(doctor => doctor._id !== id));
+
+            // Adjust pagination if needed
+            if (doctors.length === 1 && currentPage > 1) {
+                setCurrentPage(currentPage - 1);
             }
+
+        } catch (error) {
+            console.error('Error deleting doctor:', error);
+
+            // Re-fetch doctors to revert optimistic update
+            await fetchDoctors();
+
+            // Better error messaging
+            let errorMessage = 'Failed to delete doctor. Please try again.';
+
+            if (error.response) {
+                if (error.response.status === 404) {
+                    errorMessage = 'Doctor not found or already deleted.';
+                } else if (error.response.data?.message) {
+                    errorMessage = error.response.data.message;
+                }
+            } else if (error.request) {
+                errorMessage = 'No response from server. Check your connection.';
+            }
+
+            toast.error(errorMessage);
         }
     };
 
@@ -284,18 +307,19 @@ const AdminDoctors = () => {
     };
 
     const handleSearch = () => {
+        console.log("Filters are----->", filters)
         try {
             setLoading(true);
-            
+
             if (!searchTerm.trim()) {
                 // If search term is empty, reset to show all doctors
                 fetchDoctors(); // This will fetch all doctors again
                 return;
             }
-    
+
             // Convert search term to lowercase for case-insensitive search
             const term = searchTerm.toLowerCase();
-            
+
             // Filter doctors based on search term
             const filteredDoctors = doctors.filter(doctor => {
                 return (
@@ -307,7 +331,7 @@ const AdminDoctors = () => {
                     (doctor.address && doctor.address.toLowerCase().includes(term))
                 );
             });
-    
+
             setDoctors(filteredDoctors);
             setCurrentPage(1);
             setTotalPages(1);
@@ -327,62 +351,73 @@ const AdminDoctors = () => {
             [name]: value
         }));
     };
-    
+
     // Add this useEffect to apply filters whenever filters state changes
-    useEffect(() => {
-        const applyFilters = () => {
-            if (!doctors.length) return;
     
-            const filteredDoctors = doctors.filter(doctor => {
-                // Status filter
-                if (filters.status && doctor.status !== filters.status) {
+        useEffect(() => {
+            if (!doctors.length) return;
+        
+            const filtered = doctors.filter(doctor => {
+                // Search term filter
+                if (searchTerm.trim()) {
+                    const term = searchTerm.toLowerCase();
+                    if (!(
+                        doctor.Name?.toLowerCase().includes(term) ||
+                        doctor.email?.toLowerCase().includes(term) ||
+                        doctor.Speciality?.toLowerCase().includes(term) ||
+                        (doctor.phone && String(doctor.phone).toLowerCase().includes(term)) ||
+                        (doctor.State && doctor.State.toLowerCase().includes(term)) ||
+                        (doctor.address && doctor.address.toLowerCase().includes(term))
+                    )) {
+                        return false;
+                    }
+                }
+        
+                // Speciality filter
+                if (filters.Speciality && doctor.Speciality !== filters.Speciality) {
                     return false;
                 }
-                
-                // Specialization filter
-                if (filters.specialization && doctor.specialization !== filters.specialization) {
-                    return false;
-                }
-                
+        
                 // Experience filter
-                if (filters.experience) {
-                    const [minExp, maxExp] = filters.experience.split('-').map(Number);
-                    const doctorExp = parseInt(doctor.experience) || 0;
-                    
+                if (filters.Experience) {
+                    const [minExp, maxExp] = filters.Experience.split('-').map(str => {
+                        const numStr = str.replace(' years', '').replace('+', '').trim();
+                        return parseInt(numStr) || 0;
+                    });
+        
+                    const doctorExp = parseInt(doctor.Experience) || 0;
+        
                     if (maxExp) {
+                        // For ranges like "0-5 years"
                         if (doctorExp < minExp || doctorExp > maxExp) return false;
                     } else {
-                        // Handle "20+ years" case
+                        // For "20+ years" case
                         if (doctorExp < minExp) return false;
                     }
                 }
-                
-                // Country filter
-                if (filters.country && doctor.country !== filters.country) {
+        
+                // State filter
+                if (filters.State && doctor.State !== filters.State) {
                     return false;
                 }
-                
+        
                 return true;
             });
-    
-            setDoctors(filteredDoctors);
-            setCurrentPage(1);
-            setTotalPages(Math.ceil(filteredDoctors.length / doctorsPerPage) || 1);
-        };
-    
-        applyFilters();
-    }, [filters, doctors]);
-    
-    // Update your resetFilters function to also reset the doctors list
+        
+            setFilteredDoctors(filtered);
+        }, [doctors, searchTerm, filters]);
+
+        
+
     const resetFilters = async () => {
         setFilters({
-            status: '',
-            specialization: '',
-            experience: '',
-            country: ''
+            Speciality: '',
+            Experience: '',
+            State: ''
         });
         setSearchTerm('');
-        await fetchDoctors(); // This will refetch the original unfiltered list
+        setCurrentPage(1);
+        await fetchDoctors();
     };
 
     const handlePageChange = (newPage) => {
@@ -410,7 +445,7 @@ const AdminDoctors = () => {
                 <div className={`${sidebarOpen ? 'w-64' : 'w-20'} bg-gray-700 text-white transition-all duration-300 ease-in-out flex flex-col`}>
                     {/* Sidebar content */}
                 </div>
-                
+
                 {/* Main Content */}
                 <div className="flex-1 flex flex-col overflow-hidden">
                     {/* Loading spinner */}
@@ -426,7 +461,7 @@ const AdminDoctors = () => {
         <div className="flex h-screen bg-gray-100 overflow-hidden">
             {/* Mobile Sidebar Overlay */}
             {mobileSidebarOpen && (
-                <div 
+                <div
                     className="fixed inset-0 bg-black bg-opacity-50 z-40 lg:hidden"
                     onClick={toggleMobileSidebar}
                 ></div>
@@ -436,7 +471,7 @@ const AdminDoctors = () => {
             <div className={`${sidebarOpen ? 'w-64' : 'w-20'} 
                 ${mobileSidebarOpen ? 'fixed inset-y-0 left-0 z-50' : 'hidden lg:flex'} 
                 bg-gray-700 text-white transition-all duration-300 ease-in-out flex flex-col`}>
-                
+
                 {/* Sidebar Header */}
                 <div className="p-4 flex items-center justify-between border-b border-white h-16">
                     {sidebarOpen ? (
@@ -444,7 +479,7 @@ const AdminDoctors = () => {
                     ) : (
                         <div className="w-6"></div>
                     )}
-                    <button 
+                    <button
                         onClick={toggleSidebar}
                         className="text-white hover:text-blue-200 focus:outline-none hidden lg:block"
                     >
@@ -456,9 +491,8 @@ const AdminDoctors = () => {
                 <nav className="flex-1 overflow-y-auto">
                     <Link
                         to="/admin/dashboard"
-                        className={`flex items-center px-6 py-3 text-white hover:bg-blue-700 ${
-                            !sidebarOpen ? 'justify-center' : ''
-                        }`}
+                        className={`flex items-center px-6 py-3 text-white hover:bg-blue-700 ${!sidebarOpen ? 'justify-center' : ''
+                            }`}
                         onClick={() => setMobileSidebarOpen(false)}
                     >
                         <FaChartLine className={`${sidebarOpen ? 'mr-3' : ''}`} />
@@ -466,9 +500,8 @@ const AdminDoctors = () => {
                     </Link>
                     <Link
                         to="/admin/doctors"
-                        className={`flex items-center px-6 py-3 text-white hover:bg-blue-700 bg-blue-700 ${
-                            !sidebarOpen ? 'justify-center' : ''
-                        }`}
+                        className={`flex items-center px-6 py-3 text-white hover:bg-blue-700 bg-blue-700 ${!sidebarOpen ? 'justify-center' : ''
+                            }`}
                         onClick={() => setMobileSidebarOpen(false)}
                     >
                         <FaUserMd className={`${sidebarOpen ? 'mr-3' : ''}`} />
@@ -476,9 +509,8 @@ const AdminDoctors = () => {
                     </Link>
                     <Link
                         to="/admin/patients"
-                        className={`flex items-center px-6 py-3 text-white hover:bg-blue-700 ${
-                            !sidebarOpen ? 'justify-center' : ''
-                        }`}
+                        className={`flex items-center px-6 py-3 text-white hover:bg-blue-700 ${!sidebarOpen ? 'justify-center' : ''
+                            }`}
                         onClick={() => setMobileSidebarOpen(false)}
                     >
                         <FaUsers className={`${sidebarOpen ? 'mr-3' : ''}`} />
@@ -486,9 +518,8 @@ const AdminDoctors = () => {
                     </Link>
                     <Link
                         to="/admin/pricing"
-                        className={`flex items-center px-6 py-3 text-white hover:bg-blue-700 ${
-                            !sidebarOpen ? 'justify-center' : ''
-                        }`}
+                        className={`flex items-center px-6 py-3 text-white hover:bg-blue-700 ${!sidebarOpen ? 'justify-center' : ''
+                            }`}
                         onClick={() => setMobileSidebarOpen(false)}
                     >
                         <FaDollarSign className={`${sidebarOpen ? 'mr-3' : ''}`} />
@@ -496,28 +527,14 @@ const AdminDoctors = () => {
                     </Link>
                     <Link
                         to="/admin/analytics"
-                        className={`flex items-center px-6 py-3 text-white hover:bg-blue-700 ${
-                            !sidebarOpen ? 'justify-center' : ''
-                        }`}
+                        className={`flex items-center px-6 py-3 text-white hover:bg-blue-700 ${!sidebarOpen ? 'justify-center' : ''
+                            }`}
                         onClick={() => setMobileSidebarOpen(false)}
                     >
                         <FaChartLine className={`${sidebarOpen ? 'mr-3' : ''}`} />
                         {sidebarOpen && "Analytics"}
                     </Link>
                 </nav>
-
-                {/* Sidebar Footer */}
-                {/* <div className="p-4 border-t border-white">
-                    <button
-                        onClick={handleLogout}
-                        className={`flex items-center w-full text-gray-300 hover:text-white ${
-                            !sidebarOpen ? 'justify-center' : ''
-                        }`}
-                    >
-                        <FaSignOutAlt className={`${sidebarOpen ? 'mr-3' : ''}`} />
-                        {sidebarOpen && "Logout"}
-                    </button>
-                </div> */}
             </div>
 
             {/* Main Content Area */}
@@ -532,10 +549,10 @@ const AdminDoctors = () => {
                         >
                             <FaBars />
                         </button>
-                        
+
                         {/* Page title */}
                         <h1 className="text-xl font-bold text-gray-800 ml-2 lg:ml-0">Doctors Management</h1>
-                        
+
                         {/* Add Doctor button */}
                         <button
                             onClick={() => {
@@ -569,7 +586,7 @@ const AdminDoctors = () => {
                                     onKeyPress={(e) => e.key === 'Enter' && handleSearch()}
                                 />
                             </div>
-                            
+
                             {/* Filter Button */}
                             <div className="flex gap-2">
                                 <button
@@ -588,48 +605,36 @@ const AdminDoctors = () => {
                                 </button>
                             </div>
                         </div>
-                        
+
                         {/* Filter Panel */}
                         {showFilters && (
                             <div className="mt-4 p-4 bg-gray-50 rounded-lg">
                                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
                                     {/* Status Filter */}
-                                    <div>
-                                        <label className="block text-sm font-medium text-gray-700 mb-1">Status</label>
-                                        <select
-                                            name="status"
-                                            value={filters.status}
-                                            onChange={handleFilterChange}
-                                            className="w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
-                                        >
-                                            <option value="">All Statuses</option>
-                                            <option value="active">Active</option>
-                                            <option value="inactive">Inactive</option>
-                                        </select>
-                                    </div>
-                                    
+
+
                                     {/* Specialization Filter */}
                                     <div>
-                                        <label className="block text-sm font-medium text-gray-700 mb-1">Specialization</label>
+                                        <label className="block text-sm font-medium text-gray-700 mb-1">Speciality</label>
                                         <select
                                             name="specialization"
-                                            value={filters.specialization}
+                                            value={filters.Speciality}
                                             onChange={handleFilterChange}
                                             className="w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
                                         >
-                                            <option value="">All Specializations</option>
+                                            <option value="">All Speciality</option>
                                             {specialtiesList.map((spec, index) => (
                                                 <option key={index} value={spec}>{spec}</option>
                                             ))}
                                         </select>
                                     </div>
-                                    
+
                                     {/* Experience Filter */}
                                     <div>
                                         <label className="block text-sm font-medium text-gray-700 mb-1">Experience</label>
                                         <select
                                             name="experience"
-                                            value={filters.experience}
+                                            value={filters.Experience}
                                             onChange={handleFilterChange}
                                             className="w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
                                         >
@@ -639,24 +644,24 @@ const AdminDoctors = () => {
                                             ))}
                                         </select>
                                     </div>
-                                    
-                                    {/* Country Filter */}
+
+                                    {/* State Filter */}
                                     <div>
-                                        <label className="block text-sm font-medium text-gray-700 mb-1">Country</label>
+                                        <label className="block text-sm font-medium text-gray-700 mb-1">State</label>
                                         <select
                                             name="country"
-                                            value={filters.country}
+                                            value={filters.State}
                                             onChange={handleFilterChange}
                                             className="w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
                                         >
-                                            <option value="">All Countries</option>
+                                            <option value="">All States</option>
                                             {countries.map(country => (
                                                 <option key={country.code} value={country.name}>{country.name}</option>
                                             ))}
                                         </select>
                                     </div>
                                 </div>
-                                
+
                                 <div className="flex justify-end mt-4">
                                     <button
                                         onClick={resetFilters}
@@ -675,74 +680,73 @@ const AdminDoctors = () => {
                             <table className="min-w-full divide-y divide-gray-200">
                                 <thead className="bg-gray-50">
                                     <tr>
-                                        <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider sm:px-6">Doctor</th>
-                                        <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider sm:px-6">Specialization</th>
+                                        <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider sm:px-6">ID</th>
+                                        <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider sm:px-6">NAME</th>
+                                        <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider sm:px-6">Speciality</th>
                                         <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider sm:px-6">Experience</th>
-                                        <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider sm:px-6">Contact</th>
-                                        <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider sm:px-6">Status</th>
+                                        <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider sm:px-6">State</th>
                                         <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider sm:px-6">Actions</th>
                                     </tr>
                                 </thead>
                                 <tbody className="bg-white divide-y divide-gray-200">
-                                    {doctors.length > 0 ? (
-                                        doctors.map((doctor) => (
-                                            <tr key={doctor._id} className="hover:bg-gray-50">
-                                                <td className="px-4 py-4 whitespace-nowrap sm:px-6">
-                                                    <div className="flex items-center">
-                                                        <div className="flex-shrink-0 h-10 w-10">
-                                                            <FaUserMd className="h-10 w-10 text-gray-400" />
+                                    {
+                                        data.doctor.length > 0 ? (
+                                            data.doctor.map((doctor) => (
+                                                <tr key={doctor._id} className="hover:bg-gray-50">
+                                                    <td className="px-4 py-4 whitespace-nowrap sm:px-6">
+                                                        <div className="text-sm text-gray-900">{doctor._id}</div>
+                                                    </td>
+                                                    <td className="px-4 py-4 whitespace-nowrap sm:px-6">
+                                                        <div className="flex items-center">
+                                                            <div className="flex-shrink-0 h-10 w-10">
+                                                                <FaUserMd className="h-10 w-10 text-gray-400" />
+                                                            </div>
+                                                            <div className="ml-4">
+                                                                <div className="text-sm font-medium text-gray-900">{doctor.Name}</div>
+                                                                <div className="text-sm text-gray-500">{doctor.email}</div>
+                                                            </div>
                                                         </div>
-                                                        <div className="ml-4">
-                                                            <div className="text-sm font-medium text-gray-900">{doctor.name}</div>
-                                                            <div className="text-sm text-gray-500">{doctor.email}</div>
+                                                    </td>
+                                                    <td className="px-4 py-4 whitespace-nowrap sm:px-6">
+                                                        <div className="text-sm text-gray-900">{doctor.Speciality}</div>
+                                                    </td>
+                                                    <td className="px-4 py-4 whitespace-nowrap sm:px-6">
+                                                        <div className="text-sm text-gray-900">{doctor.Experience} years</div>
+                                                    </td>
+                                                    <td className="px-4 py-4 whitespace-nowrap sm:px-6">
+                                                        <div className="text-sm text-gray-900">
+                                                            {doctor.State ? String(doctor.State).replace(/(\d{3})(\d{3})(\d{4})/, '($1) $2-$3') : 'N/A'}
                                                         </div>
-                                                    </div>
-                                                </td>
-                                                <td className="px-4 py-4 whitespace-nowrap sm:px-6">
-                                                    <div className="text-sm text-gray-900">{doctor.specialization}</div>
-                                                </td>
-                                                <td className="px-4 py-4 whitespace-nowrap sm:px-6">
-                                                    <div className="text-sm text-gray-900">{doctor.experience} years</div>
-                                                </td>
-                                                <td className="px-4 py-4 whitespace-nowrap sm:px-6">
-                                                    <div className="text-sm text-gray-900">
-                                                        {doctor.phone ? String(doctor.phone).replace(/(\d{3})(\d{3})(\d{4})/, '($1) $2-$3') : 'N/A'}
-                                                    </div>
-                                                    <div className="text-sm text-gray-500 truncate max-w-xs">
-                                                        {doctor.country && <span className="mr-2">{doctor.country}</span>}
-                                                        {doctor.address}
-                                                    </div>
-                                                </td>
-                                                <td className="px-4 py-4 whitespace-nowrap sm:px-6">
-                                                    <span className={`px-2 inline-flex text-xs leading-5 font-semibold rounded-full ${doctor.status === 'active' ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'}`}>
-                                                        {doctor.status === 'active' ? 'Active' : 'Inactive'}
-                                                    </span>
-                                                </td>
-                                                <td className="px-4 py-4 whitespace-nowrap text-sm font-medium sm:px-6">
-                                                    <button
-                                                        onClick={() => handleEdit(doctor)}
-                                                        className="text-blue-600 hover:text-blue-900 mr-4"
-                                                        aria-label="Edit doctor"
-                                                    >
-                                                        <FaEdit className="inline-block" />
-                                                    </button>
-                                                    <button
-                                                        onClick={() => handleDelete(doctor._id)}
-                                                        className="text-red-600 hover:text-red-900"
-                                                        aria-label="Delete doctor"
-                                                    >
-                                                        <FaTrash className="inline-block" />
-                                                    </button>
+                                                        <div className="text-sm text-gray-500 truncate max-w-xs">
+                                                            {doctor.country && <span className="mr-2">{doctor.country}</span>}
+                                                            {doctor.address}
+                                                        </div>
+                                                    </td>
+                                                    <td className="px-4 py-4 whitespace-nowrap text-sm font-medium sm:px-6">
+                                                        <button
+                                                            onClick={() => handleEdit(doctor)}
+                                                            className="text-blue-600 hover:text-blue-900 mr-4"
+                                                            aria-label="Edit doctor"
+                                                        >
+                                                            <FaEdit className="inline-block" />
+                                                        </button>
+                                                        <button
+                                                            onClick={() => handleDelete(doctor._id)}
+                                                            className="text-red-600 hover:text-red-900"
+                                                            aria-label="Delete doctor"
+                                                        >
+                                                            <FaTrash className="inline-block" />
+                                                        </button>
+                                                    </td>
+                                                </tr>
+                                            ))
+                                        ) : (
+                                            <tr>
+                                                <td colSpan="7" className="px-4 py-4 text-center text-gray-500 sm:px-6">
+                                                    {searchTerm || Object.values(filters).some(f => f) ? 'No matching doctors found' : 'No doctors found. Click "Add Doctor" to create one.'}
                                                 </td>
                                             </tr>
-                                        ))
-                                    ) : (
-                                        <tr>
-                                            <td colSpan="6" className="px-4 py-4 text-center text-gray-500 sm:px-6">
-                                                {searchTerm || Object.values(filters).some(f => f) ? 'No matching doctors found' : 'No doctors found. Click "Add Doctor" to create one.'}
-                                            </td>
-                                        </tr>
-                                    )}
+                                        )}
                                 </tbody>
                             </table>
                         </div>
@@ -898,7 +902,7 @@ const AdminDoctors = () => {
                                                 </select>
                                             </div>
                                         </div>
-                                        
+
                                         <div>
                                             <label className="block text-sm font-medium text-gray-700">Address</label>
                                             <textarea
@@ -909,7 +913,7 @@ const AdminDoctors = () => {
                                                 rows="3"
                                             />
                                         </div>
-                                        
+
                                         <div className="flex justify-end space-x-3 pt-4">
                                             <button
                                                 type="button"
