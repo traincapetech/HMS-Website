@@ -9,8 +9,11 @@ const transactionSchema = new mongoose.Schema({
     date: Date,
     status: String,
     paymentMethod: String,
+    transactionId: String,
+    stripeSessionId: String,
+    metadata: Object
   });
-
+  
 const newuserSchema = new mongoose.Schema({
     UserName: { type: String, required: true, unique: true },
     FirstName: { type: String, required: true },

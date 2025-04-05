@@ -4,7 +4,7 @@ import NavBar from "./components/NavBar";
 import AllRoutes from "./routes/AllRoutes";
 import Footer from "./components/Footer";
 import BranchedChatbox from "./components/Chatbox/Chatbox";
-import MyAppointments from "./pages/MyAppointments";
+import MyAppointments from "./pages/user/Appointment/MyAppointments";
 import DoctorDashboard from "./pages/DoctorDashboard";
 import ApiDiagnostics from "./pages/ApiDiagnostics";
 import SEO from "./components/SEO";

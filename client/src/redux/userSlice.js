@@ -1,7 +1,6 @@
 import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
 import axios from "axios";
-import { loadStripe } from '@stripe/stripe-js';
-import { CardElement, Elements, useStripe, useElements } from '@stripe/react-stripe-js';
+import { loadStripe } from "@stripe/stripe-js";
 // Async Thunk for Login
 export const loginUser = createAsyncThunk(
   "user/login",
@@ -25,30 +24,76 @@ export const loginUser = createAsyncThunk(
     }
   }
 );
+// Payment thunk for initiating payment
 export const paymentTamdCoin = createAsyncThunk(
   "user/payment",
   async ({ paymentData }, { rejectWithValue }) => {
     try {
       console.log("Payment data received:", paymentData);
-      
-      if (paymentData.paymentMode === "Credit Card") {
-        console.log("Creditcard");
-        const stripe = await loadStripe("pk_test_51RA7gzR4IpVwwNdkSnaCFniqyAdSIFkPIcztaYVwuIlmUImYiPtSS2UEnDQjMS9GF2BddzsU75t1PjRqiWh0aa1E00bBEJqgio")
-      const body={
-        products:paymentData
-      } 
-      const headers={
-        "Content-type":"application/json"
-      }
-      } else if (paymentData.paymentMode === "Wallet") {
-        await axios.post("http://localhost:8080/api/payments/wallet", { paymentData });
-      }
 
+      if (paymentData.paymentMode === "Credit Card") {
+        const stripe = await loadStripe(
+          "pk_test_51RA7gzR4IpVwwNdkSnaCFniqyAdSIFkPIcztaYVwuIlmUImYiPtSS2UEnDQjMS9GF2BddzsU75t1PjRqiWh0aa1E00bBEJqgio"
+        );
+
+        const body = {
+          products: paymentData,
+        };
+        const response = await axios.post(
+          "http://localhost:8080/api/payments/stripe",
+          body,
+          {
+            headers: {
+              "Content-Type": "application/json",
+            },
+          }
+        );
+
+        console.log("Stripe response:", response.data);
+
+        // Use the URL directly for more reliable redirection
+        if (response.data.url) {
+          window.location.href = response.data.url;
+          return { redirecting: true, sessionId: response.data.sessionId };
+        } else {
+          // Fall back to redirectToCheckout if no URL
+          const result = await stripe.redirectToCheckout({
+            sessionId: response.data.sessionId,
+          });
+
+          if (result.error) {
+            throw new Error(result.error.message);
+          }
+          return { redirecting: true, sessionId: response.data.sessionId };
+        }
+      } else if (paymentData.paymentMode === "Wallet") {
+        const response = await axios.post("http://localhost:8080/api/payments/wallet", {
+          paymentData,
+        });
+        return response.data;
+      }
     } catch (error) {
       return rejectWithValue(error.response?.data || error.message);
     }
   }
 );
+
+// New thunk for checking payment status
+export const checkPaymentStatus = createAsyncThunk(
+  "user/checkPaymentStatus",
+  async ({ sessionId, email }, { rejectWithValue }) => {
+    try {
+      const response = await axios.get(
+        `http://localhost:8080/api/payments/success?session_id=${sessionId}&email=${encodeURIComponent(email)}`
+      );
+      
+      return response.data;
+    } catch (error) {
+      return rejectWithValue(error.response?.data || error.message);
+    }
+  }
+);
+
 
 // Async Thunk for User Registration
 export const registerUser = createAsyncThunk(
@@ -85,7 +130,6 @@ export const registerUser = createAsyncThunk(
   }
 );
 
-
 const userSlice = createSlice({
   name: "user",
   initialState: {
@@ -103,7 +147,6 @@ const userSlice = createSlice({
       state.token = null;
       localStorage.removeItem("token");
       localStorage.removeItem("user");
-
     },
   },
   extraReducers: (builder) => {

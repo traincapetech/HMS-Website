@@ -28,13 +28,13 @@ import AppointmentConfirmed from '../pages/AppointmentConfirmed'
 import VideoCall from '../components/VideoCall'
 import Dashboard from '../components/app.dashboard'
 import VideoCallControls from '../components/videocallcontrols'
-import MyAppointments from '../pages/MyAppointments'
-import MyFeedback from '../pages/MyFeedback'
-import MyMedicalRecords from '../pages/MyMedicalRecords'
+import MyAppointments from '../pages/user/Appointment/MyAppointments'
+import MyFeedback from '../pages/user/Feedback/MyFeedback'
+import MyMedicalRecords from '../pages/user/MedicalRecords/MyMedicalRecords'
 import OnlineConsultations from '../pages/MyOnlineConsultations'
 import MyTests from '../pages/MyTests'
-import Payments from '../pages/Payments'
-import Profile from '../pages/Profile'
+import Payments from '../pages/user/Payments/Payments'
+import Profile from '../pages/user/View-UpdateProfile/Profile'
 import PrivacyPolicy from '../pages/PrivacyPolicy'
 import TermsAndConditions from '../pages/Terms&Conditions'
 import ShowDoctors from '../pages/showDoctors'
@@ -62,6 +62,9 @@ import AdminSettings from '../pages/AdminSettings'
 import ProtectedAdminRoute from '../components/ProtectedAdminRoute'
 import TAMDHealthFeed from '../pages/TAMDHealthFeed'
 import ApiDiagnostics from '../pages/ApiDiagnostics'
+import { PaymentCancelPage } from '../pages/stripe/Cancel'
+import  PaymentSuccessPage  from '../pages/stripe/Success'
+import UserPage from '../pages/user/UserPage'
 
 const AllRoutes = () => {
   return (
@@ -127,6 +130,9 @@ const AllRoutes = () => {
       <Route path='/TAMDReachPage' element={<TAMDReachPage />} />
       <Route path='/HelpPage' element={<HelpPage />} />
       <Route path='/AdminLogin' element={<AdminLogin />} />
+      <Route path='/payment/cancel' element={<PaymentCancelPage/>} />
+      <Route path='/payment/success' element={<PaymentSuccessPage/>} />
+      <Route path='/UserProfile' element={<UserPage/>} />
 
       {/* Doctor Panel Routes */}
       <Route

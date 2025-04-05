@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { useSelector, useDispatch } from "react-redux";
 import { Link, useNavigate } from "react-router-dom";
-import { logoutUser } from "../redux/userSlice";
+import { logoutUser } from "../../../redux/userSlice";
 
 const Profile = () => {
   const { user } = useSelector((state) => state.user);
@@ -47,50 +47,8 @@ const Profile = () => {
   }, []);
 
   return (
-    <div className="flex flex-col md:flex-row h-screen bg-gray-100">
-      {/* Mobile Sidebar Toggle Button */}
-      <button
-        className="md:hidden p-3 bg-gray-200 w-full text-left text-xl"
-        onClick={() => setIsSidebarOpen(!isSidebarOpen)}
-      >
-        ☰ Menu
-      </button>
+    <div className="">
 
-      {/* Sidebar */}
-      <div
-        className={`fixed inset-y-0 left-0 z-50 w-64 bg-gray-100 p-6 transform ${
-          isSidebarOpen ? "translate-x-0" : "-translate-x-full"
-        } md:relative md:translate-x-0 transition-transform duration-300 ease-in-out`}
-      >
-        <button
-          className="md:hidden text-right w-full text-gray-700 text-2xl"
-          onClick={() => setIsSidebarOpen(false)}
-        >
-          ✕
-        </button>
-
-        {/* <div className="flex items-center mb-6">
-          <img
-            src={user?.photo || "https://accounts.practo.com/profile_picture/22269865/medium_thumbnail"}
-            alt="User"
-            className="w-16 h-16 rounded-lg border-2 border-gray-300"
-          />
-          <div className="ml-3">
-            <p className="font-semibold">{user?.UserName || "User"}</p>
-            <p className="text-sm text-gray-500">{user?.Mobile || "No Mobile Number"}</p>
-          </div>
-        </div> */}
-        <ul className="space-y-3">
-          <li><Link to="/MyAppointments" className="block py-2 px-3 rounded-lg hover:bg-gray-200">My Appointments</Link></li>
-          <li><Link to="/MyTests" className="block py-2 px-3 rounded-lg hover:bg-gray-200">My Tests</Link></li>
-          <li><Link to="/MyMedicalRecords" className="block py-2 px-3 rounded-lg hover:bg-gray-200">My Medical Records</Link></li>
-          <li><Link to="/OnlineConsultations" className="block py-2 px-3 rounded-lg hover:bg-gray-200">My Online Consultations</Link></li>
-          <li><Link to="/MyFeedback" className="block py-2 px-3 rounded-lg hover:bg-gray-200">My Feedback</Link></li>
-          <li><Link to="/Profile" className="block py-2 px-3 rounded-lg hover:bg-gray-200 font-bold">View / Update Profile</Link></li>
-          <li><Link to="/Payments" className="block py-2 px-3 rounded-lg hover:bg-gray-200">Payments</Link></li>
-          <li><button onClick={handleLogout} className="w-full text-left py-2 px-3 text-red-500 hover:bg-gray-200">Logout</button></li>
-        </ul>
-      </div>
 
       {/* Main Profile Form */}
       <div className="flex-1 p-6 bg-gray-50 overflow-y-auto">

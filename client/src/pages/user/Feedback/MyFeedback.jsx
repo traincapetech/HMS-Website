@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { useSelector, useDispatch } from "react-redux";
-import { logoutUser } from "../redux/userSlice";
+import { logoutUser } from "../../../redux/userSlice";
 
 const MyFeedback = () => {
   const { user, token } = useSelector((state) => state.user);
@@ -36,9 +36,12 @@ const MyFeedback = () => {
   useEffect(() => {
     const fetchDoctors = async () => {
       try {
-        const response = await fetch("https://hms-backend-1-pngp.onrender.com/api/doctors", {
-          headers: { Authorization: `Bearer ${token}` },
-        });
+        const response = await fetch(
+          "https://hms-backend-1-pngp.onrender.com/api/doctors",
+          {
+            headers: { Authorization: `Bearer ${token}` },
+          }
+        );
         const data = await response.json();
         setDoctors(data);
       } catch (error) {
@@ -115,34 +118,9 @@ const MyFeedback = () => {
     window.scrollTo(0, 0);
   }, []);
   return (
-    <div className="flex h-screen">
-      {/* Sidebar */}
-      <div className="w-1/4 bg-gray-100 p-6">
-        <div className="flex items-center mb-6">
-          <img
-            src={user?.photo || "https://accounts.practo.com/profile_picture/22269865/medium_thumbnail"}
-            alt="User"
-            className="w-16 h-16 rounded-lg border-2 border-gray-300"
-          />
-          <div className="ml-3">
-            <p className="font-semibold">{user?.UserName || "User"}</p>
-            <p className="text-sm text-gray-500">{user?.Mobile || "No Mobile Number"}</p>
-          </div>
-        </div>
-        <ul className="space-y-3">
-          <li><Link to="/MyAppointments" className="block py-2 px-3 rounded-lg hover:bg-gray-200">My Appointments</Link></li>
-          <li><Link to="/MyTests" className="block py-2 px-3 rounded-lg hover:bg-gray-200">My Tests</Link></li>
-          <li><Link to="/MyMedicalRecords" className="block py-2 px-3 rounded-lg hover:bg-gray-200">My Medical Records</Link></li>
-          <li><Link to="/OnlineConsultations" className="block py-2 px-3 rounded-lg hover:bg-gray-200">My Online Consultations</Link></li>
-          <li><Link to="/MyFeedback" className="block py-2 px-3 rounded-lg hover:bg-gray-200 font-bold">My Feedback</Link></li>
-          <li><Link to="/Profile" className="block py-2 px-3 rounded-lg hover:bg-gray-200">View / Update Profile</Link></li>
-          <li><Link to="/Payments" className="block py-2 px-3 rounded-lg hover:bg-gray-200">Payments</Link></li>
-          <li><button onClick={handleLogout} className="w-full text-left py-2 px-3 text-red-500 hover:bg-gray-200">Logout</button></li>
-        </ul>
-      </div>
-
+    <div>
       {/* Main Content */}
-      <div className="w-3/4 p-6">
+      <div className="w-full p-6">
         <h2 className="text-2xl font-bold mb-4">Provide Feedback</h2>
 
         {/* Feedback Form */}
@@ -154,9 +132,11 @@ const MyFeedback = () => {
             className="w-full p-2 border rounded-md mb-4"
           >
             <option value="doctor">Doctor</option>
-        </select>
+          </select>
 
-          <label className="block mb-2">Select {selectedType === "doctor" ? "Doctor" : "Hospital"}:</label>
+          <label className="block mb-2">
+            Select {selectedType === "doctor" ? "Doctor" : "Hospital"}:
+          </label>
           <select
             value={selectedId}
             onChange={(e) => setSelectedId(e.target.value)}
@@ -164,9 +144,16 @@ const MyFeedback = () => {
           >
             <option value="">Select</option>
             {selectedType === "doctor"
-              ? doctors.map((doc) => <option key={doc.id} value={doc.id}>{doc.name}</option>)
-              : hospitals.map((hos) => <option key={hos.id} value={hos.id}>{hos.name}</option>)
-            }
+              ? doctors.map((doc) => (
+                  <option key={doc.id} value={doc.id}>
+                    {doc.name}
+                  </option>
+                ))
+              : hospitals.map((hos) => (
+                  <option key={hos.id} value={hos.id}>
+                    {hos.name}
+                  </option>
+                ))}
           </select>
 
           <label className="block mb-2">Rating:</label>
@@ -186,7 +173,12 @@ const MyFeedback = () => {
             className="w-full p-2 border rounded-md mb-4"
           ></textarea>
 
-          <button type="submit" className="bg-blue-500 text-white px-4 py-2 rounded-md">Submit Feedback</button>
+          <button
+            type="submit"
+            className="bg-blue-500 text-white px-4 py-2 rounded-md"
+          >
+            Submit Feedback
+          </button>
         </form>
       </div>
     </div>

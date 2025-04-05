@@ -1,10 +1,10 @@
 import React, { useState, useEffect } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { useSelector, useDispatch } from "react-redux";
-import { logoutUser } from "../redux/userSlice";
+import { logoutUser } from "../../../redux/userSlice";
 import axios from "axios";
 import { FaVideo, FaCalendarAlt, FaSpinner, FaExclamationTriangle, FaCheck, FaClock, FaTimes, FaSync, FaTools } from "react-icons/fa";
-import { ENV } from "../utils/envUtils";
+import { ENV } from "../../../utils/envUtils";
 
 // Use API URL from environment utility
 const API_BASE_URL = ENV.API_URL;
@@ -372,34 +372,8 @@ const MyAppointments = () => {
   }, []);
   
   return (
-    <div className="flex flex-col md:flex-row min-h-screen bg-gray-100">
-      {/* Sidebar */}
-      <div className="w-full md:w-1/4 bg-gray-100 p-6">
-        <div className="flex items-center mb-6">
-          <img
-            src={user?.photo || "https://accounts.practo.com/profile_picture/22269865/medium_thumbnail"}
-            alt="User"
-            className="w-16 h-16 rounded-lg border-2 border-gray-300"
-          />
-          <div className="ml-3">
-            <p className="font-semibold">{user?.UserName || "User"}</p>
-            <p className="text-sm text-gray-500">{user?.Mobile || "No Mobile Number"}</p>
-          </div>
-        </div>
-        <ul className="space-y-3">
-          <li><Link to="/MyAppointments" className="block py-2 px-3 rounded-lg bg-red-100 text-red-700 font-bold">My Appointments</Link></li>
-          <li><Link to="/MyTests" className="block py-2 px-3 rounded-lg hover:bg-gray-200">My Tests</Link></li>
-          <li><Link to="/MyMedicalRecords" className="block py-2 px-3 rounded-lg hover:bg-gray-200">My Medical Records</Link></li>
-          <li><Link to="/OnlineConsultations" className="block py-2 px-3 rounded-lg hover:bg-gray-200">My Online Consultations</Link></li>
-          <li><Link to="/MyFeedback" className="block py-2 px-3 rounded-lg hover:bg-gray-200">My Feedback</Link></li>
-          <li><Link to="/Profile" className="block py-2 px-3 rounded-lg hover:bg-gray-200">View / Update Profile</Link></li>
-          <li><Link to="/Payments" className="block py-2 px-3 rounded-lg hover:bg-gray-200">Payments</Link></li>
-          <li><button onClick={handleLogout} className="w-full text-left py-2 px-3 text-red-500 hover:bg-gray-200">Logout</button></li>
-        </ul>
-      </div>
-
-      {/* Main Content */}
-      <div className="w-full md:w-3/4 p-6">
+    <div >
+     
         <div className="flex justify-between items-center mb-6">
           <h2 className="text-2xl font-bold">My Appointments</h2>
           <div className="flex space-x-2">
@@ -582,7 +556,6 @@ const MyAppointments = () => {
           )}
         </div>
       </div>
-    </div>
   );
 };
 

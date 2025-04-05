@@ -105,7 +105,9 @@ const NavBar = () => {
                             <div className="absolute right-0 mt-2 w-48 sm:w-56 bg-white rounded-lg shadow-md z-50 focus:outline-none">
                                 <div className="py-2">
                                     {/* Profile Section */}
-                                    <div className="flex items-center px-4 py-2 border-b border-gray-200">
+                                    <div className="flex items-center px-4 py-2 border-b border-gray-200"  onClick={()=>{
+                                        navigate('/UserProfile');
+                                    }}>
                                         <img
                                             src={getImageUrl(user?.photo)}
                                             alt="User"
@@ -237,7 +239,9 @@ const NavBar = () => {
                         {token ? (
                             <>
                                 <div className="py-2 border-b border-red-700">
-                                    <div className="flex items-center">
+                                    <div className="flex items-center" onClick={()=>{
+                                        navigate('/UserProfile');
+                                    }}>
                                         <img
                                             src={getImageUrl(user?.photo)}
                                             alt="User"
