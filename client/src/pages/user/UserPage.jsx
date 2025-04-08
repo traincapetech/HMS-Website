@@ -37,6 +37,7 @@ const UserPage = ({ user }) => {
   const handleLinkClick = (id) => {
     setActivePage(id);
     navigate(`#${id}`);
+    setIsSidebarOpen(false)
   };
 
   const handleLogout = () => {

@@ -269,6 +269,9 @@ const NavBar = () => {
                                 <Link to="/UserProfile#Profile" className="block py-2 border-b border-red-700 hover:bg-red-700 transition-colors duration-200" onClick={toggleMobileMenu}>
                                     View / Update Profile
                                 </Link>
+                                <Link to="/UserProfile#Payments" className="block py-2 border-b border-red-700 hover:bg-red-700 transition-colors duration-200" onClick={toggleMobileMenu}>
+                                    Payments
+                                </Link>
                                 <button
                                     onClick={() => {
                                         handleLogout();
