@@ -12,9 +12,15 @@ const appointSchema = new mongoose.Schema({
         required: true,
         validate: [validator.isEmail, "Please enter a valid Email "],
     },
-    AppointDate: {type: Date, required: true},
-    
+    Phone: {type: Number, required: true},
+    Reason: {type: String, required: true},
+    DocEmail: {type: String, required: true},
+    AppointDate: {type: Date, required: true},    
     AppointTime: {type: String, required: true},
+    zoomMeetingLink: {type: String},
+    zoomMeetingId: {type: String},
+    zoomPassword: {type: String},
+
 });
 
 const Appoint = mongoose.model("Appointment", appointSchema);

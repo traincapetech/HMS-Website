@@ -3,37 +3,38 @@ import fetch from "node-fetch";
 import base64 from "base-64";
 import nodemailer from "nodemailer";
 
-const ZoomAccountId = "dYnaii3oR4K7Z2ddvdHn9w";
-const ZoomClientId = "ZAbcvuI5S7CnaXV77UgC0Q";
-const ZoomClientSecret = "KqC5kk5Et4I0r13i076VrBjp2XJ86ISq";
+const ZoomAccountId = "upoJUPN9SOOrNYnKHqMAqA";
+const ZoomClientId = "BV1rBaqNTeGXQ2hDTs8iLQ";
+const ZoomClientSecret = "4foaqQih9ZHFLsJ2q1a7wjXjlDfBGSUo";
 
 
 //create a transporter object using your email service 
 const transporter = nodemailer.createTransport({
-//    host: "smtp.mailtrap.io",
-//    port: 2525,
-    service: "gmail",
-    auth: {
-        user: "blacksaura2@gmail.com",
-        //pass: "kumar737498@Saurav",
-        pass: "tbxq zjye tbjf rrvn",
-    },
+   host: "smtp.hostinger.com",
+   port: 465,
+   secure: true,
+   auth:{
+    user: "support@tamdhealth.com",
+    pass: "Tamd@1289",
+   }
 });
 
 //function to send email
-const sendEmail = async(to, subject, text) =>{
+const sendEmail = async({to, subject, html}) =>{
     try{
         const mailOptions ={
-            from: "blacksaura2@gmail.com",
+            from: "support@tamdhealth.com",
             to: to,
             subject: subject,
-            text: text,
+            html: html,
         };
 
         const info = await transporter.sendMail(mailOptions);
         console.log("Email sent to: ", to,"Response: ",info.response);
+        return info;
     } catch (error){
         console.log("Error sending email: ",to,"Error:", error);
+        throw error;
     }
 };
 
@@ -69,9 +70,14 @@ const generateZoomAccessToken = async() => {
     }
 };
 
-const generateZoomMeeting = async() => {
+const generateZoomMeeting = async({patientEmail, startTime, topic}) => {
     try {
         const zoomAccessToken = await generateZoomAccessToken();
+
+        //format the start time
+        const startTimeISO = new Date(startTime).toISOString();
+
+
         const response = await fetch(
             'https://api.zoom.us/v2/users/me/meetings',
             {
@@ -85,7 +91,7 @@ const generateZoomMeeting = async() => {
                     default_password: false,
                     duration: 60, 
                     password: '123456',
-                    schedule_for: 'blacksaura2@gmail.com', //host email 
+                    schedule_for: 'support@tamdhealth.com', //host email 
                     settings: {
                         allow_multiple_devices: true,
                         // alternative_hosts: 'sumitjain8061@gmail.com', //doctors and
@@ -104,7 +110,7 @@ const generateZoomMeeting = async() => {
                     //     ],
                     // },
                     calendar_type: 1, 
-                    contact_email: 'sumitjain8061@gmail.com', //doctor email
+                    // contact_email: 'sumitjain8061@gmail.com', //doctor email
                     contact_name: 'Jill Chill', //doctor name
                     email_notification: true,
                     encryption_type: 'enhanced_encryption',
@@ -115,8 +121,9 @@ const generateZoomMeeting = async() => {
                     meeting_authentication: true,
                     meeting_invitees: [
                         // {email: 'naureen.130613@gmail.com'}, //invites are going to be both doctor and patient email 
-                         {email : 'naureen.130613@gmail.com'},
-                         {email: 'sumitjain8061@gmail.com'},
+                        //  {email : 'naureen.130613@gmail.com'},
+                        //  {email: 'sumitjain8061@gmail.com'},
+                        {email: patientEmail},
                     ],
                       mute_upon_entry: true,
                       participant_video: true,
@@ -136,41 +143,71 @@ const generateZoomMeeting = async() => {
         );
 
         const jsonResponse = await response.json();
+        
+        if(!response.ok){
+            throw new Error(jsonResponse.message || 'Failed to create zoom meeting');
+        }
 
         if(jsonResponse.id){
             console.log('Meeting created successfully. Meeting id: ', jsonResponse.id);
             console.log('Join URL: ', jsonResponse.join_url);
             console.log('Password: ',jsonResponse.password);
 
-            //define the invitees
-            const invitees = [
-                {email: 'naureen.130613@gmail.com'},
-                {email: 'sumitjain8061@gmail.com'},
-            ];
+            // //define the invitees
+            // const invitees = [
+            //     // {email: 'ab852759@gmail.com'},
+            //     {email : patientEmail},
+           // ];
 
 
-            //email content
-            const subject ="Invitation : zoom meeting";
-            const text = `you are invited to zoom meeting.
-            Meeting ID: ${jsonResponse.id}
-            Join URL: ${jsonResponse.join_url}
-            Password: ${jsonResponse.password}`;
-
-            //send emails to each invitees
-            for(const invitee of invitees){
-                console.log('Sending email to: ', invitee.email);
-                await sendEmail(invitee.email, subject, text);
-            }
+           // return the meeting details 
+           return{
+            id: jsonResponse.id,
+            join_url: jsonResponse.join_url,
+            password: jsonResponse.password,
+            start_time: jsonResponse.start_time,
+           };
         }else{
-            console.log('Failed to create meeting', jsonResponse);
+            throw new Error('Failed to create zoom meeting');
         }
-
-        console.log("generateZoomMeeting jsonResponse -->", jsonResponse);
-    } catch (error) {
-        console.log("genrateZoomMeeting Error --> ", error);
+    }
+    catch (error) {
+        console.error("generateZoomMeeting Error --> ", error);
         throw error;
     }
-}
+};
+
+    //         //email content
+    //         const subject ="Invitation : zoom meeting";
+    //         const text = `you are invited to zoom meeting.
+    //         Meeting ID: ${jsonResponse.id}
+    //         Join URL: ${jsonResponse.join_url}
+    //         Password: ${jsonResponse.password}`;
+
+    //         //send emails to each invitees
+    //         for(const invitee of invitees){
+    //             console.log('Sending email to: ', patientEmail);
+    //             await sendEmail(patientEmail, subject, text);
+    //         }
+    //     }else{
+    //         console.log('Failed to create meeting', jsonResponse);
+    //     }
+
+    //     console.log("generateZoomMeeting jsonResponse -->", jsonResponse);
+    // }catch (error) {
+    //     console.log("genrateZoomMeeting Error --> ", error);
+    //     throw error;
+    // }
+
+//     return {
+//         id: jsonResponse.id,
+//         join_url: jsonResponse.join_url,
+//         password: jsonResponse.password,
+//         start_time: jsonResponse.start_time
+//     };
+
+
+// }
 
 //generateZoomAccessToken();
-export {generateZoomMeeting};
+export {generateZoomMeeting, sendEmail};

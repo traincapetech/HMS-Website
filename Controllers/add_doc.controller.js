@@ -51,4 +51,19 @@ const getDocById = async (req, res) => {
     }
 };
 
-export {addDoc, getDoc, getDocById};
+
+//delete by id
+const deleteDoc = async (req, res) => {
+    try{
+        const doctor = await Add_doc.findByIdAndDelete(req.params.id);
+        if(!doctor){
+            return res.status(404).json({ message: "Doctor not found" });
+        }
+        res.status(200).json({ message: "Doctor deleted successfully"});
+    } catch(error){
+        console.error(error);
+        res.status(500).json({ message: "An error occurred while deleting the doctor"});
+    }
+};
+
+export {addDoc, getDoc, getDocById, deleteDoc};

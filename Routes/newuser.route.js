@@ -22,8 +22,8 @@ router.post('/register', (req, res) => {
     });
 });
 router.post('/login', loginNewuser);
-router.get('/all', authenticateToken, getnewUser);
-router.get('/:id', authenticateToken, getnewUserById);
+router.get('/all', getnewUser);
+router.get('/:id', getnewUserById);
 
 //routes for fetching image
 router.get('/:id/image', getNewuserImage);

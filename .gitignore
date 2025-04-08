@@ -1,14 +1,23 @@
 .env    
 node_modules 
 
-//delete appointment api 
-http://localhost:8080/api/appoint/67d91c477cdc12d97b61383e
+pricing.model.js
+pricing.controller.js
 
-//add patient 
-http://localhost:8080/api/add_patient/add
 
-//get patient by id
-http://localhost:8080/api/add_patient/67eccfed36255c19ed922bcd
 
-//get all patient
-http://localhost:8080/api/add_patient/all
+
+support@tamdhealth.com
+Tamd@1289
+
+
+
+const ZoomAccountId = "upoJUPN9SOOrNYnKHqMAqA";
+const ZoomClientId = "BV1rBaqNTeGXQ2hDTs8iLQ";
+const ZoomClientSecret = "4foaqQih9ZHFLsJ2q1a7wjXjlDfBGSUo";
+
+
+
+smtp.hostinger.com
+Port:- 465
+SSL/TSL
