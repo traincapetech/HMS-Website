@@ -7,11 +7,59 @@
     <meta name="theme-color" content="#991B1B" />
     <link rel="icon" type="image/png" href="/favicon.png" />
     <title>TAMD - Your Health, Our Priority</title>
+    
+    <!-- Enhanced routing support for SPA -->
+    <script type="text/javascript">
+      // This script handles different types of SPA redirects
+      (function() {
+        // Check if we have a payment route redirect
+        if (window.location.search.includes('route=payment')) {
+          // Extract the route and parameters
+          var routeParam = new URLSearchParams(window.location.search).get('route');
+          if (routeParam) {
+            console.log("Handling payment route redirect:", routeParam);
+            // Convert all URL parameters to an object
+            var params = {};
+            window.location.search.slice(1).split('&').forEach(function(pair) {
+              var parts = pair.split('=');
+              if (parts.length === 2) {
+                params[parts[0]] = decodeURIComponent(parts[1]);
+              }
+            });
+            
+            // Rebuild the URL but without the 'route=' part
+            var newPath = '/' + routeParam;
+            var newParams = [];
+            Object.keys(params).forEach(function(key) {
+              if (key !== 'route') {
+                newParams.push(key + '=' + params[key]);
+              }
+            });
+            
+            var newUrl = newPath + (newParams.length ? '?' + newParams.join('&') : '');
+            console.log("Redirecting to:", newUrl);
+            
+            // Replace the current history entry
+            window.history.replaceState(null, '', newUrl);
+          }
+        }
+        // Regular GitHub Pages style redirect
+        else if (window.location.search[1] === '/') {
+          var decoded = window.location.search.slice(1).split('&').map(function(s) { 
+            return s.replace(/~and~/g, '&')
+          }).join('?');
+          window.history.replaceState(null, null,
+            window.location.pathname.slice(0, -1) + decoded + window.location.hash
+          );
+        }
+      })();
+    </script>
+    
+    <!-- Environment configuration script - must load before app -->
+    <script src="/env-config.js"></script>
   </head>
   <body>
     <div id="root"></div>
-    <!-- Environment configuration script -->
-    <script src="/env-config.js"></script>
     <script type="module" src="/src/main.jsx"></script>
   </body>
 </html>

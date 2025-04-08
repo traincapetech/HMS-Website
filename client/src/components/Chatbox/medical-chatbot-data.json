@@ -5,12 +5,12 @@
         "text": "Welcome to our medical support center! How can we assist you today?",
         "options": [
           { "text": "I have a medical concern", "nextQuestion": "medical_concern" },
-          { "text": "I want to learn about your services", "nextQuestion": "services" },
+          { "text": "I want information about a specific condition", "nextQuestion": "specific_condition" },
           { "text": "I need to contact a doctor", "nextQuestion": "contact_doctor" },
-          { "text": "I have a payment issue", "nextQuestion": "payment_issue" },
-          { "text": "I need to raise a support ticket", "nextQuestion": "raise_ticket" },
-          { "text": "I have an insurance-related query", "nextQuestion": "insurance_query" },
-          { "text": "I need emergency assistance", "nextQuestion": "emergency" },
+          { "text": "I need emergency guidance", "nextQuestion": "emergency" },
+          { "text": "I have questions about medications", "nextQuestion": "medication_questions" },
+          { "text": "I want to know about preventive care", "nextQuestion": "preventive_care" },
+          { "text": "I have insurance or payment questions", "nextQuestion": "insurance_payment" },
           { "text": "I need mental health support", "nextQuestion": "mental_health" }
         ]
       },
@@ -33,7 +33,7 @@
         "text": "Here are the emergency contact numbers: \n - Ambulance: 911 \n - Poison Control: 1-800-222-1222 \n - Suicide Prevention: 988. Do you need further assistance?",
         "options": [
           { "text": "Yes, I have another question", "nextQuestion": "start" },
-          { "text": "No, that’s all for now", "nextQuestion": "end" }
+          { "text": "No, that's all for now", "nextQuestion": "end" }
         ]
       },
       "mental_health": {
@@ -55,7 +55,7 @@
         "text": "You can visit mental health organizations like NAMI (National Alliance on Mental Illness) or call helplines for support. Do you need further help?",
         "options": [
           { "text": "Yes, I have another question", "nextQuestion": "start" },
-          { "text": "No, that’s all for now", "nextQuestion": "end" }
+          { "text": "No, that's all for now", "nextQuestion": "end" }
         ]
       },
       "prescription_refill": {
@@ -82,189 +82,416 @@
         "id": "medical_concern",
         "text": "What type of medical concern do you have?",
         "options": [
-          { "text": "Symptoms assessment", "nextQuestion": "symptoms" },
-          { "text": "Medication inquiry", "nextQuestion": "medication" },
+          { "text": "Symptoms assessment", "nextQuestion": "symptoms_category" },
+          { "text": "Medication inquiry", "nextQuestion": "medication_questions" },
+          { "text": "Follow-up on a previous visit", "nextQuestion": "follow_up" },
+          { "text": "Chronic condition management", "nextQuestion": "chronic_condition" },
           { "text": "Other health concerns", "nextQuestion": "other_health" }
         ]
       },
-        "services": {
-          "id": "services",
-          "text": "Which service would you like to learn more about?",
-          "options": [
-            {
-              "text": "General consultation",
-              "nextQuestion": "general_consult"
-            },
-            {
-              "text": "Specialist consultation",
-              "nextQuestion": "specialist_consult"
-            },
-            {
-              "text": "Health check-up packages",
-              "nextQuestion": "health_packages"
-            }
-          ]
-        },
-        "contact_doctor": {
-          "id": "contact_doctor",
-          "text": "How would you like to contact a doctor?",
-          "options": [
-            {
-              "text": "Book an appointment",
-              "nextQuestion": "appointment"
-            },
-            {
-              "text": "Live chat with a doctor",
-              "nextQuestion": "live_chat"
-            },
-            {
-              "text": "Call our helpline",
-              "nextQuestion": "helpline"
-            }
-          ]
-        },
-        "symptoms": {
-          "id": "symptoms",
-          "text": "Please describe your symptoms:",
-          "freeText": true,
-          "nextQuestion": "doctor_review"
-        },
-        "medication": {
-          "id": "medication",
-          "text": "Please provide details about your medication inquiry:",
-          "freeText": true,
-          "nextQuestion": "doctor_review"
-        },
-        "other_health": {
-          "id": "other_health",
-          "text": "Please describe your health concern:",
-          "freeText": true,
-          "nextQuestion": "doctor_review"
-        },
-        "doctor_review": {
-          "id": "doctor_review",
-          "text": "Thank you for providing the details. A medical professional will review your information and get back to you shortly. You can contact us at \nPhone Number: \n+1 (787) 949-3280 \nEmail Address: \nsupport@totalaccessmd.net \nWould you like to ask anything else?",
-          "options": [
-            {
-              "text": "Yes, I have another question",
-              "nextQuestion": "start"
-            },
-            {
-              "text": "No, that's all for now",
-              "nextQuestion": "end"
-            }
-          ]
-        },
-        "payment_issue": {
-          "id": "payment_issue",
-          "text": "Please describe your payment issue so we can assist you:",
-          "freeText": true,
-          "nextQuestion": "support_review"
-        },
-        "raise_ticket": {
-          "id": "raise_ticket",
-          "text": "Please provide details about your issue, and we will raise a support ticket for you:",
-          "freeText": true,
-          "nextQuestion": "support_review"
-        },
-        "support_review": {
-          "id": "support_review",
-          "text": "Thank you for reaching out. Our support team will review your request and get back to you soon. Do you need further assistance?",
-          "options": [
-            {
-              "text": "Yes, I have another question",
-              "nextQuestion": "start"
-            },
-            {
-              "text": "No, that's all for now",
-              "nextQuestion": "end"
-            }
-          ]
-        },
-        "contact_details": {
-          "id": "contact_details",
-          "text":"Thank you for reaching out to our medical support center. Our team will review your request and get back to you soon. If you have any further questions or concerns, please don't hesitate to ask. \nPhone Number: \n+1 (787) 949-3280 \nEmail Address: \nsupport@totalaccessmd.net \nOffice Hours: Monday - Friday, 9am - 5pm EST \nAddress: 123 Main St, Anytown, USA 12345 "
-          ,"options": [
-            {
-              "text": "Yes, I have aother question",
-              "nextQuestion": "start"
-            },
-            {
-              "text": "No, that's all for now",
-              "nextQuestion": "end"
-            }
-          ]
-        },
-        "general_consult": {
-          "id": "general_consult",
-          "text": "Our general consultation service provides access to certified doctors for common medical issues. Would you like to book an appointment?",
-          "options": [
-            {
-              "text": "Yes, book an appointment",
-              "nextQuestion": "appointment"
-            },
-            {
-              "text": "No, tell me about other services",
-              "nextQuestion": "services"
-            },
-            {
-              "text": "No, thanks",
-              "nextQuestion": "end"
-            }
-          ]
-        },
-        "specialist_consult": {
-          "id": "specialist_consult",
-          "text": "We offer specialist consultations in various fields. Would you like to schedule one?",
-          "options": [
-            {
-              "text": "Yes, schedule a consultation",
-              "nextQuestion": "appointment"
-            },
-            {
-              "text": "No, tell me about other services",
-              "nextQuestion": "services"
-            }
-          ]
-        },
-        "health_packages": {
-          "id": "health_packages",
-          "text": "We offer various health check-up packages. Would you like to see the available options?",
-          "options": [
-            {
-              "text": "Yes, show me the packages",
-              "nextQuestion": "package_info"
-            },
-            {
-              "text": "No, tell me about other services",
-              "nextQuestion": "services"
-            }
-          ]
-        },
-        "appointment": {
-          "id": "appointment",
-          "text": "Please provide your contact details and preferred time for the appointment:",
-          "freeText": true,
-          "nextQuestion": "thankyou"
-        },
-        "thankyou": {
-          "id": "thankyou",
-          "text": "Thank you! We have received your request and will be in touch soon. You can contact us at \nPhone Number: \n+1 (787) 949-3280 \nEmail Address: \nsupport@totalaccessmd.net \nDo you need further assistance?",
-          "options": [
-            {
-              "text": "Yes, I have another question",
-              "nextQuestion": "start"
-            },
-            {
-              "text": "No, that's all for now",
-              "nextQuestion": "end"
-            }
-          ]
-        },
-        "end": {
-          "id": "end",
-          "text": "Thank you for reaching out! Stay healthy and have a great day.",
-          "isEnd": true
-        }
+      "symptoms_category": {
+        "id": "symptoms_category",
+        "text": "What category best describes your symptoms?",
+        "options": [
+          { "text": "Pain (head, chest, abdomen, etc.)", "nextQuestion": "pain_symptoms" },
+          { "text": "Respiratory issues (cough, shortness of breath)", "nextQuestion": "respiratory_symptoms" },
+          { "text": "Digestive problems", "nextQuestion": "digestive_symptoms" },
+          { "text": "Skin, rash or allergic reactions", "nextQuestion": "skin_symptoms" },
+          { "text": "Fever, fatigue or general illness", "nextQuestion": "fever_symptoms" },
+          { "text": "Other symptoms", "nextQuestion": "symptoms_free_text" }
+        ]
+      },
+      "pain_symptoms": {
+        "id": "pain_symptoms",
+        "text": "Please describe your pain in detail (location, severity, duration, etc.):",
+        "freeText": true,
+        "nextQuestion": "doctor_review"
+      },
+      "respiratory_symptoms": {
+        "id": "respiratory_symptoms",
+        "text": "Respiratory symptoms can range from mild to serious. Please select the most relevant option:",
+        "options": [
+          { "text": "Cough (dry or with phlegm)", "nextQuestion": "cough_symptoms" },
+          { "text": "Shortness of breath or difficulty breathing", "nextQuestion": "breath_symptoms" },
+          { "text": "Chest congestion", "nextQuestion": "chest_congestion" },
+          { "text": "Other respiratory symptoms", "nextQuestion": "symptoms_free_text" }
+        ]
+      },
+      "digestive_symptoms": {
+        "id": "digestive_symptoms",
+        "text": "What digestive symptoms are you experiencing?",
+        "options": [
+          { "text": "Nausea or vomiting", "nextQuestion": "nausea_symptoms" },
+          { "text": "Diarrhea or constipation", "nextQuestion": "bowel_symptoms" },
+          { "text": "Abdominal pain", "nextQuestion": "abdominal_pain" },
+          { "text": "Other digestive symptoms", "nextQuestion": "symptoms_free_text" }
+        ]
+      },
+      "skin_symptoms": {
+        "id": "skin_symptoms",
+        "text": "What skin symptoms are you experiencing?",
+        "options": [
+          { "text": "Rash", "nextQuestion": "rash_symptoms" },
+          { "text": "Itching", "nextQuestion": "itching_symptoms" },
+          { "text": "Unusual skin changes", "nextQuestion": "skin_changes" },
+          { "text": "Other skin symptoms", "nextQuestion": "symptoms_free_text" }
+        ]
+      },
+      "fever_symptoms": {
+        "id": "fever_symptoms",
+        "text": "Please tell us more about your fever and associated symptoms:",
+        "freeText": true,
+        "nextQuestion": "fever_assessment"
+      },
+      "fever_assessment": {
+        "id": "fever_assessment",
+        "text": "Based on your description, here are some important considerations:\n\n• A fever above 103°F (39.4°C) in adults or any fever in infants under 3 months requires immediate medical attention\n• Persistent fever lasting more than 3 days should be evaluated by a healthcare provider\n• Fever accompanied by severe headache, stiff neck, confusion, or rash may indicate a serious condition\n\nWould you like to speak with a healthcare provider?",
+        "options": [
+          { "text": "Yes, connect me with a provider", "nextQuestion": "appointment" },
+          { "text": "No, I need other information", "nextQuestion": "start" }
+        ]
+      },
+      "symptoms_free_text": {
+        "id": "symptoms_free_text",
+        "text": "Please describe your symptoms in detail (when they started, severity, any triggers, etc.):",
+        "freeText": true,
+        "nextQuestion": "doctor_review"
+      },
+      "cough_symptoms": {
+        "id": "cough_symptoms",
+        "text": "How long have you had this cough?",
+        "options": [
+          { "text": "Less than 1 week", "nextQuestion": "cough_assessment" },
+          { "text": "1-3 weeks", "nextQuestion": "cough_assessment" },
+          { "text": "More than 3 weeks", "nextQuestion": "chronic_cough" },
+          { "text": "Recurring or constant cough", "nextQuestion": "chronic_cough" }
+        ]
+      },
+      "cough_assessment": {
+        "id": "cough_assessment",
+        "text": "A cough can be caused by many conditions from mild viral infections to more serious issues. Consider these factors:\n\n• Cough with fever, shortness of breath, or chest pain needs prompt evaluation\n• Green or yellow phlegm may indicate infection\n• Blood in phlegm always requires medical attention\n• Persistent coughs (over 3 weeks) should be evaluated\n\nWould you like to speak with a healthcare provider?",
+        "options": [
+          { "text": "Yes, connect me with a provider", "nextQuestion": "appointment" },
+          { "text": "I'd like to provide more details", "nextQuestion": "symptoms_details" }
+        ]
+      },
+      "chronic_cough": {
+        "id": "chronic_cough",
+        "text": "A cough lasting more than 3 weeks is considered chronic and should be evaluated by a healthcare provider. Common causes include:\n\n• Asthma or allergies\n• Acid reflux (GERD)\n• Postnasal drip\n• Chronic bronchitis\n• Medication side effects (e.g., ACE inhibitors)\n\nWe recommend scheduling an appointment. Would you like to do that now?",
+        "options": [
+          { "text": "Yes, schedule an appointment", "nextQuestion": "appointment" },
+          { "text": "No, I have other questions", "nextQuestion": "start" }
+        ]
+      },
+      "breath_symptoms": {
+        "id": "breath_symptoms",
+        "text": "Shortness of breath (dyspnea) can range from mild to life-threatening. Is your shortness of breath:",
+        "options": [
+          { "text": "Severe and sudden onset", "nextQuestion": "emergency_breath" },
+          { "text": "Moderate but worsening", "nextQuestion": "breath_assessment" },
+          { "text": "Mild and during activity only", "nextQuestion": "breath_assessment" },
+          { "text": "Occurring with other symptoms", "nextQuestion": "symptoms_details" }
+        ]
+      },
+      "emergency_breath": {
+        "id": "emergency_breath",
+        "text": "⚠️ IMPORTANT: Sudden, severe shortness of breath may indicate a medical emergency such as a pulmonary embolism, severe asthma attack, or heart issue.\n\nPlease call 911 or go to the nearest emergency room immediately.\n\nDo you need emergency contact information?",
+        "options": [
+          { "text": "Yes, show emergency contacts", "nextQuestion": "emergency_contacts" },
+          { "text": "No, I'll seek help now", "nextQuestion": "end" }
+        ]
+      },
+      "specific_condition": {
+        "id": "specific_condition",
+        "text": "What condition would you like information about?",
+        "options": [
+          { "text": "Diabetes", "nextQuestion": "diabetes_info" },
+          { "text": "Heart conditions", "nextQuestion": "heart_info" },
+          { "text": "Respiratory conditions", "nextQuestion": "respiratory_info" },
+          { "text": "Mental health conditions", "nextQuestion": "mental_health_info" },
+          { "text": "Other condition (specify)", "nextQuestion": "other_condition" }
+        ]
+      },
+      "diabetes_info": {
+        "id": "diabetes_info",
+        "text": "Diabetes is a chronic condition that affects how your body processes blood sugar (glucose). There are several types:\n\n• Type 1: The body doesn't produce insulin\n• Type 2: The body doesn't use insulin properly\n• Gestational: Occurs during pregnancy\n• Prediabetes: Blood sugar is elevated but not yet diabetic\n\nWhat specific information about diabetes do you need?",
+        "options": [
+          { "text": "Symptoms and diagnosis", "nextQuestion": "diabetes_symptoms" },
+          { "text": "Treatment options", "nextQuestion": "diabetes_treatment" },
+          { "text": "Managing diabetes", "nextQuestion": "diabetes_management" },
+          { "text": "Complications", "nextQuestion": "diabetes_complications" }
+        ]
+      },
+      "diabetes_symptoms": {
+        "id": "diabetes_symptoms",
+        "text": "Common symptoms of diabetes include:\n\n• Increased thirst and urination\n• Extreme hunger\n• Unexplained weight loss\n• Fatigue\n• Blurred vision\n• Slow-healing sores\n\nType 1 diabetes symptoms often develop quickly, while Type 2 symptoms may develop gradually or be subtle. Diagnosis is typically done through blood tests measuring blood glucose levels.\n\nWould you like to learn more about diabetes?",
+        "options": [
+          { "text": "Yes, tell me about treatment", "nextQuestion": "diabetes_treatment" },
+          { "text": "I want to schedule a diabetes screening", "nextQuestion": "appointment" },
+          { "text": "No, I have other questions", "nextQuestion": "start" }
+        ]
+      },
+      "diabetes_treatment": {
+        "id": "diabetes_treatment",
+        "text": "Diabetes treatment varies by type and individual needs:\n\n• Type 1: Insulin therapy, carbohydrate counting, regular blood sugar monitoring\n• Type 2: Lifestyle changes, medication, possibly insulin\n• Gestational: Blood sugar monitoring, diet, exercise, possibly insulin\n\nRegular medical care is essential for managing diabetes effectively. Would you like to speak with a healthcare provider about diabetes treatment?",
+        "options": [
+          { "text": "Yes, connect me with a provider", "nextQuestion": "appointment" },
+          { "text": "Tell me about diabetes management", "nextQuestion": "diabetes_management" },
+          { "text": "No, I have other questions", "nextQuestion": "start" }
+        ]
+      },
+      "heart_info": {
+        "id": "heart_info",
+        "text": "Heart conditions encompass various disorders affecting the heart and blood vessels. Common heart conditions include:\n\n• Coronary artery disease\n• Heart failure\n• Arrhythmias (irregular heartbeats)\n• Heart valve disease\n• Hypertension (high blood pressure)\n\nWhat specific information about heart conditions do you need?",
+        "options": [
+          { "text": "Symptoms and warning signs", "nextQuestion": "heart_symptoms" },
+          { "text": "Risk factors and prevention", "nextQuestion": "heart_prevention" },
+          { "text": "Treatment options", "nextQuestion": "heart_treatment" },
+          { "text": "When to seek emergency care", "nextQuestion": "heart_emergency" }
+        ]
+      },
+      "medication_questions": {
+        "id": "medication_questions",
+        "text": "What information about medications do you need?",
+        "options": [
+          { "text": "Prescription refill", "nextQuestion": "prescription_refill" },
+          { "text": "Medication side effects", "nextQuestion": "medication_side_effects" },
+          { "text": "Drug interactions", "nextQuestion": "drug_interactions" },
+          { "text": "Other medication question", "nextQuestion": "other_medication" }
+        ]
+      },
+      "prescription_refill": {
+        "id": "prescription_refill",
+        "text": "For prescription refills, we need the following information:\n\n• Medication name\n• Dosage\n• Your full name and date of birth\n• Prescribing doctor's name\n• Pharmacy information\n\nPlease provide these details:",
+        "freeText": true,
+        "nextQuestion": "refill_confirmation"
+      },
+      "refill_confirmation": {
+        "id": "refill_confirmation",
+        "text": "Thank you for providing your prescription information. Our team will process your refill request and contact you if we need additional information.\n\nStandard processing time is 24-48 hours. If you need an urgent refill, please call our office directly at (787) 949-3280.\n\nDo you need assistance with anything else?",
+        "options": [
+          { "text": "Yes, I have another question", "nextQuestion": "start" },
+          { "text": "No, that's all for now", "nextQuestion": "end" }
+        ]
+      },
+      "medication_side_effects": {
+        "id": "medication_side_effects",
+        "text": "Please provide the name of the medication you're concerned about:",
+        "freeText": true,
+        "nextQuestion": "side_effects_info"
+      },
+      "side_effects_info": {
+        "id": "side_effects_info",
+        "text": "Thank you for providing the medication name. For specific and accurate information about side effects, we recommend:\n\n1. Checking the medication information leaflet that came with your prescription\n2. Consulting with your pharmacist\n3. Speaking directly with your healthcare provider\n\nSide effects can vary based on your individual health situation. Would you like to speak with a healthcare provider about this medication?",
+        "options": [
+          { "text": "Yes, connect me with a provider", "nextQuestion": "appointment" },
+          { "text": "No, I have other questions", "nextQuestion": "start" }
+        ]
+      },
+      "preventive_care": {
+        "id": "preventive_care",
+        "text": "Preventive care helps you stay healthy and detects problems early. What preventive care information are you interested in?",
+        "options": [
+          { "text": "Recommended screenings by age", "nextQuestion": "screenings_by_age" },
+          { "text": "Immunizations and vaccines", "nextQuestion": "immunizations" },
+          { "text": "Lifestyle and wellness tips", "nextQuestion": "lifestyle_wellness" },
+          { "text": "Preventive care coverage", "nextQuestion": "preventive_coverage" }
+        ]
+      },
+      "screenings_by_age": {
+        "id": "screenings_by_age",
+        "text": "Please select your age group for recommended health screenings:",
+        "options": [
+          { "text": "18-39 years", "nextQuestion": "screenings_18_39" },
+          { "text": "40-64 years", "nextQuestion": "screenings_40_64" },
+          { "text": "65+ years", "nextQuestion": "screenings_65_plus" }
+        ]
+      },
+      "screenings_18_39": {
+        "id": "screenings_18_39",
+        "text": "Recommended screenings for adults 18-39 years:\n\n• Blood pressure: Every 3-5 years (annually if elevated)\n• Cholesterol: Every 4-6 years\n• Depression: Regularly during annual exams\n• Diabetes: If overweight/obese or have other risk factors\n\nWomen:\n• Cervical cancer: Pap test every 3 years starting at 21\n• Breast health: Clinical breast exam\n\nMen:\n• Testicular exam: Consider self-exams\n\nWould you like to schedule a preventive care appointment?",
+        "options": [
+          { "text": "Yes, schedule preventive care", "nextQuestion": "appointment" },
+          { "text": "No, I have other questions", "nextQuestion": "start" }
+        ]
+      },
+      "screenings_40_64": {
+        "id": "screenings_40_64",
+        "text": "Recommended screenings for adults 40-64 years:\n\n• Blood pressure: Annually\n• Cholesterol: Every 4-6 years\n• Colorectal cancer: Starting at 45\n• Diabetes: Every 3 years if risk factors present\n• Depression: Regularly during annual exams\n\nWomen:\n• Mammogram: Every 1-2 years starting at 40-45\n• Cervical cancer: Pap test every 3 years or HPV/Pap every 5 years\n\nMen:\n• Prostate cancer: Discuss with doctor starting at 50 (earlier if high risk)\n\nWould you like to schedule a preventive care appointment?",
+        "options": [
+          { "text": "Yes, schedule preventive care", "nextQuestion": "appointment" },
+          { "text": "No, I have other questions", "nextQuestion": "start" }
+        ]
+      },
+      "emergency": {
+        "id": "emergency",
+        "text": "⚠️ If this is a life-threatening emergency, call 911 immediately or go to the nearest emergency room.\n\nWhat type of emergency guidance do you need?",
+        "options": [
+          { "text": "Chest pain or breathing difficulty", "nextQuestion": "cardiac_emergency" },
+          { "text": "Severe injury or bleeding", "nextQuestion": "trauma_emergency" },
+          { "text": "Stroke symptoms", "nextQuestion": "stroke_emergency" },
+          { "text": "See emergency contacts", "nextQuestion": "emergency_contacts" },
+          { "text": "This is not an emergency", "nextQuestion": "start" }
+        ]
+      },
+      "cardiac_emergency": {
+        "id": "cardiac_emergency",
+        "text": "⚠️ IMPORTANT: Chest pain or breathing difficulty may indicate a heart attack or other serious condition requiring immediate medical attention.\n\nCALL 911 IMMEDIATELY or go to the nearest emergency room.\n\nWhile waiting for emergency services:\n• Remain as calm and still as possible\n• Loosen tight clothing\n• If not allergic to aspirin and heart attack is suspected, chew a regular aspirin\n• If prescribed, use nitroglycerin as directed\n\nDo you need emergency contact information?",
+        "options": [
+          { "text": "Yes, show emergency contacts", "nextQuestion": "emergency_contacts" },
+          { "text": "No, I'll call 911 now", "nextQuestion": "end" }
+        ]
+      },
+      "stroke_emergency": {
+        "id": "stroke_emergency",
+        "text": "⚠️ IMPORTANT: Stroke is a medical emergency. Use the FAST method to recognize stroke symptoms:\n\nF - Face drooping\nA - Arm weakness\nS - Speech difficulty\nT - Time to call 911\n\nOther symptoms may include sudden:\n• Numbness/weakness on one side\n• Confusion or trouble understanding\n• Severe headache\n• Vision problems\n• Trouble walking or dizziness\n\nCALL 911 IMMEDIATELY - rapid treatment is critical.\n\nDo you need emergency contact information?",
+        "options": [
+          { "text": "Yes, show emergency contacts", "nextQuestion": "emergency_contacts" },
+          { "text": "No, I'll call 911 now", "nextQuestion": "end" }
+        ]
+      },
+      "emergency_contacts": {
+        "id": "emergency_contacts",
+        "text": "Emergency Contact Information:\n\n• Emergency Services: 911\n• Poison Control: 1-800-222-1222\n• Suicide Prevention Hotline: 988\n• Our Urgent Care Center: (787) 949-3280\n• Mental Health Crisis Line: 1-800-273-8255\n\nRemember, for life-threatening emergencies, always call 911 or go to the nearest emergency room.",
+        "options": [
+          { "text": "Return to main menu", "nextQuestion": "start" },
+          { "text": "End conversation", "nextQuestion": "end" }
+        ]
+      },
+      "mental_health": {
+        "id": "mental_health",
+        "text": "Mental health is an essential part of overall wellbeing. How can we assist you with mental health support?",
+        "options": [
+          { "text": "I'm experiencing anxiety or depression", "nextQuestion": "anxiety_depression" },
+          { "text": "I need urgent mental health help", "nextQuestion": "mental_health_urgent" },
+          { "text": "I want information about therapy options", "nextQuestion": "therapy_options" },
+          { "text": "I have questions about mental health medications", "nextQuestion": "mental_health_meds" }
+        ]
+      },
+      "anxiety_depression": {
+        "id": "anxiety_depression",
+        "text": "Many people experience anxiety and depression, and effective treatments are available. Would you like to:",
+        "options": [
+          { "text": "Take a brief screening assessment", "nextQuestion": "mental_health_screening" },
+          { "text": "Learn about treatment options", "nextQuestion": "mental_health_treatment" },
+          { "text": "Schedule an appointment with a provider", "nextQuestion": "mental_health_appointment" }
+        ]
+      },
+      "mental_health_urgent": {
+        "id": "mental_health_urgent",
+        "text": "⚠️ If you're experiencing thoughts of harming yourself or others, please reach out for immediate help:\n\n• National Suicide Prevention Lifeline: 988 (call or text)\n• Crisis Text Line: Text HOME to 741741\n• Call 911 or go to your nearest emergency room\n\nThere are people who care and want to help. You don't have to face this alone.",
+        "options": [
+          { "text": "I need more resources", "nextQuestion": "mental_health_resources" },
+          { "text": "I'll contact crisis services now", "nextQuestion": "end" }
+        ]
+      },
+      "mental_health_resources": {
+        "id": "mental_health_resources",
+        "text": "Additional Mental Health Resources:\n\n• National Alliance on Mental Illness (NAMI): 1-800-950-NAMI (6264)\n• Substance Abuse and Mental Health Services Administration (SAMHSA): 1-800-662-4357\n• Veterans Crisis Line: 1-800-273-8255, Press 1\n• LGBTQ+ Youth: The Trevor Project 1-866-488-7386\n\nLocal Resources:\n• Our Behavioral Health Department: (787) 949-3280\n• Community Mental Health Center: (555) 123-4567\n\nWould you like to schedule an appointment with one of our mental health providers?",
+        "options": [
+          { "text": "Yes, schedule an appointment", "nextQuestion": "mental_health_appointment" },
+          { "text": "No, thank you for the information", "nextQuestion": "end" }
+        ]
+      },
+      "insurance_payment": {
+        "id": "insurance_payment",
+        "text": "How can we assist you with insurance or payment matters?",
+        "options": [
+          { "text": "Insurance coverage questions", "nextQuestion": "insurance_query" },
+          { "text": "Billing inquiries", "nextQuestion": "billing_inquiry" },
+          { "text": "Payment options", "nextQuestion": "payment_options" },
+          { "text": "Financial assistance programs", "nextQuestion": "financial_assistance" }
+        ]
+      },
+      "insurance_query": {
+        "id": "insurance_query",
+        "text": "For insurance coverage questions, please provide details about your inquiry (insurance provider, specific service or procedure, etc.):",
+        "freeText": true,
+        "nextQuestion": "insurance_response"
+      },
+      "insurance_response": {
+        "id": "insurance_response",
+        "text": "Thank you for your inquiry. Our billing department will review your insurance question and contact you within 1-2 business days. For immediate assistance, please call our billing office at (787) 949-3280 during business hours (Monday-Friday, 9am-5pm).\n\nWe accept most major insurance plans including Blue Cross, Aetna, United Healthcare, Cigna, and Medicare/Medicaid.\n\nIs there anything else you need help with?",
+        "options": [
+          { "text": "Yes, I have another question", "nextQuestion": "start" },
+          { "text": "No, that's all for now", "nextQuestion": "end" }
+        ]
+      },
+      "contact_doctor": {
+        "id": "contact_doctor",
+        "text": "How would you like to connect with a healthcare provider?",
+        "options": [
+          { "text": "Schedule an in-person appointment", "nextQuestion": "appointment_type" },
+          { "text": "Request a telemedicine visit", "nextQuestion": "telemedicine_info" },
+          { "text": "Message a provider", "nextQuestion": "message_provider" },
+          { "text": "Call our office", "nextQuestion": "office_contact" }
+        ]
+      },
+      "appointment_type": {
+        "id": "appointment_type",
+        "text": "What type of appointment do you need?",
+        "options": [
+          { "text": "New patient visit", "nextQuestion": "new_patient" },
+          { "text": "Follow-up appointment", "nextQuestion": "follow_up_appt" },
+          { "text": "Specific specialist", "nextQuestion": "specialist_appt" },
+          { "text": "Urgent care visit", "nextQuestion": "urgent_care" }
+        ]
+      },
+      "new_patient": {
+        "id": "new_patient",
+        "text": "For new patient appointments, we'll need some basic information. Please provide:",
+        "freeText": true,
+        "nextQuestion": "appointment_confirmation"
+      },
+      "appointment_confirmation": {
+        "id": "appointment_confirmation",
+        "text": "Thank you for your appointment request. Our scheduling team will contact you within 1 business day to confirm your appointment time.\n\nFor faster scheduling, you can also call us directly at (787) 949-3280.\n\nIs there anything else you need assistance with?",
+        "options": [
+          { "text": "Yes, I have another question", "nextQuestion": "start" },
+          { "text": "No, that's all for now", "nextQuestion": "end" }
+        ]
+      },
+      "telemedicine_info": {
+        "id": "telemedicine_info",
+        "text": "Our telemedicine visits allow you to consult with healthcare providers from the comfort of your home. Benefits include:\n\n• Convenience and accessibility\n• Reduced travel and waiting time\n• Access to specialists who may not be locally available\n• Follow-up care without office visits\n\nTelehealth visits are conducted using secure, HIPAA-compliant video platform. You'll need a device with internet access, camera, and microphone.\n\nWould you like to schedule a telemedicine appointment?",
+        "options": [
+          { "text": "Yes, schedule telemedicine visit", "nextQuestion": "telemedicine_schedule" },
+          { "text": "No, I prefer in-person care", "nextQuestion": "appointment_type" },
+          { "text": "I have more questions", "nextQuestion": "telemedicine_questions" }
+        ]
+      },
+      "doctor_review": {
+        "id": "doctor_review",
+        "text": "Thank you for providing your health information. Based on your description, we recommend speaking with a healthcare provider for proper evaluation and guidance.\n\nWould you like to schedule an appointment with one of our providers?",
+        "options": [
+          { "text": "Yes, schedule an appointment", "nextQuestion": "appointment" },
+          { "text": "No, I have other questions", "nextQuestion": "start" }
+        ]
+      },
+      "appointment": {
+        "id": "appointment",
+        "text": "We're happy to help you schedule an appointment. Please provide your contact information and preferred time for the appointment:",
+        "freeText": true,
+        "nextQuestion": "thankyou"
+      },
+      "follow_up": {
+        "id": "follow_up",
+        "text": "For follow-up inquiries, we'll need some information. Please provide:",
+        "freeText": true,
+        "nextQuestion": "thankyou"
+      },
+      "thankyou": {
+        "id": "thankyou",
+        "text": "Thank you! We have received your information and our team will be in touch within 1 business day. You can also contact us directly at:\n\nPhone: (787) 949-3280\nEmail: support@totalaccessmd.net\n\nIs there anything else you need assistance with?",
+        "options": [
+          { "text": "Yes, I have another question", "nextQuestion": "start" },
+          { "text": "No, that's all for now", "nextQuestion": "end" }
+        ]
+      },
+      "end": {
+        "id": "end",
+        "text": "Thank you for reaching out to our medical support center. If you need further assistance, don't hesitate to contact us again. Stay healthy!",
+        "isEnd": true
       }
     }
+}

@@ -1,8 +1,9 @@
-import React from 'react'
-import { Route, Routes } from 'react-router-dom'
+import React, { useEffect } from 'react'
+import { Route, Routes, Navigate, useNavigate, useLocation } from 'react-router-dom'
 import Home from '../pages/Home'
 import Login from '../pages/Login'
 import Signup from '../pages/Signup'
+import ForgotPassword from '../pages/ForgotPassword'
 import About from '../pages/About'
 import Blog from '../pages/Blog'
 import Careers from '../pages/Career'
@@ -62,13 +63,40 @@ import AdminSettings from '../pages/AdminSettings'
 import ProtectedAdminRoute from '../components/ProtectedAdminRoute'
 import TAMDHealthFeed from '../pages/TAMDHealthFeed'
 import ApiDiagnostics from '../pages/ApiDiagnostics'
+import DoctorProfile from '../pages/DoctorProfile'
+import PaymentCancel from '../pages/stripe/Cancel'
+import PaymentSuccess from '../pages/stripe/Success'
+import UserPage from '../pages/user/UserPage'
+
+// Component to prevent accessing auth pages when already logged in
+const RequireNotAuth = ({ children }) => {
+  const isLoggedIn = localStorage.getItem("token") && localStorage.getItem("user");
+  const location = useLocation();
+  
+  if (isLoggedIn) {
+    // If user has a desired destination after login, send them there
+    const returnUrl = location.state?.returnUrl || "/";
+    return <Navigate to={returnUrl} state={location.state} replace />;
+  }
+  
+  return children;
+};
 
 const AllRoutes = () => {
   return (
     <Routes>
       <Route path='/' element={<Home />} />
-      <Route path='/login' element={<Login />} />
-      <Route path='/signup' element={<Signup />} />
+      <Route path='/login' element={
+        <RequireNotAuth>
+          <Login />
+        </RequireNotAuth>
+      } />
+      <Route path='/signup' element={
+        <RequireNotAuth>
+          <Signup />
+        </RequireNotAuth>
+      } />
+      <Route path='/forgot-password' element={<ForgotPassword />} />
       <Route path='/About' element={<About />} />
       <Route path='/Blog' element={<Blog />} />
       <Route path='/Careers' element={<Careers />} />
@@ -104,6 +132,7 @@ const AllRoutes = () => {
       {/* <Route path='/consultation' element={<Consultation/>}/> */}
       <Route path='/video' element={<VideoConsult />} />
       <Route path="/consultation/:id" element={<ConsultationDetail />} />
+      <Route path='/doctor/:id' element={<DoctorProfile />} />
       <Route path='/ConsultTopDoctors' element={<ConsultTopDoctors />} />
       <Route path='/Appointments' element={<Appointments />} />
       <Route path='/appointment-confirmed' element={<AppointmentConfirmed />} />
@@ -127,7 +156,10 @@ const AllRoutes = () => {
       <Route path='/TAMDReachPage' element={<TAMDReachPage />} />
       <Route path='/HelpPage' element={<HelpPage />} />
       <Route path='/AdminLogin' element={<AdminLogin />} />
-
+      <Route path='/payment/cancel' element={<PaymentCancel />} />
+      <Route path='/payment/success' element={<PaymentSuccess />} />
+      <Route path='/UserProfile' element={<UserPage/>} />
+    
       {/* Doctor Panel Routes */}
       <Route
         path="/doctor/dashboard"

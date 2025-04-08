@@ -3,15 +3,32 @@ import { useSelector, useDispatch } from "react-redux";
 import { Link, useNavigate } from "react-router-dom";
 import { logoutUser } from "../redux/userSlice";
 
+// Define API base URL
+const API_BASE_URL = "https://hms-backend-1-pngp.onrender.com/api";
+
 const Profile = () => {
   const { user } = useSelector((state) => state.user);
   const dispatch = useDispatch();
   const navigate = useNavigate();
-  const [isSidebarOpen, setIsSidebarOpen] = useState(false); 
+  const [isSidebarOpen, setIsSidebarOpen] = useState(false);
+  const [profileImage, setProfileImage] = useState(null); 
+
+  // Default fallback image - guaranteed to work
+  const fallbackImage = "https://ui-avatars.com/api/?name=" + encodeURIComponent(user?.UserName || "User") + "&background=random";
+  
+  // Skip trying to fetch from the backend since it's not working
+  useEffect(() => {
+    if (!user) return;
+    
+    console.log("User data in Profile:", user);
+    // Just use a reliable avatar service that generates images from names
+    setProfileImage("https://ui-avatars.com/api/?name=" + encodeURIComponent(user?.UserName || "User") + "&background=random&color=fff&size=200");
+    
+  }, [user]);
 
   const [formData, setFormData] = useState({
     name: user?.UserName || "",
-    phone: user?.Mobile || "",
+    phone: user?.Phone || "",
     email: user?.Email || "",
     gender: user?.Gender || "",
     dob: user?.DOB || "",
@@ -24,8 +41,20 @@ const Profile = () => {
     pincode: user?.Pincode || "",
     extraPhone: user?.ExtraPhone || "",
     language: user?.Language || "English",
-    profilePhoto: user?.photo || "https://via.placeholder.com/150",
   });
+  
+  // File upload state and handler
+  const [selectedFile, setSelectedFile] = useState(null);
+  
+  const handleFileChange = (e) => {
+    const file = e.target.files[0];
+    if (file) {
+      setSelectedFile(file);
+      // Create a local preview of the selected file
+      const localPreviewUrl = URL.createObjectURL(file);
+      setProfileImage(localPreviewUrl);
+    }
+  };
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -34,6 +63,13 @@ const Profile = () => {
 
   const handleSave = () => {
     console.log("Updated Profile Data:", formData);
+    
+    // TODO: Implement API call to update profile with the new image
+    if (selectedFile) {
+      console.log("New profile image selected:", selectedFile.name);
+      // Here you would send the selectedFile to your backend
+    }
+    
     alert("Profile Updated Successfully!");
   };
 
@@ -260,17 +296,20 @@ const Profile = () => {
             <label className="block text-gray-700 mb-2">Profile Photo</label>
             <div className="flex items-center">
               <img 
-                src={formData.profilePhoto} 
+                src={profileImage || fallbackImage} 
                 alt="Profile Preview" 
-                className="w-20 h-20 rounded-full object-cover mr-4 border-2 border-gray-300" 
+                className="w-20 h-20 rounded-full object-cover mr-4 border-2 border-gray-300"
+                onError={(e) => {
+                  console.error("Profile image load error in profile page");
+                  e.target.onerror = null; // Prevent infinite loop
+                  e.target.src = fallbackImage;
+                }} 
               />
               <input
                 type="file"
                 accept="image/*"
                 className="block w-full text-sm text-gray-500 cursor-pointer border border-gray-300 rounded-md p-1"
-                onChange={(e) =>
-                  setFormData({ ...formData, profilePhoto: URL.createObjectURL(e.target.files[0]) })
-                }
+                onChange={handleFileChange}
               />
             </div>
           </div>

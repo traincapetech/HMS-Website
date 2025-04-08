@@ -1,5 +1,5 @@
-import React from "react";
-import { BrowserRouter, useLocation } from "react-router-dom";
+import React, { useEffect } from "react";
+import { useLocation, useNavigate, Route } from "react-router-dom";
 import NavBar from "./components/NavBar";
 import AllRoutes from "./routes/AllRoutes";
 import Footer from "./components/Footer";
@@ -8,9 +8,11 @@ import MyAppointments from "./pages/MyAppointments";
 import DoctorDashboard from "./pages/DoctorDashboard";
 import ApiDiagnostics from "./pages/ApiDiagnostics";
 import SEO from "./components/SEO";
+import Login from "./pages/Login";
 
 const Layout = () => {
   const location = useLocation();
+  const navigate = useNavigate();
 
   // Define admin-related paths where NavBar should be hidden
   const hideNavbarRoutes = [
@@ -57,6 +59,32 @@ const Layout = () => {
   
   const seoProps = getDefaultSEO();
 
+  // Login route with redirect if already logged in
+  <Route path="/login" element={
+    <RequireNotAuth>
+      <Login />
+    </RequireNotAuth>
+  } />
+  
+  // RequireNotAuth component to redirect if already logged in
+  function RequireNotAuth({ children }) {
+    const navigate = useNavigate();
+    const location = useLocation();
+    
+    // Check if user is already logged in
+    useEffect(() => {
+      const token = localStorage.getItem("token");
+      const user = localStorage.getItem("user");
+      
+      if (token && user) {
+        // Redirect to home page if already logged in
+        navigate("/", { replace: true });
+      }
+    }, [navigate]);
+    
+    return children;
+  }
+
   return (
     <>
       {/* Default SEO that will be overridden by page-specific SEO components */}
@@ -77,11 +105,7 @@ const Layout = () => {
 };
 
 function App() {
-  return (
-    <BrowserRouter>
-      <Layout />
-    </BrowserRouter>
-  );
+  return <Layout />;
 }
 
 export default App;

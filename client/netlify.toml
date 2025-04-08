@@ -1,0 +1,14 @@
+# netlify.toml - Fallback configuration for various static hosts
+# This helps services like Render.com, Netlify, Vercel, etc.
+
+[[redirects]]
+  from = "/*"
+  to = "/index.html"
+  status = 200
+
+[build]
+  publish = "dist"
+  command = "npm run build"
+  
+[build.environment]
+  NODE_VERSION = "18" 

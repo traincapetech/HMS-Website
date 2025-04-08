@@ -4,9 +4,13 @@ import { useSelector, useDispatch } from "react-redux";
 import { logoutUser } from "../redux/userSlice";
 import tamdLogo from "../assets/TAMD.png";
 
+// Define API base URL
+const API_BASE_URL = "https://hms-backend-1-pngp.onrender.com/api";
+
 const NavBar = () => {
     const [isProfileOpen, setIsProfileOpen] = useState(false);
     const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+    const [profileImage, setProfileImage] = useState(null);
     const profileRef = useRef(null);
     const profileButtonRef = useRef(null);
     const mobileMenuRef = useRef(null);
@@ -23,6 +27,19 @@ const NavBar = () => {
         // Add a cache-busting parameter to force re-render of image
         return `${photoUrl}?v=${new Date().getTime()}`;
     };
+    
+    // Default fallback image - guaranteed to work
+    const fallbackImage = "https://ui-avatars.com/api/?name=" + encodeURIComponent(user?.UserName || "User") + "&background=random";
+    
+    // Skip trying to fetch from the backend since it's not working
+    useEffect(() => {
+        if (!user) return;
+        
+        console.log("User data in NavBar:", user);
+        // Just use a reliable avatar service that generates images from names
+        setProfileImage("https://ui-avatars.com/api/?name=" + encodeURIComponent(user?.UserName || "User") + "&background=random&color=fff");
+        
+    }, [user]);
 
     // Handle clicks outside the profile dropdown to close it
     useEffect(() => {
@@ -105,12 +122,19 @@ const NavBar = () => {
                             <div className="absolute right-0 mt-2 w-48 sm:w-56 bg-white rounded-lg shadow-md z-50 focus:outline-none">
                                 <div className="py-2">
                                     {/* Profile Section */}
-                                    <div className="flex items-center px-4 py-2 border-b border-gray-200">
+                                    <div className="flex items-center px-4 py-2 border-b border-gray-200" onClick={()=>{
+                                        navigate('/UserProfile');
+                                    }}>
                                         <img
                                             src={getImageUrl(user?.photo)}
                                             alt="User"
                                             className="w-10 h-10 sm:w-12 sm:h-12 rounded-full object-cover border-2 border-red-800"
                                             key={`profile-img-${user?.photo}`} // Add key to force re-render
+                                            onError={(e) => {
+                                                console.error("Image load error in navbar");
+                                                e.target.onerror = null; // Prevent infinite loop
+                                                e.target.src = fallbackImage;
+                                            }}
                                         />
                                         <div className="ml-2 sm:ml-3">
                                             <p className="font-semibold text-gray-800 text-sm sm:text-base">{user?.UserName || "User"}</p>
@@ -237,11 +261,18 @@ const NavBar = () => {
                         {token ? (
                             <>
                                 <div className="py-2 border-b border-red-700">
-                                    <div className="flex items-center">
+                                    <div className="flex items-center" onClick={()=>{
+                                        navigate('/UserProfile');
+                                    }}>
                                         <img
                                             src={getImageUrl(user?.photo)}
                                             alt="User"
                                             className="w-10 h-10 rounded-full object-cover border-2 border-white"
+                                            onError={(e) => {
+                                                console.error("Image load error in mobile menu");
+                                                e.target.onerror = null; // Prevent infinite loop
+                                                e.target.src = fallbackImage;
+                                            }}
                                         />
                                         <div className="ml-3">
                                             <p className="font-semibold text-white">{user?.UserName || "User"}</p>

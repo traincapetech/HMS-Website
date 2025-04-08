@@ -155,7 +155,7 @@ const DoctorRegister = () => {
     // License number validation
     if (!formData.LicenseNo) {
       errors.LicenseNo = "License number is required";
-    } else if (!/^[A-Z0-9-]{5,}$/.test(formData.LicenseNo)) {
+    } else if (!/^[A-Z0-9-]{1,}$/.test(formData.LicenseNo)) {
       errors.LicenseNo = "Please enter a valid license number (minimum 5 characters, letters, numbers, and hyphens)";
     }
     

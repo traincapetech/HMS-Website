@@ -2,7 +2,7 @@ import React, { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { registerUser, clearError } from "../redux/userSlice.js"; // Import Redux actions
 import { useNavigate } from "react-router-dom"; // For navigation after registration
-import { FaExclamationCircle, FaCheckCircle, FaEye, FaEyeSlash } from "react-icons/fa"; // Import icons
+import { FaExclamationCircle, FaCheckCircle, FaEye, FaEyeSlash, FaUpload, FaImage } from "react-icons/fa"; // Import icons
 
 const Signup = () => {
   const [currentStep, setCurrentStep] = useState(1);
@@ -19,6 +19,7 @@ const Signup = () => {
     state: "",
     city: "",
     address: "",
+    image: null, // Add image field
   });
   const [showPassword, setShowPassword] = useState(false);
   const [errors, setErrors] = useState({});
@@ -27,6 +28,7 @@ const Signup = () => {
     message: "Password strength: None",
     color: "text-gray-500"
   });
+  const [imagePreview, setImagePreview] = useState(null); // Add state for image preview
 
   const dispatch = useDispatch();
   const navigate = useNavigate();
@@ -159,6 +161,12 @@ const Signup = () => {
         }
         break;
         
+      case "image":
+        if (!value) {
+          fieldError = "Profile image is required";
+        }
+        break;
+        
       default:
         break;
     }
@@ -188,6 +196,49 @@ const Signup = () => {
     });
   };
 
+  // Handle image file selection
+  const handleImageChange = (e) => {
+    const file = e.target.files[0];
+    if (file) {
+      // Check if file is too large (10MB)
+      if (file.size > 10 * 1024 * 1024) {
+        setErrors({
+          ...errors,
+          image: "Image file is too large (max 10MB)"
+        });
+        return;
+      }
+      
+      // Check file type
+      if (!['image/jpeg', 'image/png'].includes(file.type)) {
+        setErrors({
+          ...errors,
+          image: "Only JPEG and PNG images are allowed"
+        });
+        return;
+      }
+      
+      // File is valid, update state
+      setFormData({
+        ...formData,
+        image: file
+      });
+      
+      // Create preview
+      const reader = new FileReader();
+      reader.onloadend = () => {
+        setImagePreview(reader.result);
+      };
+      reader.readAsDataURL(file);
+      
+      // Clear error if any
+      setErrors({
+        ...errors,
+        image: ""
+      });
+    }
+  };
+
   // Validate step before proceeding
   const validateStep = (step) => {
     const stepErrors = {};
@@ -195,7 +246,7 @@ const Signup = () => {
     
     if (step === 1) {
       // Validate first step fields
-      ["userName", "firstName", "lastName", "email", "phone", "password"].forEach(field => {
+      ["userName", "firstName", "lastName", "email", "phone", "password", "image"].forEach(field => {
         const fieldError = validateField(field, formData[field]);
         if (fieldError) {
           stepErrors[field] = fieldError;
@@ -240,8 +291,44 @@ const Signup = () => {
       return;
     }
 
-    // Dispatch the registerUser action with form data
-    const resultAction = await dispatch(registerUser(formData));
+    // Create FormData object to handle file upload
+    const formDataObj = new FormData();
+    
+    // Map frontend field names to backend expected field names (PascalCase)
+    const fieldMapping = {
+      userName: 'UserName',
+      firstName: 'FirstName',
+      lastName: 'LastName',
+      email: 'Email',
+      phone: 'Phone',
+      password: 'Password',
+      dateOfBirth: 'DOB',
+      gender: 'Gender',
+      country: 'Country',
+      state: 'State',
+      city: 'City',
+      address: 'Address',
+      image: 'image' // 'image' stays lowercase as it's the file field name in multer
+    };
+    
+    // Add all form fields to FormData with proper field names
+    Object.keys(formData).forEach(key => {
+      if (key === 'image' && formData[key]) {
+        // File fields keep their original name for multer
+        formDataObj.append('image', formData[key]);
+      } else {
+        // Map other field names to what the backend expects
+        const backendFieldName = fieldMapping[key] || key;
+        formDataObj.append(backendFieldName, formData[key]);
+      }
+    });
+
+    // Log what we're sending for debugging
+    console.log("Form data fields being sent with proper naming:", 
+      [...formDataObj.entries()].map(entry => entry[0]));
+
+    // Dispatch the registerUser action with FormData
+    const resultAction = await dispatch(registerUser(formDataObj));
 
     // If registration is successful, navigate to the login page
     if (registerUser.fulfilled.match(resultAction)) {
@@ -444,6 +531,56 @@ const Signup = () => {
                     <FaExclamationCircle className="mr-1" /> {errors.password}
                   </p>
                 )}
+              </div>
+
+              {/* Profile Image Upload */}
+              <div>
+                <label
+                  htmlFor="image"
+                  className="block text-lg text-gray-700 mb-2"
+                >
+                  Profile Image *
+                </label>
+                <div className="mt-1 flex items-center space-x-4">
+                  <div className={`border-2 ${errors.image ? 'border-red-300' : 'border-gray-300'} rounded-lg p-2 w-full`}>
+                    <label className="flex flex-col items-center cursor-pointer">
+                      <div className="flex flex-col items-center justify-center">
+                        {imagePreview ? (
+                          <div className="relative w-32 h-32 overflow-hidden rounded-full mb-2">
+                            <img 
+                              src={imagePreview} 
+                              alt="Profile Preview" 
+                              className="w-full h-full object-cover"
+                            />
+                          </div>
+                        ) : (
+                          <FaImage className="w-12 h-12 text-gray-400 mb-2" />
+                        )}
+                        <div className="flex items-center justify-center bg-red-600 hover:bg-red-700 text-white text-sm px-4 py-2 rounded-md">
+                          <FaUpload className="mr-2" /> 
+                          {imagePreview ? "Change Image" : "Upload Image"}
+                        </div>
+                      </div>
+                      <input
+                        id="image"
+                        name="image"
+                        type="file"
+                        className="hidden"
+                        accept="image/jpeg, image/png"
+                        onChange={handleImageChange}
+                        required
+                      />
+                    </label>
+                  </div>
+                </div>
+                {errors.image && (
+                  <p className="mt-1 text-sm text-red-600 flex items-center">
+                    <FaExclamationCircle className="mr-1" /> {errors.image}
+                  </p>
+                )}
+                <p className="mt-1 text-xs text-gray-500">
+                  Upload a profile image (JPEG or PNG, max 10MB)
+                </p>
               </div>
 
               {/* Step 1 Button */}
