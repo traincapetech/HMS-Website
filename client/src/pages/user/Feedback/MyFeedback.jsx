@@ -37,7 +37,7 @@ const MyFeedback = () => {
     const fetchDoctors = async () => {
       try {
         const response = await fetch(
-          "https://hms-backend-1-pngp.onrender.com/api/doctors",
+          "https://hms-backend-1-pngp.onrender.com/api/doctor/all",
           {
             headers: { Authorization: `Bearer ${token}` },
           }

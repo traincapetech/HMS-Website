@@ -1,5 +1,5 @@
-import React, { useState } from "react";
-import { Link, useNavigate } from "react-router-dom";
+import React, { useState,useEffect  } from "react";
+import { useNavigate, useLocation } from "react-router-dom";
 import MyAppointments from "./Appointment/MyAppointments";
 import MyMedicalRecords from "./MedicalRecords/MyMedicalRecords";
 import MyFeedback from "./Feedback/MyFeedback";
@@ -11,26 +11,32 @@ const UserPage = ({ user }) => {
   const [activePage, setActivePage] = useState("MyAppointments");
   const navigate = useNavigate();
 
+  const location = useLocation();
   const sidebarLinks = [
-    { to: "/MyAppointments", text: "My Appointments", id: "MyAppointments" },
-    { to: "/MyTests", text: "My Tests", id: "MyTests" },
+    { to: "#MyAppointments", text: "My Appointments", id: "MyAppointments" },
+    { to: "#MyTests", text: "My Tests", id: "MyTests" },
     {
-      to: "/MyMedicalRecords",
+      to: "#MyMedicalRecords",
       text: "My Medical Records",
       id: "MyMedicalRecords",
     },
     {
-      to: "/OnlineConsultations",
+      to: "#OnlineConsultations",
       text: "My Online Consultations",
       id: "OnlineConsultations",
     },
-    { to: "/MyFeedback", text: "My Feedback", id: "MyFeedback" },
-    { to: "/Profile", text: "View / Update Profile", id: "Profile" },
-    { to: "/Payments", text: "Payments", id: "Payments" },
+    { to: "#MyFeedback", text: "My Feedback", id: "MyFeedback" },
+    { to: "#Profile", text: "View / Update Profile", id: "Profile" },
+    { to: "#Payments", text: "Payments", id: "Payments" },
   ];
-
+  useEffect(() => {
+    const hash = location.hash.split("/")[0].replace("#", "");
+    console.log("HASH ELECMENT IS--->",hash)
+    setActivePage(hash|| "MyAppointments");
+  }, [location]);
   const handleLinkClick = (id) => {
     setActivePage(id);
+    navigate(`#${id}`);
   };
 
   const handleLogout = () => {
@@ -102,7 +108,7 @@ const UserPage = ({ user }) => {
   };
 
   return (
-    <div className="flex flex-col md:flex-row h-screen bg-gray-100">
+    <div className="flex flex-col md:flex-row  bg-gray-100">
       {/* Mobile Sidebar Toggle Button */}
       <button
         className="md:hidden p-3 bg-gray-200 w-full text-left text-xl"
@@ -147,7 +153,7 @@ const UserPage = ({ user }) => {
       </div>
 
       {/* Main Content */}
-      <div className="flex-1 p-6">{renderPageContent()}</div>
+      <div className="flex-1 px-6">{renderPageContent()}</div>
     </div>
   );
 };
