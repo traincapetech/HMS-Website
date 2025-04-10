@@ -1,6 +1,6 @@
 //doctor.route.js
 import express from 'express';
-import { registerDoctor, getDoctor, getDoctorById, getDoctorDocument, getDoctorImage, loginDoctor } from '../Controllers/doctor.controller.js';
+import { registerDoctor, getDoctor, getDoctorById, getDoctorDocument, getDoctorImage, loginDoctor, countDoctors } from '../Controllers/doctor.controller.js';
 import { uploadFiles } from '../multer.js';
 
 const router = express.Router();
@@ -22,6 +22,7 @@ router.post('/register', (req, res) => {
 
 router.post('/login', loginDoctor);
 router.get('/all', getDoctor);
+router.get('/count', countDoctors);
 router.get('/:id', getDoctorById);
 
 

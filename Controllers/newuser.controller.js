@@ -155,4 +155,17 @@ const getNewuserImage = async(req, res) => {
     }
 };
 
-export {registerNewuser, loginNewuser, getnewUser, getnewUserById, getNewuserImage};
+
+//count the new users
+const countNewUser = async(req, res) => {
+    try{
+        const count = await Newuser.countDocuments();
+        res.status(200).json({ count });
+    }
+    catch(error){
+        console.error(error);
+        res.status(500).json({ message: "An error occurred while counting new users"});
+    }
+};
+
+export {registerNewuser, loginNewuser, getnewUser, getnewUserById, getNewuserImage, countNewUser};

@@ -1,9 +1,7 @@
 .env    
 node_modules 
-
 pricing.model.js
 pricing.controller.js
-
 
 
 
