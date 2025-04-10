@@ -1,69 +1,33 @@
 # Enable rewrite engine
 RewriteEngine On
+RewriteBase /
 
-# If the requested file or directory doesn't exist
-RewriteCond %{REQUEST_FILENAME} !-f
-RewriteCond %{REQUEST_FILENAME} !-d
+# If the requested file exists as-is, serve it directly
+RewriteCond %{REQUEST_FILENAME} -f [OR]
+RewriteCond %{REQUEST_FILENAME} -d
+RewriteRule ^ - [L]
 
-# Rewrite all requests to the root index.html
-RewriteRule ^ index.html [QSA,L]
+# Handle front controller patterns - Send everything else to index.html
+RewriteRule ^ index.html [L]
 
 # Set security headers
 <IfModule mod_headers.c>
-  # HSTS (mod_headers is required) (31536000 seconds = 1 year)
-  Header always set Strict-Transport-Security "max-age=31536000; includeSubDomains"
-  
-  # Prevent browsers from incorrectly detecting non-scripts as scripts
+  # Prevent MIME type sniffing security vulnerability
   Header set X-Content-Type-Options "nosniff"
   
-  # Block pages from loading when they detect reflected XSS attacks
+  # Prevent clickjacking
+  Header set X-Frame-Options "SAMEORIGIN"
+  
+  # Enable XSS protection in browsers
   Header set X-XSS-Protection "1; mode=block"
   
-  # Prevent embedding in frames (clickjacking protection)
-  Header always set X-Frame-Options "SAMEORIGIN"
-  
-  # Content Security Policy
-  Header always set Content-Security-Policy "default-src 'self' https: data: 'unsafe-inline' 'unsafe-eval'; connect-src 'self' https: ws: wss:; img-src 'self' https: data:; font-src 'self' https: data:; frame-src 'self' https:;"
+  # Only allow HTTPS for 1 year
+  Header set Strict-Transport-Security "max-age=31536000; includeSubDomains"
 </IfModule>
 
-# GZIP compression
+# Enable compression
 <IfModule mod_deflate.c>
-  # Compress HTML, CSS, JavaScript, Text, XML and fonts
-  AddOutputFilterByType DEFLATE application/javascript
-  AddOutputFilterByType DEFLATE application/json
-  AddOutputFilterByType DEFLATE application/x-javascript
-  AddOutputFilterByType DEFLATE application/xml
-  AddOutputFilterByType DEFLATE text/css
-  AddOutputFilterByType DEFLATE text/html
-  AddOutputFilterByType DEFLATE text/javascript
-  AddOutputFilterByType DEFLATE text/plain
-  AddOutputFilterByType DEFLATE text/xml
-  AddOutputFilterByType DEFLATE font/opentype
-  AddOutputFilterByType DEFLATE font/otf
-  AddOutputFilterByType DEFLATE font/ttf
-  AddOutputFilterByType DEFLATE image/svg+xml
-  AddOutputFilterByType DEFLATE image/x-icon
-  AddOutputFilterByType DEFLATE application/vnd.ms-fontobject
-  AddOutputFilterByType DEFLATE application/font-sfnt
-  AddOutputFilterByType DEFLATE application/font-woff
-</IfModule>
-
-# Set proper MIME types
-<IfModule mod_mime.c>
-  # JavaScript
-  AddType application/javascript js
-  # CSS
-  AddType text/css css
-  # JSON
-  AddType application/json json
-  # Fonts
-  AddType application/vnd.ms-fontobject eot
-  AddType application/x-font-ttf ttf ttc
-  AddType font/opentype otf
-  AddType application/x-font-woff woff
-  AddType application/font-woff2 woff2
-  # Images
-  AddType image/svg+xml svg svgz
+  AddOutputFilterByType DEFLATE text/html text/plain text/xml text/css text/javascript application/javascript application/json application/x-javascript
 </IfModule>
 
 # Set browser caching
@@ -78,10 +42,6 @@ RewriteRule ^ index.html [QSA,L]
   ExpiresByType image/svg+xml "access plus 1 year"
   ExpiresByType image/x-icon "access plus 1 year"
   
-  # Video
-  ExpiresByType video/mp4 "access plus 1 year"
-  ExpiresByType video/mpeg "access plus 1 year"
-  
   # CSS, JavaScript
   ExpiresByType text/css "access plus 1 month"
   ExpiresByType text/javascript "access plus 1 month"
@@ -93,9 +53,22 @@ RewriteRule ^ index.html [QSA,L]
   ExpiresByType application/x-font-opentype "access plus 1 year"
   ExpiresByType application/x-font-woff "access plus 1 year"
   ExpiresByType application/font-woff2 "access plus 1 year"
-  ExpiresByType image/svg+xml "access plus 1 year"
-  
-  # Others
-  ExpiresByType application/pdf "access plus 1 month"
-  ExpiresByType application/x-shockwave-flash "access plus 1 month"
+</IfModule>
+
+# PHP settings (if your hosting runs PHP)
+<IfModule mod_php7.c>
+  php_value upload_max_filesize 64M
+  php_value post_max_size 64M
+  php_value max_execution_time 300
+  php_value max_input_time 300
+</IfModule>
+
+# Default character set
+AddDefaultCharset UTF-8
+
+# Allow cross-origin for fonts
+<IfModule mod_headers.c>
+  <FilesMatch "\.(ttf|ttc|otf|eot|woff|woff2|font.css)$">
+    Header set Access-Control-Allow-Origin "*"
+  </FilesMatch>
 </IfModule> 

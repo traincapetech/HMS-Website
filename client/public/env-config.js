@@ -3,30 +3,38 @@
  * This script is loaded in index.html and populates window.__env with environment variables
  */
 (function(window) {
-  // Default configuration to use when environment variables are not available
-  window.__env = window.__env || {};
-  
-  // API URLs
-  window.__env.REACT_APP_API_URL = 'https://hms-backend-1-pngp.onrender.com/api';
-  
-  // Auto-detect API URL from current location (useful for development/testing)
+  // Default configuration for local development
+  const defaultConfig = {
+    // Default API URL if not set by environment
+    REACT_APP_API_URL: "https://hms-backend-1-pngp.onrender.com/api",
+  };
+
   try {
+    // Auto-detect API URL based on current host
     const currentHost = window.location.hostname;
-    
-    // If not localhost and not using the production URL, try to detect local API
-    if (currentHost !== 'localhost' && 
-        currentHost !== '127.0.0.1' && 
-        !currentHost.includes('hms-backend-1-pngp.onrender.com')) {
-      
-      // Use the same hostname but with API port (useful for local development)
-      const apiPort = 3001; // Adjust based on your API port
-      window.__env.REACT_APP_API_URL = `http://${currentHost}:${apiPort}/api`;
-      
-      console.log('Auto-detected API URL:', window.__env.REACT_APP_API_URL);
+    if (currentHost && !currentHost.includes('localhost')) {
+      // If we're on a custom domain, update the API URL
+      if (currentHost === 'tamdhealth.com') {
+        defaultConfig.REACT_APP_API_URL = "https://hms-backend-1-pngp.onrender.com/api";
+        console.log("Auto-detected production environment on tamdhealth.com");
+      }
+    } else {
+      // Local development
+      console.log("Auto-detected local development environment");
     }
   } catch (error) {
-    console.warn('Error auto-detecting API URL:', error);
+    console.warn("Error auto-detecting environment:", error);
   }
+
+  // Create or update global ENV_CONFIG object
+  window.ENV_CONFIG = window.ENV_CONFIG || defaultConfig;
   
-  console.log('Environment config loaded:', window.__env);
+  // Fill in any missing fields from defaultConfig
+  Object.keys(defaultConfig).forEach(key => {
+    if (window.ENV_CONFIG[key] === undefined) {
+      window.ENV_CONFIG[key] = defaultConfig[key];
+    }
+  });
+
+  console.log("Environment config loaded:", window.ENV_CONFIG);
 })(window); 

@@ -1,0 +1,24 @@
+{
+  "name": "hms-backend",
+  "version": "1.0.0",
+  "description": "Backend for TAMD Health Management System",
+  "main": "index.js",
+  "type": "module",
+  "scripts": {
+    "start": "node server/index.js",
+    "server": "nodemon server/index.js",
+    "client": "cd client && npm run dev",
+    "dev": "concurrently \"npm run server\" \"npm run client\"",
+    "build": "cd client && npm install && npm run build"
+  },
+  "keywords": [
+    "healthcare",
+    "management",
+    "api"
+  ],
+  "engines": {
+    "node": ">=16.0.0"
+  },
+  "author": "TAMD Health",
+  "license": "ISC"
+} 

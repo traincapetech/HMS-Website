@@ -1,0 +1,37 @@
+services:
+  # Backend API service
+  - type: web
+    name: hms-backend
+    env: node
+    plan: free
+    buildCommand: cd server && npm install
+    startCommand: cd server && npm start
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: FRONTEND_URL
+        value: https://tamd-website.onrender.com
+
+  # Frontend service (static site)
+  - type: web
+    name: tamd-website
+    env: static
+    buildCommand: cd client && npm install && npm run build
+    staticPublishPath: ./client/dist
+    routes:
+      - type: rewrite
+        source: /*
+        destination: /index.html
+      - type: rewrite
+        source: /payment/success
+        destination: /index.html
+      - type: rewrite
+        source: /payment/cancel
+        destination: /index.html
+    headers:
+      - path: /*
+        name: Cache-Control
+        value: no-store, no-cache
+    envVars:
+      - key: FRONTEND_URL
+        value: https://tamd-website.onrender.com 

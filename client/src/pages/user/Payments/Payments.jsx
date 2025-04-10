@@ -33,7 +33,7 @@ const Payments = () => {
     try {
       state.loading = true;
       const response = await axios.get(
-        `http://localhost:8080/api/newuser/${user._id}`,
+        `https://hms-backend-1-pngp.onrender.com/api/newuser/${user._id}`,
         {
           headers: { Authorization: `Bearer ${token}` },
         }
@@ -61,7 +61,7 @@ const Payments = () => {
     setState((prev) => ({ ...prev, loading: true }));
 
     const paymentData = {
-      quantity: state.coinsToBuy,
+      quantity: state.coinsToBuy || 1,
       date: new Date(),
       user: user,
       amount: totalPrice,
@@ -172,7 +172,24 @@ const CoinsTab = ({
                 type="number"
                 min="1"
                 value={coinsToBuy}
-                onChange={(e) => setCoinsToBuy(Number(e.target.value) || 1)}
+                onChange={(e) => {
+                  const val = e.target.value;
+              
+                  // Allow empty string so user can type
+                  if (val === '') {
+                    setCoinsToBuy('');
+                    return;
+                  }
+              
+                  // Convert to number
+                  const num = Number(val);
+              
+                  // Prevent zero or negative
+                  if (num < 1) return;
+              
+                  setCoinsToBuy(num);
+                }}
+              
                 className="w-24 px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-red-500 focus:border-red-500"
               />
               <p className="text-sm text-gray-500">
@@ -191,7 +208,7 @@ const CoinsTab = ({
 
           <button
             onClick={handleCoinPurchase}
-            disabled={loading}
+            disabled={loading || coinsToBuy == ''}
             className={`hover:cursor-pointer w-full py-2 px-4 rounded-md font-medium text-white ${
               loading
                 ? "bg-red-300 cursor-not-allowed"
@@ -264,8 +281,6 @@ const PaymentHistory = ({ payments, loading, error }) => {
               <div className="text-center p-4">No payments found.</div>
             ) : (
               <table className="w-full text-sm">
-                {" "}
-                {/* Reduced font size */}
                 <thead>
                   <tr className="bg-gray-100 text-left">
                     {["Date", "Amount", "Qty", "Status", "Method"].map(

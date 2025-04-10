@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <title>Redirecting...</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <script type="text/javascript">
+    // Enhanced SPA redirect handler
+    // This script improves handling of payment routes specifically
+    (function() {
+      // Get the current URL path
+      var path = window.location.pathname;
+      var search = window.location.search;
+      
+      // Special handling for payment routes
+      if (path.includes('/payment/')) {
+        console.log('Payment route detected:', path);
+        // For payment routes, preserve query parameters
+        window.location.replace('/' + '?route=' + encodeURIComponent(path.slice(1)) + '&' + search.slice(1));
+        return;
+      }
+      
+      // Standard SPA redirect for other routes
+      var pathSegmentsToKeep = 0;
+      var l = window.location;
+      l.replace(
+        l.protocol + '//' + l.hostname + (l.port ? ':' + l.port : '') +
+        l.pathname.split('/').slice(0, 1 + pathSegmentsToKeep).join('/') + '/?/' +
+        l.pathname.slice(1).split('/').slice(pathSegmentsToKeep).join('/').replace(/&/g, '~and~') +
+        (l.search ? '&' + l.search.slice(1).replace(/&/g, '~and~') : '') +
+        l.hash
+      );
+    })();
+  </script>
+  <style>
+    body {
+      font-family: 'Arial', sans-serif;
+      text-align: center;
+      padding: 50px;
+      background: #f8f9fa;
+    }
+    .container {
+      max-width: 600px;
+      margin: 0 auto;
+      background: white;
+      padding: 30px;
+      border-radius: 10px;
+      box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    }
+    h1 {
+      color: #991B1B;
+    }
+    p {
+      font-size: 18px;
+      line-height: 1.6;
+      color: #555;
+    }
+    .loading {
+      display: block;
+      width: 80px;
+      height: 80px;
+      margin: 20px auto;
+      border: 6px solid #991B1B;
+      border-radius: 50%;
+      border-top-color: #ddd;
+      animation: spin 1s linear infinite;
+    }
+    @keyframes spin {
+      0% { transform: rotate(0deg); }
+      100% { transform: rotate(360deg); }
+    }
+    a {
+      display: inline-block;
+      margin-top: 20px;
+      padding: 10px 20px;
+      background: #991B1B;
+      color: white;
+      text-decoration: none;
+      border-radius: 5px;
+      font-weight: bold;
+    }
+    a:hover {
+      background: #7e1919;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>Redirecting...</h1>
+    <div class="loading"></div>
+    <p>You'll be redirected to the TAMD Health homepage in a moment.</p>
+    <p>If you're not redirected automatically, please click the button below:</p>
+    <a href="/">Go to Homepage</a>
+  </div>
+</body>
+</html> 

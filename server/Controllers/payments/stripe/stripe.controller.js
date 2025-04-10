@@ -8,6 +8,13 @@ const stripe = new Stripe(
   }
 );
 
+// Get the frontend URL with better fallback handling
+const FRONTEND_URL = process.env.NODE_ENV === 'production'
+  ? (process.env.FRONTEND_URL || "https://tamd-website.onrender.com")
+  : "https://tamdhealth.com/";
+
+console.log("Using FRONTEND_URL for payment redirects:", FRONTEND_URL);
+
 // Create payment session
 const StripePayment = async (req, res) => {
   const { products } = req.body;
@@ -16,7 +23,7 @@ const StripePayment = async (req, res) => {
     
     const userEmail = products?.user?.Email;
     if (!userEmail) {
-       res.status(400).json({
+      return res.status(400).json({
         success: false,
         message: "User email is required",
       });
@@ -24,7 +31,7 @@ const StripePayment = async (req, res) => {
     
     const user = await Newuser.findOne({ Email: userEmail });
     if (!user) {
-       res.status(404).json({
+      return res.status(404).json({
         success: false,
         message: "User not found with this email",
       });
@@ -32,6 +39,15 @@ const StripePayment = async (req, res) => {
     
     // Calculate amount per unit in cents
     const amount = Math.round((products.amount * 100) / (products.quantity || 1));
+
+    // Define success and cancel URLs
+    const successUrl = `https://tamdhealth.com/payment/success`;
+    const cancelUrl = `https://tamdhealth.com/payment/cancel`;
+    
+    console.log("Stripe payment URLs:", {
+      successUrl: `${successUrl}?session_id={CHECKOUT_SESSION_ID}&email=user@example.com`,
+      cancelUrl
+    });
 
     const lineItems = [
       {
@@ -54,10 +70,10 @@ const StripePayment = async (req, res) => {
       payment_method_types: ["card"],
       line_items: lineItems,
       mode: "payment",
-      success_url: `http://localhost:5173/payment/success?session_id={CHECKOUT_SESSION_ID}&email=${encodeURIComponent(userEmail)}`,
-      cancel_url: "http://localhost:5173/payment/cancel",
+      success_url: `${successUrl}?session_id={CHECKOUT_SESSION_ID}&email=${encodeURIComponent(userEmail)}`,
+      cancel_url: cancelUrl,
       metadata: {
-        userId: products.user?._id || "guest",
+        userId: user._id.toString(), // Convert ObjectId to string
         userEmail: userEmail,
         coinQuantity: products.quantity.toString(),
         transactionId: transactionId,
@@ -80,7 +96,11 @@ const StripePayment = async (req, res) => {
       metadata: session.metadata // Store all metadata for reference
     };
     
-    user.transactions = user.transactions || [];
+    // Initialize transactions array if it doesn't exist
+    if (!user.transactions) {
+      user.transactions = [];
+    }
+    
     user.transactions.unshift(transaction_details);
     await user.save();
     

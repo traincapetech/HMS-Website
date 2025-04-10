@@ -52,13 +52,12 @@ const MyAppointments = () => {
         `${API_BASE_URL}/appoint/patient/${encodeURIComponent(userEmail)}`,
         // Try root endpoint with query parameters
         `${API_BASE_URL}/appoint?email=${encodeURIComponent(userEmail)}`,
-        // Try alternative prefixes
-        `${API_BASE_URL}/appointment/query?email=${encodeURIComponent(userEmail)}`,
-        `${API_BASE_URL}/appointment/patient/${encodeURIComponent(userEmail)}`,
-        `${API_BASE_URL}/appointment?email=${encodeURIComponent(userEmail)}`,
         // Try get all and filter client-side as last resort
         `${API_BASE_URL}/appoint/all`,
-        `${API_BASE_URL}/appointment/all`
+        // Fallback to alternative endpoints if necessary
+        `${API_BASE_URL}/appointment/query?email=${encodeURIComponent(userEmail)}`,
+        `${API_BASE_URL}/appointment/patient/${encodeURIComponent(userEmail)}`,
+        `${API_BASE_URL}/appointment?email=${encodeURIComponent(userEmail)}`
       ];
       
       let appointmentsData = null;

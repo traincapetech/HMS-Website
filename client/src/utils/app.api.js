@@ -44,5 +44,25 @@ api.interceptors.response.use(
   }
 );
 
+/**
+ * Get doctor image URL with proper fallback to avoid 500 errors
+ * @param {string} doctorId - The doctor ID
+ * @param {string} doctorName - The doctor name for fallback avatar
+ * @returns {string} The image URL
+ */
+export const getDoctorImageUrl = (doctorId, doctorName) => {
+  // Always use UI Avatars as a reliable fallback
+  return `https://ui-avatars.com/api/?name=${encodeURIComponent(doctorName || 'Doctor')}&background=f1f5f9&color=0f172a&size=128`;
+  
+  // Note: The backend image endpoint is currently causing 500 errors
+  // If the backend endpoint is fixed in the future, this function can be updated to:
+  // 
+  // try {
+  //   return `${API_BASE_URL}/doctor/${doctorId}/image`;
+  // } catch (error) {
+  //   return `https://ui-avatars.com/api/?name=${encodeURIComponent(doctorName || 'Doctor')}&background=f1f5f9&color=0f172a&size=128`;
+  // }
+};
+
 export default api;
 export { API_BASE_URL };

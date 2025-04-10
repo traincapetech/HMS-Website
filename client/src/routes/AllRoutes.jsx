@@ -1,9 +1,9 @@
-import React from 'react'
-import { Route, Routes } from 'react-router-dom'
+import React, { useEffect } from 'react'
+import { Route, Routes, Navigate, useNavigate, useLocation } from 'react-router-dom'
 import Home from '../pages/Home'
-import Login from '../pages/auth/Login'
-import Signup from '../pages/auth/Signup'
-import ForgotPassword from '../pages/auth/ForgotPassword'
+import Login from '../pages/Login'
+import Signup from '../pages/Signup'
+import ForgotPassword from '../pages/ForgotPassword'
 import About from '../pages/About'
 import Blog from '../pages/Blog'
 import Careers from '../pages/Career'
@@ -29,13 +29,13 @@ import AppointmentConfirmed from '../pages/AppointmentConfirmed'
 import VideoCall from '../components/VideoCall'
 import Dashboard from '../components/app.dashboard'
 import VideoCallControls from '../components/videocallcontrols'
-import MyAppointments from '../pages/user/Appointment/MyAppointments'
-import MyFeedback from '../pages/user/Feedback/MyFeedback'
-import MyMedicalRecords from '../pages/user/MedicalRecords/MyMedicalRecords'
+import MyAppointments from '../pages/MyAppointments'
+import MyFeedback from '../pages/MyFeedback'
+import MyMedicalRecords from '../pages/MyMedicalRecords'
 import OnlineConsultations from '../pages/MyOnlineConsultations'
 import MyTests from '../pages/MyTests'
-import Payments from '../pages/user/Payments/Payments'
-import Profile from '../pages/user/View-UpdateProfile/Profile'
+import Payments from '../pages/Payments'
+import Profile from '../pages/Profile'
 import PrivacyPolicy from '../pages/PrivacyPolicy'
 import TermsAndConditions from '../pages/Terms&Conditions'
 import ShowDoctors from '../pages/showDoctors'
@@ -63,18 +63,54 @@ import AdminSettings from '../pages/AdminSettings'
 import ProtectedAdminRoute from '../components/ProtectedAdminRoute'
 import TAMDHealthFeed from '../pages/TAMDHealthFeed'
 import ApiDiagnostics from '../pages/ApiDiagnostics'
-import { PaymentCancelPage } from '../pages/stripe/Cancel'
-import  PaymentSuccessPage  from '../pages/stripe/Success'
+import DoctorProfile from '../pages/DoctorProfile'
+import PaymentCancel from '../pages/stripe/Cancel'
+import PaymentSuccess from '../pages/stripe/Success'
 import UserPage from '../pages/user/UserPage'
+
+// Component to prevent accessing auth pages when already logged in
+const RequireNotAuth = ({ children }) => {
+  const isLoggedIn = localStorage.getItem("token") && localStorage.getItem("user");
+  const location = useLocation();
+  
+  if (isLoggedIn) {
+    // If user has a desired destination after login, send them there
+    const returnUrl = location.state?.returnUrl || "/";
+    return <Navigate to={returnUrl} state={location.state} replace />;
+  }
+  
+  return children;
+};
+
+// Protected route component that requires authentication
+const ProtectedRoute = ({ children }) => {
+  const isLoggedIn = localStorage.getItem("token") && localStorage.getItem("user");
+  const location = useLocation();
+  
+  if (!isLoggedIn) {
+    // Redirect to login page with return URL
+    return <Navigate to="/login" state={{ returnUrl: location.pathname }} replace />;
+  }
+  
+  return children;
+};
 
 const AllRoutes = () => {
   return (
     <Routes>
       <Route path='/' element={<Home />} />
-      <Route path='/login' element={<Login />} />
-      <Route path='/About' element={<About />} />
-      <Route path='/signup' element={<Signup />} />
+      <Route path='/login' element={
+        <RequireNotAuth>
+          <Login />
+        </RequireNotAuth>
+      } />
+      <Route path='/signup' element={
+        <RequireNotAuth>
+          <Signup />
+        </RequireNotAuth>
+      } />
       <Route path='/forgot-password' element={<ForgotPassword />} />
+      <Route path='/About' element={<About />} />
       <Route path='/Blog' element={<Blog />} />
       <Route path='/Careers' element={<Careers />} />
       <Route path='/doctor' element={<FindDoctor />} />
@@ -109,6 +145,7 @@ const AllRoutes = () => {
       {/* <Route path='/consultation' element={<Consultation/>}/> */}
       <Route path='/video' element={<VideoConsult />} />
       <Route path="/consultation/:id" element={<ConsultationDetail />} />
+      <Route path='/doctor/:id' element={<DoctorProfile />} />
       <Route path='/ConsultTopDoctors' element={<ConsultTopDoctors />} />
       <Route path='/Appointments' element={<Appointments />} />
       <Route path='/appointment-confirmed' element={<AppointmentConfirmed />} />
@@ -132,10 +169,10 @@ const AllRoutes = () => {
       <Route path='/TAMDReachPage' element={<TAMDReachPage />} />
       <Route path='/HelpPage' element={<HelpPage />} />
       <Route path='/AdminLogin' element={<AdminLogin />} />
-      <Route path='/payment/cancel' element={<PaymentCancelPage/>} />
-      <Route path='/payment/success' element={<PaymentSuccessPage/>} />
+      <Route path='/payment/cancel' element={<PaymentCancel />} />
+      <Route path='/payment/success' element={<PaymentSuccess />} />
       <Route path='/UserProfile' element={<UserPage/>} />
-
+    
       {/* Doctor Panel Routes */}
       <Route
         path="/doctor/dashboard"

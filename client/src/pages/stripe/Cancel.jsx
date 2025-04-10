@@ -6,7 +6,7 @@ import {  XCircle, ArrowLeft, Home } from "lucide-react";
 
 
 // Cancel Page Component
-export const PaymentCancelPage = () => {
+const PaymentCancelPage = () => {
   const navigate = useNavigate();
   
   return (
@@ -55,7 +55,7 @@ export const PaymentCancelPage = () => {
     </div>
   );
 };
-
+export default PaymentCancelPage;
 // You can add this to your routes like:
 // <Route path="/payment/success" element={<PaymentSuccessPage />} />
 // <Route path="/payment/cancel" element={<PaymentCancelPage />} />
