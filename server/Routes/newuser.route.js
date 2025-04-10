@@ -1,6 +1,6 @@
 //newuser.route.js
 import express from 'express';
-import { registerNewuser, loginNewuser, getnewUser, getnewUserById, getNewuserImage} from '../Controllers/newuser.controller.js';
+import { registerNewuser, loginNewuser, getnewUser, getnewUserById, getNewuserImage, sendOTPToEmail,verifyOtp,reset_password} from '../Controllers/newuser.controller.js';
 import { authenticateToken } from '../Middlewares/auth.middleware.js';
 import { uploadFiles } from '../multer.js';
 
@@ -22,6 +22,9 @@ router.post('/register', (req, res) => {
     });
 });
 router.post('/login', loginNewuser);
+router.post('/sendOTPToEmail', sendOTPToEmail);
+router.post('/verifyOtp', verifyOtp); 
+router.post('/reset_password', reset_password); 
 router.get('/all', authenticateToken, getnewUser);
 router.get('/:id', authenticateToken, getnewUserById);
 

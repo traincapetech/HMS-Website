@@ -130,6 +130,65 @@ export const registerUser = createAsyncThunk(
   }
 );
 
+
+
+// Async thunk for user send otp
+export const sendOTPToEmail = createAsyncThunk(
+  "user/sendOTPToEmail",
+  async ({ email }, { rejectWithValue }) => {
+    try {
+      const response = await axios.post(
+        "http://localhost:8080/api/newuser/sendOTPToEmail",
+        { email }
+      );
+      return response.data;
+    } catch (error) {
+      return rejectWithValue(error.response?.data || { msg: "OTP Failed to be Sent" });
+    }
+  }
+);
+
+// Async thunk for user verify otp
+export const verifyOtp = createAsyncThunk(
+  "user/verifyOtp",
+  async ({ otp, email }, { rejectWithValue }) => {
+    try {
+      const response = await axios.post(
+        "http://localhost:8080/api/newuser/verifyOtp",
+        { otp, email }
+      );
+      return response.data;
+    } catch (error) {
+      return rejectWithValue(error.response?.data || { msg: "OTP Failed to be Verified" });
+    }
+  }
+);
+
+// Async thunk for password reset
+export const reset_password = createAsyncThunk(
+  "user/reset_password",
+  async ({ otp, email, newPassword }, { rejectWithValue }) => {
+    try {
+      const response = await axios.post(
+       "http://localhost:8080/api/newuser/reset_password",
+        { otp, email, newPassword }
+      );
+      return response.data;
+    } catch (error) {
+      return rejectWithValue(error.response?.data || { msg: "New Password Failed to be Changed" });
+    }
+  }
+);
+
+
+
+
+
+
+
+
+
+
 const userSlice = createSlice({
   name: "user",
   initialState: {

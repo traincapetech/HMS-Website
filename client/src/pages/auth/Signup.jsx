@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { registerUser, clearError } from "../redux/userSlice.js"; // Import Redux actions
+import { registerUser, clearError } from "../../redux/userSlice.js"; // Import Redux actions
 import { useNavigate } from "react-router-dom"; // For navigation after registration
 import { FaExclamationCircle, FaCheckCircle, FaEye, FaEyeSlash } from "react-icons/fa"; // Import icons
 
