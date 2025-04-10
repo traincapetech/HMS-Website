@@ -143,13 +143,13 @@ const NavBar = () => {
                                     </div>
 
                                     {/* Dropdown Menu Links */}
-                                    <Link to="/MyAppointments" className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 transition-colors duration-200">My Appointments</Link>
-                                    <Link to="/MyTests" className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 transition-colors duration-200">My Tests</Link>
-                                    <Link to="/MyMedicalRecords" className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 transition-colors duration-200">My Medical Records</Link>
-                                    <Link to="/OnlineConsultations" className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 transition-colors duration-200">My Online Consultations</Link>
-                                    <Link to="/MyFeedback" className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 transition-colors duration-200">My Feedback</Link>
-                                    <Link to="/profile" className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 transition-colors duration-200">View / Update Profile</Link>
-                                    <Link to="/Payments" className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 transition-colors duration-200">Payments & Balance</Link>
+                                    <Link to="/UserProfile#MyAppointments" className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 transition-colors duration-200">My Appointments</Link>
+                                    <Link to="/UserProfile#MyTests" className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 transition-colors duration-200">My Tests</Link>
+                                    <Link to="/UserProfile#MyMedicalRecords" className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 transition-colors duration-200">My Medical Records</Link>
+                                    <Link to="/UserProfile#OnlineConsultations" className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 transition-colors duration-200">My Online Consultations</Link>
+                                    <Link to="/UserProfile#MyFeedback" className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 transition-colors duration-200">My Feedback</Link>
+                                    <Link to="/UserProfile#profile" className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 transition-colors duration-200">View / Update Profile</Link>
+                                    <Link to="/UserProfile#Payments" className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 transition-colors duration-200">Payments & Balance</Link>
                                     <button
                                         onClick={handleLogout}
                                         className="block w-full text-left px-4 py-2 text-sm text-red-500 hover:bg-gray-100 transition-colors duration-200"
@@ -281,20 +281,23 @@ const NavBar = () => {
                                     </div>
                                 </div>
 
-                                <Link to="/MyAppointments" className="block py-2 border-b border-red-700 hover:bg-red-700 transition-colors duration-200" onClick={toggleMobileMenu}>
+                                <Link to="/UserProfile#MyAppointments" className="block py-2 border-b border-red-700 hover:bg-red-700 transition-colors duration-200" onClick={toggleMobileMenu}>
                                     My Appointments
                                 </Link>
-                                <Link to="/MyTests" className="block py-2 border-b border-red-700 hover:bg-red-700 transition-colors duration-200" onClick={toggleMobileMenu}>
+                                <Link to="/UserProfile#MyTests" className="block py-2 border-b border-red-700 hover:bg-red-700 transition-colors duration-200" onClick={toggleMobileMenu}>
                                     My Tests
                                 </Link>
-                                <Link to="/MyMedicalRecords" className="block py-2 border-b border-red-700 hover:bg-red-700 transition-colors duration-200" onClick={toggleMobileMenu}>
+                                <Link to="/UserProfile#MyMedicalRecords" className="block py-2 border-b border-red-700 hover:bg-red-700 transition-colors duration-200" onClick={toggleMobileMenu}>
                                     My Medical Records
                                 </Link>
-                                <Link to="/OnlineConsultations" className="block py-2 border-b border-red-700 hover:bg-red-700 transition-colors duration-200" onClick={toggleMobileMenu}>
+                                <Link to="/UserProfile#OnlineConsultations" className="block py-2 border-b border-red-700 hover:bg-red-700 transition-colors duration-200" onClick={toggleMobileMenu}>
                                     My Online Consultations
                                 </Link>
-                                <Link to="/profile" className="block py-2 border-b border-red-700 hover:bg-red-700 transition-colors duration-200" onClick={toggleMobileMenu}>
+                                <Link to="/UserProfile#Profile" className="block py-2 border-b border-red-700 hover:bg-red-700 transition-colors duration-200" onClick={toggleMobileMenu}>
                                     View / Update Profile
+                                </Link>
+                                <Link to="/UserProfile#Payments" className="block py-2 border-b border-red-700 hover:bg-red-700 transition-colors duration-200" onClick={toggleMobileMenu}>
+                                    Payments
                                 </Link>
                                 <button
                                     onClick={() => {

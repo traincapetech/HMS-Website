@@ -82,6 +82,19 @@ const RequireNotAuth = ({ children }) => {
   return children;
 };
 
+// Protected route component that requires authentication
+const ProtectedRoute = ({ children }) => {
+  const isLoggedIn = localStorage.getItem("token") && localStorage.getItem("user");
+  const location = useLocation();
+  
+  if (!isLoggedIn) {
+    // Redirect to login page with return URL
+    return <Navigate to="/login" state={{ returnUrl: location.pathname }} replace />;
+  }
+  
+  return children;
+};
+
 const AllRoutes = () => {
   return (
     <Routes>

@@ -1,17 +1,21 @@
 {
-  "name": "server",
+  "name": "hms-server",
   "version": "1.0.0",
-  "description": "",
-  "license": "ISC",
-  "author": "Ritik Kumar Singh",
+  "description": "Backend API for HMS Healthcare",
+  "main": "index.js",
   "type": "module",
-  "main": "app.js",
   "scripts": {
-    "start": "nodemon app.js",
-    "server": "nodemon app.js",
+    "start": "node index.js",
+    "dev": "nodemon index.js",
+    "server": "node app.js",
     "create-superadmin": "node scripts/createSuperAdmin.js",
     "initialize-pricing": "node scripts/initializePricing.js"
   },
+  "engines": {
+    "node": ">=16.0.0"
+  },
+  "author": "TAMD Health",
+  "license": "ISC",
   "dependencies": {
     "base-64": "^1.0.0",
     "bcrypt": "^5.1.1",
@@ -25,6 +29,7 @@
     "mongoose": "^8.10.0",
     "multer": "^1.4.5-lts.1",
     "nodemailer": "^6.10.0",
-    "nodemon": "^3.1.9"
+    "nodemon": "^3.1.9",
+    "stripe": "^13.2.0"
   }
 }
