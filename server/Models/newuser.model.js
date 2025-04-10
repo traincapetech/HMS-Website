@@ -56,8 +56,13 @@ const newuserSchema = new mongoose.Schema({
         default: 0
     },
     transactions: [
-        transactionSchema
-      ]
+        transactionSchema,
+      ],
+      verifyOtp: { type: String, default: "" },
+    verifyOtpExpireAt: { type: Number, default: 0 },
+    resetOtp: { type: String, default: "" },
+    resetOtpExpireAt: { type: Number, default: 0 },
+
 },
     {
         timestamps: true,

@@ -179,148 +179,54 @@ export const registerUser = createAsyncThunk(
   }
 );
 
-// Async Thunk for Sending OTP to Email for Password Reset
+// Async thunk for user send otp
 export const sendOTPToEmail = createAsyncThunk(
-  "user/sendOTP",
-  async (data, { rejectWithValue }) => {
+  "user/sendOTPToEmail",
+  async ({ email }, { rejectWithValue }) => {
     try {
-      // Try multiple endpoints in order of preference
-      const endpoints = [
-        `${API_BASE_URL}/newuser/forgot-password`,
-        `${API_BASE_URL}/user/forgot-password`,
-        `${API_BASE_URL}/auth/forgot-password`,
-      ];
-      
-      let response;
-      let lastError;
-      
-      // Try each endpoint until success
-      for (const endpoint of endpoints) {
-        try {
-          console.log(`Attempting to send OTP using endpoint: ${endpoint}`);
-          response = await axios.post(endpoint, { 
-            Email: data.email  // Using 'Email' to match backend
-          });
-          
-          if (response.data) {
-            console.log("OTP sent successfully:", response.data);
-            return response.data;
-          }
-        } catch (err) {
-          console.warn(`Failed to send OTP with ${endpoint}:`, err.message);
-          lastError = err;
-          // Continue to next endpoint
-        }
-      }
-      
-      // If we reach here, all endpoints failed
-      // Try to extract meaningful error messages from response data if available
-      if (lastError && lastError.response && lastError.response.data) {
-        return rejectWithValue(lastError.response.data);
-      }
-      return rejectWithValue({ message: "Failed to send OTP" });
+      const response = await axios.post(
+        "https://hms-backend-1-pngp.onrender.com/api/newuser/sendOTPToEmail",
+        { email }
+      );
+      return response.data;
     } catch (error) {
-      console.error("Error sending OTP:", error);
-      return rejectWithValue(error.response?.data || { message: "Failed to send OTP" });
+      return rejectWithValue(error.response?.data || { msg: "OTP Failed to be Sent" });
     }
   }
 );
 
-// Async Thunk for Verifying OTP
+// Async thunk for user verify otp
 export const verifyOtp = createAsyncThunk(
-  "user/verifyOTP",
-  async (data, { rejectWithValue }) => {
+  "user/verifyOtp",
+  async ({ otp, email }, { rejectWithValue }) => {
     try {
-      // Try multiple endpoints in order of preference
-      const endpoints = [
-        `${API_BASE_URL}/newuser/verify-otp`,
-        `${API_BASE_URL}/user/verify-otp`,
-        `${API_BASE_URL}/auth/verify-otp`,
-      ];
-      
-      let response;
-      let lastError;
-      
-      // Try each endpoint until success
-      for (const endpoint of endpoints) {
-        try {
-          console.log(`Attempting to verify OTP using endpoint: ${endpoint}`);
-          response = await axios.post(endpoint, { 
-            Email: data.email,  // Using 'Email' to match backend
-            otp: data.otp  // Using 'otp' to match backend
-          });
-          
-          if (response.data) {
-            console.log("OTP verified successfully:", response.data);
-            return response.data;
-          }
-        } catch (err) {
-          console.warn(`Failed to verify OTP with ${endpoint}:`, err.message);
-          lastError = err;
-          // Continue to next endpoint
-        }
-      }
-      
-      // If we reach here, all endpoints failed
-      // Try to extract meaningful error messages from response data if available
-      if (lastError && lastError.response && lastError.response.data) {
-        return rejectWithValue(lastError.response.data);
-      }
-      return rejectWithValue({ message: "OTP verification failed" });
+      const response = await axios.post(
+        "https://hms-backend-1-pngp.onrender.com/api/newuser/verifyOtp",
+        { otp, email }
+      );
+      return response.data;
     } catch (error) {
-      console.error("Error verifying OTP:", error);
-      return rejectWithValue(error.response?.data || { message: "OTP verification failed" });
+      return rejectWithValue(error.response?.data || { msg: "OTP Failed to be Verified" });
     }
   }
 );
 
-// Async Thunk for Resetting Password
+// Async thunk for password reset
 export const reset_password = createAsyncThunk(
-  "user/resetPassword",
-  async (data, { rejectWithValue }) => {
+  "user/reset_password",
+  async ({ otp, email, newPassword }, { rejectWithValue }) => {
     try {
-      // Try multiple endpoints in order of preference
-      const endpoints = [
-        `${API_BASE_URL}/newuser/reset-password`,
-        `${API_BASE_URL}/user/reset-password`,
-        `${API_BASE_URL}/auth/reset-password`,
-      ];
-      
-      let response;
-      let lastError;
-      
-      // Try each endpoint until success
-      for (const endpoint of endpoints) {
-        try {
-          console.log(`Attempting to reset password using endpoint: ${endpoint}`);
-          response = await axios.post(endpoint, { 
-            Email: data.email,  // Using 'Email' to match backend
-            Password: data.newPassword  // Using 'Password' to match backend
-          });
-          
-          if (response.data) {
-            console.log("Password reset successfully:", response.data);
-            return response.data;
-          }
-        } catch (err) {
-          console.warn(`Failed to reset password with ${endpoint}:`, err.message);
-          lastError = err;
-          // Continue to next endpoint
-        }
-      }
-      
-      // If we reach here, all endpoints failed
-      // Try to extract meaningful error messages from response data if available
-      if (lastError && lastError.response && lastError.response.data) {
-        return rejectWithValue(lastError.response.data);
-      }
-      return rejectWithValue({ message: "Password reset failed" });
+      const response = await axios.post(
+       "https://hms-backend-1-pngp.onrender.com/api/newuser/reset_password",
+        { otp, email, newPassword }
+      );
+      return response.data;
     } catch (error) {
-      console.error("Error resetting password:", error);
-      return rejectWithValue(error.response?.data || { message: "Password reset failed" });
+      return rejectWithValue(error.response?.data || { msg: "New Password Failed to be Changed" });
     }
   }
 );
+
 
 const userSlice = createSlice({
   name: "user",

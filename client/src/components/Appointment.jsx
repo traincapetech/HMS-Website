@@ -192,6 +192,7 @@ const Appointment = () => {
     phone: initialUserData.phone,
     Speciality: preSelectedDoctor?.Speciality || preSelectedSpecialty || '',
     doctorId: preSelectedDoctor?._id || '',
+    doctorEmail: preSelectedDoctor?.Email || '',
     appointmentDate: '',
     appointmentTime: '',
     symptoms: '',
@@ -854,21 +855,42 @@ const Appointment = () => {
       setErrors(prev => ({ ...prev, [name]: '' }));
     }
     
-    // Clear appointment time if doctor or date changes
-    if ((name === 'doctorId' || name === 'appointmentDate') && formData.appointmentTime) {
+    // If doctorId changes, get the doctor's email
+    if (name === 'doctorId') {
+      const selectedDoctor = filteredDoctors.find(doc => doc._id === value);
+      
+      // Clear appointment time if doctor changes
+      setFormData(prev => ({
+        ...prev,
+        [name]: value,
+        appointmentTime: '',
+        doctorEmail: selectedDoctor?.Email || '',
+      }));
+      
+      // Debug log for doctor email
+      console.log("Selected doctor email:", selectedDoctor?.Email);
+    } 
+    // Clear appointment time if date changes
+    else if (name === 'appointmentDate' && formData.appointmentTime) {
       setFormData(prev => ({
         ...prev,
         [name]: value,
         appointmentTime: ''
       }));
-    } else {
-      // Update form state
-      setFormData(prev => ({ ...prev, [name]: value }));
-    }
-    
+    } 
     // If speciality changes, reset doctor selection
-    if (name === 'Speciality' && formData.doctorId) {
-      setFormData(prev => ({ ...prev, doctorId: '', appointmentTime: '' }));
+    else if (name === 'Speciality' && formData.doctorId) {
+      setFormData(prev => ({ 
+        ...prev, 
+        [name]: value, 
+        doctorId: '', 
+        doctorEmail: '',
+        appointmentTime: '' 
+      }));
+    } 
+    // Update form state
+    else {
+      setFormData(prev => ({ ...prev, [name]: value }));
     }
   };
 
@@ -972,7 +994,7 @@ const Appointment = () => {
     return false;
   };
 
-  // Update handleSubmit to focus on getting MongoDB storage working
+  // Update handleSubmit to include doctorEmail
   const handleSubmit = async (e) => {
     e.preventDefault();
     
@@ -1035,11 +1057,15 @@ const Appointment = () => {
     setSubmitting(true);
     
     try {
+      // Get the selected doctor to ensure we have their email
+      const selectedDoctor = filteredDoctors.find(doc => doc._id === formData.doctorId);
+      
       // Format data for sending to API
       const appointmentData = {
         Speciality: formData.Speciality,
-        Doctor: filteredDoctors.find(doc => doc._id === formData.doctorId)?.Name || "Unknown Doctor",
+        Doctor: selectedDoctor?.Name || "Unknown Doctor",
         doctorId: formData.doctorId,
+        doctorEmail: formData.doctorEmail || selectedDoctor?.Email || '',
         Name: formData.fullName,
         Email: formData.email,
         Phone: formData.phone,
@@ -1048,6 +1074,8 @@ const Appointment = () => {
         Symptoms: formData.symptoms || 'Not specified',
         Status: 'Active'
       };
+      
+      console.log("Appointment data with doctor email:", appointmentData);
       
       // Create a timestamp-based ID for local storage
       const localAppointmentId = `local-${Date.now()}`;
@@ -1095,7 +1123,7 @@ const Appointment = () => {
           navigate('/appointment-confirmed', { 
             state: {
               appointmentId: serverAppointmentId || localAppointmentId,
-              doctorName: filteredDoctors.find(doc => doc._id === formData.doctorId)?.Name || "Your doctor",
+              doctorName: selectedDoctor?.Name || "Your doctor",
               appointmentDate: formData.appointmentDate,
               appointmentTime: formData.appointmentTime,
               offlineMode: false,
@@ -1193,7 +1221,7 @@ const Appointment = () => {
             navigate('/appointment-confirmed', { 
               state: {
                 appointmentId: serverAppointmentId || localAppointmentId,
-                doctorName: filteredDoctors.find(doc => doc._id === formData.doctorId)?.Name || "Your doctor",
+                doctorName: selectedDoctor?.Name || "Your doctor",
                 appointmentDate: formData.appointmentDate,
                 appointmentTime: formData.appointmentTime,
                 offlineMode: false,
@@ -1239,7 +1267,7 @@ const Appointment = () => {
       navigate('/appointment-confirmed', { 
         state: {
           appointmentId: localAppointmentId,
-          doctorName: filteredDoctors.find(doc => doc._id === formData.doctorId)?.Name || "Your doctor",
+          doctorName: selectedDoctor?.Name || "Your doctor",
           appointmentDate: formData.appointmentDate,
           appointmentTime: formData.appointmentTime,
           offlineMode: true,
@@ -1683,6 +1711,28 @@ const Appointment = () => {
                   </p>
                 )}
               </div>
+              
+              {/* Doctor Email - Added for transparency */}
+              {formData.doctorId && (
+                <div>
+                  <label htmlFor="doctorEmail" className="block text-sm font-medium text-gray-700">
+                    Doctor's Email (for video consultation)
+                  </label>
+                  <input
+                    type="email"
+                    id="doctorEmail"
+                    name="doctorEmail"
+                    value={formData.doctorEmail || ""}
+                    readOnly
+                    className="mt-1 block w-full rounded-md border-gray-300 bg-gray-50 shadow-sm sm:text-sm cursor-not-allowed"
+                  />
+                  {!formData.doctorEmail && (
+                    <p className="mt-1 text-sm text-amber-600">
+                      No email available for this doctor. Video consultation may not be possible.
+                    </p>
+                  )}
+                </div>
+              )}
               
               {/* Appointment Date */}
               <div>
