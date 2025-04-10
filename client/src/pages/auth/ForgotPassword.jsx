@@ -104,7 +104,7 @@ const ForgotPassword = () => {
       setLoading(true);
       setError(false);
       setSuccessMessage(false);
-      
+
       if (!payload.email.trim()) {
         setError("Email is required");
         setLoading(false);
@@ -134,11 +134,11 @@ const ForgotPassword = () => {
         // Don't modify the OTP array here - no need to reset it
       } else {
         // Safe error handling
-        const errorMessage = 
-          result?.payload?.message || 
-          (result?.error?.message) || 
+        const errorMessage =
+          result?.payload?.message ||
+          result?.error?.message ||
           "Failed to send OTP. Please try again later.";
-        
+
         setError(errorMessage);
         setLoading(false);
       }
@@ -153,7 +153,7 @@ const ForgotPassword = () => {
     e.preventDefault();
     setError(false);
     setSuccessMessage(false);
-    
+
     // Get values from the refs instead of state to ensure we have the latest input
     const otpArray = inputRefs.current.map((el) => el?.value || "");
     const otp = otpArray.join("");
@@ -187,7 +187,8 @@ const ForgotPassword = () => {
           errorMessage = result.payload.message;
         } else if (typeof result?.payload === "string") {
           if (result.payload.includes("Invalid OTP")) {
-            errorMessage = "The OTP you entered is incorrect. Please try again.";
+            errorMessage =
+              "The OTP you entered is incorrect. Please try again.";
           } else if (result.payload.includes("expired")) {
             errorMessage = "The OTP has expired. Please request a new one.";
           }
@@ -259,7 +260,8 @@ const ForgotPassword = () => {
           errorMessage = result.payload.message;
         } else if (typeof result?.payload === "string") {
           if (result.payload.includes("not found")) {
-            errorMessage = "User account not found. Please try with a different email.";
+            errorMessage =
+              "User account not found. Please try with a different email.";
           }
         }
 
@@ -275,11 +277,8 @@ const ForgotPassword = () => {
 
   return (
     <div
-      className="w-full min-h-screen bg-cover bg-center relative flex items-center justify-center p-4"
-      style={{ backgroundImage: `url(${banner})`, backgroundColor: "#f0f2f5" }}
+      className="w-full min-h-screen relative flex items-center justify-center p-4"
     >
-      <div className="absolute inset-0 bg-gradient-to-r from-gray-900 to-blue-900 opacity-80"></div>
-
       <div className="relative z-10 w-full max-w-4xl">
         {loading ? (
           <div className="bg-white rounded-xl shadow-2xl p-8 flex justify-center items-center">
@@ -392,7 +391,7 @@ const ForgotPassword = () => {
                               name="email"
                               value={payload.email}
                               onChange={handleChange}
-                              className="block w-full pl-10 pr-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                              className="block w-full pl-10 pr-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-red-500 focus:border-transparent"
                               placeholder="Enter your email address"
                             />
                           </div>
@@ -406,7 +405,7 @@ const ForgotPassword = () => {
                       <button
                         type="button"
                         onClick={handleEmailSubmit}
-                        className="w-full mt-6 inline-flex items-center justify-center px-4 py-3 border border-transparent text-base font-medium rounded-md text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
+                        className="hover:cursor-pointer w-full mt-6 inline-flex items-center justify-center px-4 py-3 border border-transparent text-base font-medium rounded-md text-white bg-red-600 hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500"
                       >
                         <FaShieldAlt className="mr-2" />
                         Send Reset OTP
@@ -440,7 +439,7 @@ const ForgotPassword = () => {
                                 type="text"
                                 maxLength="1"
                                 key={index}
-                                className="w-12 h-12 text-center text-2xl border-2 border-gray-300 rounded-lg focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500"
+                                className="w-12 h-12 text-center text-2xl border-2 border-gray-300 rounded-lg focus:outline-none focus:border-red-500 focus:ring-1 focus:ring-red-500"
                                 ref={(e) => (inputRefs.current[index] = e)}
                                 onChange={(e) => handleInput(e, index)}
                                 onKeyDown={(e) => handleKeyDown(e, index)}
@@ -453,7 +452,7 @@ const ForgotPassword = () => {
                         <button
                           type="button"
                           onClick={handleOtpSubmit}
-                          className="w-full inline-flex items-center justify-center px-4 py-3 border border-transparent text-base font-medium rounded-md text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
+                          className="hover:cursor-pointer w-full inline-flex items-center justify-center px-4 py-3 border border-transparent text-base font-medium rounded-md text-white bg-red-600 hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500"
                         >
                           <FaKey className="mr-2" />
                           Verify OTP
@@ -467,7 +466,7 @@ const ForgotPassword = () => {
                             setError(false);
                             setSuccessMessage(false);
                           }}
-                          className="w-full inline-flex items-center justify-center px-4 py-3 border border-gray-300 text-base font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
+                          className="w-full inline-flex items-center justify-center px-4 py-3 border border-gray-300 text-base font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500"
                         >
                           Back to Email
                         </button>
@@ -505,7 +504,7 @@ const ForgotPassword = () => {
                                   newPassword: e.target.value,
                                 })
                               }
-                              className="block w-full pl-10 pr-10 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                              className="block w-full pl-10 pr-10 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-red-500 focus:border-transparent"
                               placeholder="Enter new password"
                             />
                             <button
@@ -549,7 +548,7 @@ const ForgotPassword = () => {
                                   confirmPassword: e.target.value,
                                 })
                               }
-                              className="block w-full pl-10 pr-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                              className="block w-full pl-10 pr-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-red-500 focus:border-transparent"
                               placeholder="Confirm new password"
                             />
                           </div>
@@ -559,7 +558,7 @@ const ForgotPassword = () => {
                       <button
                         type="button"
                         onClick={handleResetPassword}
-                        className="w-full mt-6 inline-flex items-center justify-center px-4 py-3 border border-transparent text-base font-medium rounded-md text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
+                        className="hover:cursor-pointer w-full mt-6 inline-flex items-center justify-center px-4 py-3 border border-transparent text-base font-medium rounded-md text-white bg-red-600 hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500"
                       >
                         Reset Password
                       </button>

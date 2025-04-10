@@ -233,16 +233,21 @@ const sendOTPToEmail = async (req, res) => {
       subject: "Password Reset OTP",
       html: `
       <!-- Updated HTML template with image -->
-<div style="font-family: Arial, sans-serif; text-align: center; padding: 20px; background-color: #f4f4f4;">
-  <div style="max-width: 600px; margin: auto; background: #fff; padding: 20px; border-radius: 10px; border: 1px solid #ddd;">
-      <h2 style="color: #333;">OTP Verification</h2>
-      <p style="color: #555; font-size: 16px;">Your One-Time Password (OTP) for verification is:</p>
-      <div style="font-size: 24px; font-weight: bold; color: #333; padding: 10px 20px; background: #f8f8f8; border: 1px dashed #333; display: inline-block; margin: 10px 0;">
-          ${otp}
-      </div>
-      <p style="color: #777; font-size: 14px;">This OTP is valid for only 10 minutes. Do not share it with anyone.</p>
-      <p style="color: #777; font-size: 14px;">If you did not request this, please ignore this email.</p>
-      <div style="font-size: 12px; color: #aaa; margin-top: 20px;">© 2025 TrainCape Industries</div>
+<div style="font-family: Arial, sans-serif; text-align: center; padding: 20px; background-color: #ffffff;">
+  <div style="max-width: 600px; margin: auto; background: #fff; padding: 20px; border-radius: 10px; border: 1px solid #e0e0e0; box-shadow: 0 2px 10px rgba(0,0,0,0.05);">
+    <h2 style="color: #d32f2f;">Reset Password OTP Verification</h2>
+    <p style="color: #555; font-size: 16px;">Your One-Time Password (OTP) for password reset is:</p>
+    <div style="font-size: 28px; font-weight: bold; color: #d32f2f; padding: 15px 25px; background: #f8f8f8; border: 1px solid #ffcdd2; display: inline-block; margin: 15px 0; border-radius: 6px; letter-spacing: 3px;">
+      ${otp}
+    </div>
+    <p style="color: #555; font-size: 14px;">This OTP is valid for only 10 minutes. Do not share it with anyone.</p>
+    <p style="color: #555; font-size: 14px;">If you did not request this, please ignore this email.</p>
+    <div style="margin-top: 30px;">
+      <a href="#" style="background-color: #d32f2f; color: #fff; padding: 12px 30px; border-radius: 4px; text-decoration: none; font-weight: bold; display: inline-block;">Reset Password</a>
+    </div>
+    <div style="font-size: 12px; color: #888; margin-top: 30px; padding-top: 15px; border-top: 1px solid #eee;">
+      &copy; 2025 Tamd Health Company
+    </div>
   </div>
 </div>
 `,
@@ -292,7 +297,7 @@ const verifyOtp = async (req, res) => {
 const reset_password = async (req, res) => {
   const { email, newPassword } = req.body;
   try {
-    const user = await Newuser.findOne({  Email: email });
+    const user = await Newuser.findOne({ Email: email });
     if (!user) {
       return res.status(400).send({ msg: "Wrong Credentials" });
     }
