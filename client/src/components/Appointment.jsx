@@ -51,7 +51,7 @@ const SAMPLE_DOCTORS = [
 ];
 
 // API base URL
-const API_BASE_URL = ENV.API_URL;
+const API_BASE_URL = "http://localhost:8080/api";
 
 // Create a specific key for appointments localStorage
 const LOCAL_APPOINTMENTS_KEY = 'hms_appointments';
