@@ -182,4 +182,16 @@ const getDoctorImage = async(req, res) => {
     }
 };
 
-export {registerDoctor, getDoctor, getDoctorById, getDoctorDocument, getDoctorImage, loginDoctor};
+//count the doctors
+const countDoctors = async(req, res) => {
+    try{
+    const count = await Doctor.countDocuments();
+    res.status(200).json({ count});
+    }
+    catch(error){
+        console.error(error);
+        res.status(500).json({ message: ' An error occurred while counting the doctors'});
+    }
+};
+
+export {registerDoctor, getDoctor, getDoctorById, getDoctorDocument, getDoctorImage, loginDoctor, countDoctors};

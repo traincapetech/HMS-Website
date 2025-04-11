@@ -32,8 +32,7 @@ const add_docSchema = new mongoose.Schema({
         required: true
     },
     status:{
-        type: String,
-        enum: ["active", "inactive"],
+        type: Boolean,
         required: true
     },
 });

@@ -1,6 +1,6 @@
 //newuser.route.js
 import express from 'express';
-import { registerNewuser, loginNewuser, getnewUser, getnewUserById, getNewuserImage} from '../Controllers/newuser.controller.js';
+import { registerNewuser, loginNewuser, getnewUser, getnewUserById, getNewuserImage, countNewUser} from '../Controllers/newuser.controller.js';
 import { authenticateToken } from '../Middlewares/auth.middleware.js';
 import { uploadFiles } from '../multer.js';
 
@@ -22,8 +22,10 @@ router.post('/register', (req, res) => {
     });
 });
 router.post('/login', loginNewuser);
-router.get('/all',  getnewUser);
-router.get('/:id',  getnewUserById);
+router.get('/all', getnewUser);
+router.get('/count', countNewUser);
+router.get('/:id', getnewUserById);
+
 
 //routes for fetching image
 router.get('/:id/image', getNewuserImage);

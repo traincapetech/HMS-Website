@@ -1,0 +1,32 @@
+.env    
+node_modules 
+pricing.model.js
+pricing.controller.js
+
+
+
+support@tamdhealth.com
+Tamd@1289
+
+
+
+const ZoomAccountId = "upoJUPN9SOOrNYnKHqMAqA";
+const ZoomClientId = "BV1rBaqNTeGXQ2hDTs8iLQ";
+const ZoomClientSecret = "4foaqQih9ZHFLsJ2q1a7wjXjlDfBGSUo";
+
+
+
+smtp.hostinger.com
+Port:- 465
+SSL/TSL
+
+appoint count
+http://localhost:8080/api/appoint/count
+
+doc count
+http://localhost:8080/api/doctor/count
+
+new user count
+http://localhost:8080/api/newuser/count
+
+

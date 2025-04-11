@@ -3,8 +3,6 @@ import express from "express";
 import cors from "cors";
 import dotenv from "dotenv";
 import connectdb from "./db.js";
-import path from 'path';
-import { fileURLToPath } from 'url';
 import newuserRouter from "./Routes/newuser.route.js";
 import doctorRouter from  "./Routes/doctor.route.js";
 import appointRouter from "./Routes/appoint.route.js";
@@ -14,27 +12,20 @@ import add_patientrouter from "./Routes/add_patient.route.js";
 
 dotenv.config();
 
-// Get directory name for ES module
-const __filename = fileURLToPath(import.meta.url);
-const __dirname = path.dirname(__filename);
-
 const port = process.env.PORT || 3000;
+
 
 const app = express();
 connectdb()
 
-// Enhanced CORS settings
 app.use(cors({
-    origin: true, // Allow all origins or specify specific origins
-    methods: ['GET', 'PUT', 'POST', 'DELETE', 'OPTIONS', 'PATCH'],
+    methods: ['GET', 'PUT', 'POST', 'DELETE'],
     credentials: true,
-    allowedHeaders: ['Content-Type', 'Authorization', 'X-Requested-With'],
-    exposedHeaders: ['Content-Length', 'X-RateLimit-Limit', 'X-RateLimit-Remaining']
 }));
 
 app.use(express.json());
 
-// API Routes
+//Routes
 app.use('/api/newuser', newuserRouter);
 app.use('/api/doctor', doctorRouter);
 app.use('/api/appoint', appointRouter);
@@ -42,26 +33,14 @@ app.use('/api/zoom', zoomRouter);
 app.use('/api/add_doc', add_docrouter);
 app.use('/api/add_patient', add_patientrouter);
 
-// API health check endpoint
-app.get('/api/health', (req, res) => {
-    res.status(200).json({ 
-        status: 'ok',
-        message: 'API is running', 
-        timestamp: new Date().toISOString() 
-    });
-});
 
-// Serve static files from the React app
-app.use(express.static(path.resolve(__dirname, '../client/dist')));
-
-// The "catch-all" handler: for any request that doesn't match API routes,
-// send back the index.html file so React Router can handle client-side routing
-app.get('*', (req, res) => {
-    res.sendFile(path.resolve(__dirname, '../client/dist/index.html'));
+app.get('/', (req, res) => {
+    res.send("HELLO WORLD");
 });
 
 app.listen(port, () => {
-    console.log(`Server is listening on port ${port}`);
+    console.log(`server is listening ${port}`);
 });
 
 export default app;
+

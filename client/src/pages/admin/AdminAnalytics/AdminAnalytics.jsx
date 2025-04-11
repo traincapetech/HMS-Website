@@ -71,14 +71,14 @@ const AdminAnalytics = () => {
                     axios.get('http://localhost:8080/api/doctor/count', config),
                     axios.get('http://localhost:8080/api/newuser/count', config),
                     axios.get('http://localhost:8080/api/appoint/count', config),
-                    Promise.resolve({ data: { revenue: 18500 } }) // Replace with actual revenue API if available
+                    Promise.resolve({ data: { revenue: 0 } }) // Replace with actual revenue API if available
                 ]);
                 
                 setStats({
                     totalDoctors: doctorsResponse.data.count || 0,
                     totalPatients: patientsResponse.data.count || 0,
                     totalAppointments: appointmentsResponse.data.count || 0,
-                    totalRevenue: revenueResponse.data.revenue || 18500
+                    totalRevenue: revenueResponse.data.revenue || 0
                 });
             } catch (err) {
                 console.error("Error fetching dashboard data:", err);

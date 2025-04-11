@@ -7,32 +7,21 @@ const router = express.Router();
 //Routes
 router.post("/ZoomMeeting", async(req, res) => {
     try{
-        const { doctorEmail, userEmail } = req.body;
-        
-        // Validate input parameters
-        if (!doctorEmail || !userEmail) {
-            return res.status(400).json({
-                success: false,
-                message: "Both doctorEmail and userEmail are required"
-            });
-        }
-        
-        // Generate Zoom meeting with both email addresses
-        const meetingDetails = await generateZoomMeeting(doctorEmail, userEmail);
-        
-        res.status(200).json({
-            success: true,
-            message: "Zoom Meeting Created Successfully",
-            meetingDetails
+        const {patientEmail, startTime, topic} = req.body;
+
+        const meeting = await generateZoomMeeting({
+            patientEmail,
+            startTime,
+            topic: topic || "Zoom Meeting"
         });
+
+        res.status(201).json(meeting);
+
+        // res.status(200).json({message :" Zoom Meeting Created Successfully"});
     } catch (error){
         console.error("Error creating Zoom Meeting", error);
-        res.status(500).json({
-            success: false, 
-            error: "Failed to create meeting",
-            message: error.message
-        });
-    }
+        res.status(500).json({error: "Failed to create meeting"});
+}
 });
 
 
