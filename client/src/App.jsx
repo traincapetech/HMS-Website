@@ -18,7 +18,8 @@ const Layout = () => {
     "/admin/analytics",
     "/admin/settings",
     "/admin/notifications",
-  ];
+    "/admin/sidebar",
+    ];
 
   const shouldHideNavbar = hideNavbarRoutes.includes(location.pathname);
 

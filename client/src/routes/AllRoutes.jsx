@@ -24,6 +24,7 @@ import DoctorPage from '../pages/DoctorPage'
 import VideoConsult from '../components/VideoConsult'
 import ConsultationDetail from '../pages/ConsultationDetail'
 import Appointments from '../components/Appointment'
+import AppointmentConfirmed from '../pages/AppointmentConfirmed'
 import VideoCall from '../components/VideoCall'
 import Dashboard from '../components/app.dashboard'
 import VideoCallControls from '../components/videocallcontrols'
@@ -52,11 +53,11 @@ import DoctorRegister from '../pages/DoctorRegister'
 import ProtectedDoctorRoute from '../components/ProtectedDoctorRoute'
 import SpecialtyDetail from '../pages/SpecialtyDetail'
 import AdminLogin from '../pages/AdminLogin'
-import AdminDashboard from '../pages/AdminDashboard'
-import AdminDoctors from '../pages/AdminDoctors'
-import AdminPricing from '../pages/AdminPricing'
-import AdminPatients from '../pages/AdminPatients'
-import AdminAnalytics from '../pages/AdminAnalytics'
+import AdminDoctors from '../pages/admin/AdminDoctors/AdminDoctors'
+import AdminPricing from '../pages/admin/AdminPricing/AdminPricing'
+import AdminPatients from '../pages/admin/AdminPatients/AdminPatients'
+import AdminAnalytics from '../pages/admin/AdminAnalytics/AdminAnalytics'
+import AdminSidebar from '../pages/admin/adminsidebar'
 import AdminSettings from '../pages/AdminSettings'
 import AdminNotifications from '../pages/AdminNotifications'
 import ProtectedAdminRoute from '../components/ProtectedAdminRoute'
@@ -109,6 +110,7 @@ const AllRoutes = () => {
       <Route path='/Dashboard' element={<Dashboard />} />
       <Route path='/VideoCallControls' element={<VideoCallControls />} />
       <Route path='/MyAppointments' element={<MyAppointments />} />
+      <Route path='/appointment-confirmed' element={<AppointmentConfirmed />} />
       <Route path='/MyFeedback' element={<MyFeedback />} />
       <Route path='/MyMedicalRecords' element={<MyMedicalRecords />} />
       <Route path='/OnlineConsultations' element={<OnlineConsultations />} />
@@ -157,10 +159,10 @@ const AllRoutes = () => {
       {/* Admin Routes */}
       <Route path="/admin/login" element={<AdminLogin />} />
       <Route
-        path="/admin/dashboard"
+        path="/admin/sidebar"
         element={
           <ProtectedAdminRoute>
-            <AdminDashboard />
+            <AdminSidebar />
           </ProtectedAdminRoute>
         }
       />

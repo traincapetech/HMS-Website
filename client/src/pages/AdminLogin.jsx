@@ -54,8 +54,8 @@ const AdminLogin = () => {
                 localStorage.setItem('adminData', JSON.stringify(mockAdminData));
                 
                 // Navigate to dashboard
-                console.log('Direct login successful, navigating to dashboard');
-                navigate('/admin/dashboard');
+                console.log('Direct login successful, navigating to sidebar');
+                navigate('/admin/sidebar');
                 return;
             }
             
