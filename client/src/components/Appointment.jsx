@@ -2,8 +2,7 @@ import React, { useState, useEffect, useRef } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { toast } from 'react-toastify';
 import axios from 'axios';
-import { FaCalendarAlt, FaUserMd, FaStethoscope, FaSpinner, FaLock, FaClock, FaSync, FaFileUpload, FaFilePdf, FaTrash } from 'react-icons/fa';
-import { ENV } from '../utils/envUtils';
+import { FaCalendarAlt, FaUserMd, FaStethoscope, FaSpinner, FaLock, FaClock, FaFileUpload, FaFilePdf, FaTrash } from 'react-icons/fa';
 
 // Hardcoded list of medical specialities
 const SPECIALITIES = [
@@ -995,6 +994,305 @@ const Appointment = () => {
   };
 
   // Update handleSubmit to include doctorEmail
+  // const handleSubmit = async (e) => {
+  //   e.preventDefault();
+    
+  //   // Validate form
+  //   const newErrors = {};
+    
+  //   if (!formData.Speciality) {
+  //     newErrors.Speciality = 'Please select a specialty';
+  //   }
+    
+  //   if (!formData.doctorId) {
+  //     newErrors.doctorId = 'Please select a doctor';
+  //   }
+    
+  //   if (!formData.fullName || !formData.fullName.trim()) {
+  //     newErrors.fullName = 'Full name is required';
+  //   }
+    
+  //   if (!formData.email || !formData.email.trim()) {
+  //     newErrors.email = 'Email is required';
+  //   } else if (!/^\S+@\S+\.\S+$/.test(formData.email.trim())) {
+  //     newErrors.email = 'Email is invalid';
+  //   }
+    
+  //   if (!formData.phone || (typeof formData.phone === 'string' && !formData.phone.trim())) {
+  //     newErrors.phone = 'Phone number is required';
+  //   }
+    
+  //   if (!formData.appointmentDate) {
+  //     newErrors.appointmentDate = 'Please select a date';
+  //   }
+    
+  //   if (!formData.appointmentTime) {
+  //     newErrors.appointmentTime = 'Please select a time';
+  //   }
+    
+  //   // Check if the selected time slot is already booked remotely
+  //   if (formData.appointmentTime && bookedTimeSlots.includes(formData.appointmentTime)) {
+  //     newErrors.appointmentTime = 'This time slot has already been booked. Please select another time.';
+      
+  //     // Refresh booked slots to ensure we have the latest data
+  //     if (formData.doctorId && formData.appointmentDate) {
+  //       fetchBookedTimeSlots(formData.doctorId, formData.appointmentDate);
+  //     }
+  //   }
+    
+  //   // Check if the selected time slot is already booked locally
+  //   if (formData.appointmentTime && isSlotBookedLocally(formData.doctorId, formData.appointmentDate, formData.appointmentTime)) {
+  //     newErrors.appointmentTime = 'You have already booked this time slot. Please select another time.';
+  //   }
+    
+  //   // If there are errors, show them and stop submission
+  //   if (Object.keys(newErrors).length > 0) {
+  //     setErrors(newErrors);
+  //     return;
+  //   }
+    
+  //   // Clear errors
+  //   setErrors({});
+  //   setSubmitting(true);
+    
+  //   try {
+  //     // Get the selected doctor to ensure we have their email
+  //     const selectedDoctor = filteredDoctors.find(doc => doc._id === formData.doctorId);
+      
+  //     // Format data for sending to API
+  //     const appointmentData = {
+  //       Speciality: formData.Speciality,
+  //       Doctor: selectedDoctor?.Name || "Unknown Doctor",
+  //       doctorId: formData.doctorId,
+  //       doctorEmail: formData.doctorEmail || selectedDoctor?.Email || '',
+  //       Name: formData.fullName,
+  //       Email: formData.email,
+  //       Phone: formData.phone,
+  //       AppointDate: formData.appointmentDate,
+  //       AppointTime: formData.appointmentTime,
+  //       Symptoms: formData.symptoms || 'Not specified',
+  //       Status: 'Active'
+  //     };
+      
+  //     console.log("Appointment data with doctor email:", appointmentData);
+      
+  //     // Create a timestamp-based ID for local storage
+  //     const localAppointmentId = `local-${Date.now()}`;
+      
+  //     console.log("Correct API endpoint based on backend code:", `${API_BASE_URL}/appoint/create`);
+      
+  //     // Get auth token
+  //     const authToken = token || localStorage.getItem('token');
+  //     console.log("Authentication token available:", !!authToken);
+      
+  //     // Try JSON first - the most reliable format
+  //     try {
+  //       console.log(`Making direct API call to the correct endpoint: ${API_BASE_URL}/appoint/create`);
+        
+  //       const response = await axios({
+  //         method: 'post',
+  //         url: `${API_BASE_URL}/appoint/create`,
+  //         data: appointmentData,
+  //         headers: {
+  //           'Content-Type': 'application/json',
+  //           'Authorization': authToken ? `Bearer ${authToken}` : '',
+  //         },
+  //         timeout: 10000
+  //       });
+        
+  //       console.log("API Response:", response);
+        
+  //       if (response && response.data) {
+  //         console.log("Successfully saved appointment to database:", response.data);
+          
+  //         // Get ID and process as usual
+  //         const serverAppointmentId = response.data.appointmentId || 
+  //                                   response.data._id || 
+  //                                   response.data.id;
+          
+  //         // Handle file uploads if needed
+  //         if (files.length > 0 && serverAppointmentId) {
+  //           await uploadFiles(serverAppointmentId, authToken);
+  //         }
+          
+  //         // Show success message
+  //         toast.success("Appointment successfully stored in database!");
+          
+  //         // Redirect to confirmation page
+  //         navigate('/appointment-confirmed', { 
+  //           state: {
+  //             appointmentId: serverAppointmentId || localAppointmentId,
+  //             doctorName: selectedDoctor?.Name || "Your doctor",
+  //             appointmentDate: formData.appointmentDate,
+  //             appointmentTime: formData.appointmentTime,
+  //             offlineMode: false,
+  //             pendingSync: false,
+  //             hasDocuments: files.length > 0
+  //           }
+  //         });
+  //         return;
+  //       }
+  //     } catch (apiError) {
+  //       console.error("Error saving appointment with correct endpoint:", apiError);
+        
+  //       if (apiError.response) {
+  //         console.error("API response details:", apiError.response.status, apiError.response.data);
+  //       }
+  //     }
+      
+  //     // If direct approach fails, try the multiple endpoints approach
+  //     try {
+  //       // ... existing multiple endpoints code ...
+  //     } catch (jsonError) {
+  //       console.error("DIRECT JSON API CALL FAILED:", jsonError);
+        
+  //       // Try FormData as fallback
+  //       try {
+  //         const formDataForApi = new FormData();
+          
+  //         // Add all appointment data
+  //         Object.entries(appointmentData).forEach(([key, value]) => {
+  //           formDataForApi.append(key, value);
+  //         });
+          
+  //         // Add files if any
+  //         files.forEach((fileObj, index) => {
+  //           formDataForApi.append(`document_${index}`, fileObj.file);
+  //         });
+          
+  //         console.log("Trying FormData approach...");
+          
+  //         // Try multiple endpoints with FormData
+  //         const possibleEndpoints = [
+  //           `${API_BASE_URL}/appointments`, // Simple RESTful endpoint
+  //           `${API_BASE_URL}/appointment`,  // Singular version
+  //           `${API_BASE_URL}/appointments/add`, // Common add verb
+  //           `${API_BASE_URL}/appointment/save`, // Save verb
+  //           `${API_BASE_URL}/add-appointment`, // Hyphenated version
+  //           `${API_BASE_URL}/appointment/create` // Original with no API prefix
+  //         ];
+          
+  //         let formDataSuccess = false;
+  //         let serverAppointmentId = null;
+  //         let formDataResponse = null;
+          
+  //         // Try each endpoint until one works
+  //         for (const endpoint of possibleEndpoints) {
+  //           try {
+  //             console.log(`Trying FormData endpoint: ${endpoint}`);
+              
+  //             const response = await axios({
+  //               method: 'post',
+  //               url: endpoint,
+  //               data: formDataForApi,
+  //               headers: {
+  //                 'Content-Type': 'multipart/form-data',
+  //                 'Authorization': authToken ? `Bearer ${authToken}` : '',
+  //               },
+  //               timeout: 15000
+  //             });
+              
+  //             if (response && response.status < 400) {
+  //               console.log(`SUCCESS! FormData endpoint ${endpoint} worked:`, response);
+  //               formDataResponse = response;
+                
+  //               // Get appointment ID
+  //               serverAppointmentId = response.data.appointmentId || 
+  //                                   response.data._id || 
+  //                                   response.data.id || 
+  //                                   response.data.appointment?._id;
+                
+  //               formDataSuccess = true;
+  //               break;
+  //             }
+  //           } catch (error) {
+  //             console.warn(`FormData endpoint ${endpoint} failed:`, error.message);
+  //           }
+  //         }
+          
+  //         if (formDataSuccess && formDataResponse) {
+  //           console.log("FORMDATA API CALL SUCCESSFUL:", formDataResponse);
+            
+  //           // Show success message
+  //           toast.success("Appointment successfully stored in database!");
+            
+  //           // Redirect to confirmation page
+  //           navigate('/appointment-confirmed', { 
+  //             state: {
+  //               appointmentId: serverAppointmentId || localAppointmentId,
+  //               doctorName: selectedDoctor?.Name || "Your doctor",
+  //               appointmentDate: formData.appointmentDate,
+  //               appointmentTime: formData.appointmentTime,
+  //               offlineMode: false,
+  //               pendingSync: false,
+  //               hasDocuments: files.length > 0
+  //             }
+  //           });
+  //           return;
+  //         }
+  //       } catch (formDataError) {
+  //         console.error("ALL FORMDATA API CALLS FAILED:", formDataError);
+  //       }
+  //     }
+      
+  //     // If we got here, both API calls failed - save to localStorage as fallback
+  //     console.log("API calls failed, saving to localStorage as fallback");
+      
+  //     // Add booking to local storage 
+  //     const localAppointment = {
+  //       _id: localAppointmentId,
+  //       doctorId: formData.doctorId,
+  //       doctorName: appointmentData.Doctor,
+  //       specialty: formData.Speciality,
+  //       appointmentDate: formData.appointmentDate,
+  //       appointmentTime: formData.appointmentTime,
+  //       name: formData.fullName,
+  //       email: formData.email,
+  //       phone: formData.phone,
+  //       symptoms: formData.symptoms || 'Not specified',
+  //       status: 'Active',
+  //       createdAt: new Date().toISOString(),
+  //       hasDocuments: files.length > 0
+  //     };
+      
+  //     // Save to local storage
+  //     saveLocalBooking(localAppointment);
+  //     savePendingSync({...appointmentData, fileCount: files.length});
+      
+  //     // Show message
+  //     toast.warning("Could not connect to server. Appointment saved locally for now.");
+      
+  //     // Redirect to confirmation page
+  //     navigate('/appointment-confirmed', { 
+  //       state: {
+  //         appointmentId: localAppointmentId,
+  //         doctorName: selectedDoctor?.Name || "Your doctor",
+  //         appointmentDate: formData.appointmentDate,
+  //         appointmentTime: formData.appointmentTime,
+  //         offlineMode: true,
+  //         pendingSync: true,
+  //         hasDocuments: files.length > 0
+  //       }
+  //     });
+      
+  //   } catch (error) {
+  //     console.error("ERROR DURING SUBMISSION:", error);
+      
+  //     if (error.stack) {
+  //       console.error("Stack trace:", error.stack);
+  //     }
+      
+  //     toast.error("Failed to book appointment. Please try again later.");
+      
+  //   } finally {
+  //     setSubmitting(false);
+  //   }
+  // };
+  
+
+
+
+
   const handleSubmit = async (e) => {
     e.preventDefault();
     
@@ -1052,12 +1350,12 @@ const Appointment = () => {
       return;
     }
     
-    // Clear errors
+    // Clear errors and show loading
     setErrors({});
     setSubmitting(true);
     
     try {
-      // Get the selected doctor to ensure we have their email
+      // Get the selected doctor
       const selectedDoctor = filteredDoctors.find(doc => doc._id === formData.doctorId);
       
       // Format data for sending to API
@@ -1072,224 +1370,74 @@ const Appointment = () => {
         AppointDate: formData.appointmentDate,
         AppointTime: formData.appointmentTime,
         Symptoms: formData.symptoms || 'Not specified',
-        Status: 'Active'
+        Status: 'Active',
+        selectedDoctor: selectedDoctor // Include the complete doctor object for fee information
       };
       
-      console.log("Appointment data with doctor email:", appointmentData);
+      console.log("Appointment data ready, transferring to payment page:", appointmentData);
       
-      // Create a timestamp-based ID for local storage
-      const localAppointmentId = `local-${Date.now()}`;
-      
-      console.log("Correct API endpoint based on backend code:", `${API_BASE_URL}/appoint/create`);
-      
-      // Get auth token
-      const authToken = token || localStorage.getItem('token');
-      console.log("Authentication token available:", !!authToken);
-      
-      // Try JSON first - the most reliable format
-      try {
-        console.log(`Making direct API call to the correct endpoint: ${API_BASE_URL}/appoint/create`);
-        
-        const response = await axios({
-          method: 'post',
-          url: `${API_BASE_URL}/appoint/create`,
-          data: appointmentData,
-          headers: {
-            'Content-Type': 'application/json',
-            'Authorization': authToken ? `Bearer ${authToken}` : '',
-          },
-          timeout: 10000
-        });
-        
-        console.log("API Response:", response);
-        
-        if (response && response.data) {
-          console.log("Successfully saved appointment to database:", response.data);
-          
-          // Get ID and process as usual
-          const serverAppointmentId = response.data.appointmentId || 
-                                    response.data._id || 
-                                    response.data.id;
-          
-          // Handle file uploads if needed
-          if (files.length > 0 && serverAppointmentId) {
-            await uploadFiles(serverAppointmentId, authToken);
-          }
-          
-          // Show success message
-          toast.success("Appointment successfully stored in database!");
-          
-          // Redirect to confirmation page
-          navigate('/appointment-confirmed', { 
-            state: {
-              appointmentId: serverAppointmentId || localAppointmentId,
-              doctorName: selectedDoctor?.Name || "Your doctor",
-              appointmentDate: formData.appointmentDate,
-              appointmentTime: formData.appointmentTime,
-              offlineMode: false,
-              pendingSync: false,
-              hasDocuments: files.length > 0
-            }
-          });
-          return;
-        }
-      } catch (apiError) {
-        console.error("Error saving appointment with correct endpoint:", apiError);
-        
-        if (apiError.response) {
-          console.error("API response details:", apiError.response.status, apiError.response.data);
-        }
-      }
-      
-      // If direct approach fails, try the multiple endpoints approach
-      try {
-        // ... existing multiple endpoints code ...
-      } catch (jsonError) {
-        console.error("DIRECT JSON API CALL FAILED:", jsonError);
-        
-        // Try FormData as fallback
-        try {
-          const formDataForApi = new FormData();
-          
-          // Add all appointment data
-          Object.entries(appointmentData).forEach(([key, value]) => {
-            formDataForApi.append(key, value);
-          });
-          
-          // Add files if any
-          files.forEach((fileObj, index) => {
-            formDataForApi.append(`document_${index}`, fileObj.file);
-          });
-          
-          console.log("Trying FormData approach...");
-          
-          // Try multiple endpoints with FormData
-          const possibleEndpoints = [
-            `${API_BASE_URL}/appointments`, // Simple RESTful endpoint
-            `${API_BASE_URL}/appointment`,  // Singular version
-            `${API_BASE_URL}/appointments/add`, // Common add verb
-            `${API_BASE_URL}/appointment/save`, // Save verb
-            `${API_BASE_URL}/add-appointment`, // Hyphenated version
-            `${API_BASE_URL}/appointment/create` // Original with no API prefix
-          ];
-          
-          let formDataSuccess = false;
-          let serverAppointmentId = null;
-          let formDataResponse = null;
-          
-          // Try each endpoint until one works
-          for (const endpoint of possibleEndpoints) {
-            try {
-              console.log(`Trying FormData endpoint: ${endpoint}`);
-              
-              const response = await axios({
-                method: 'post',
-                url: endpoint,
-                data: formDataForApi,
-                headers: {
-                  'Content-Type': 'multipart/form-data',
-                  'Authorization': authToken ? `Bearer ${authToken}` : '',
-                },
-                timeout: 15000
-              });
-              
-              if (response && response.status < 400) {
-                console.log(`SUCCESS! FormData endpoint ${endpoint} worked:`, response);
-                formDataResponse = response;
-                
-                // Get appointment ID
-                serverAppointmentId = response.data.appointmentId || 
-                                    response.data._id || 
-                                    response.data.id || 
-                                    response.data.appointment?._id;
-                
-                formDataSuccess = true;
-                break;
-              }
-            } catch (error) {
-              console.warn(`FormData endpoint ${endpoint} failed:`, error.message);
-            }
-          }
-          
-          if (formDataSuccess && formDataResponse) {
-            console.log("FORMDATA API CALL SUCCESSFUL:", formDataResponse);
-            
-            // Show success message
-            toast.success("Appointment successfully stored in database!");
-            
-            // Redirect to confirmation page
-            navigate('/appointment-confirmed', { 
-              state: {
-                appointmentId: serverAppointmentId || localAppointmentId,
-                doctorName: selectedDoctor?.Name || "Your doctor",
-                appointmentDate: formData.appointmentDate,
-                appointmentTime: formData.appointmentTime,
-                offlineMode: false,
-                pendingSync: false,
-                hasDocuments: files.length > 0
-              }
-            });
-            return;
-          }
-        } catch (formDataError) {
-          console.error("ALL FORMDATA API CALLS FAILED:", formDataError);
-        }
-      }
-      
-      // If we got here, both API calls failed - save to localStorage as fallback
-      console.log("API calls failed, saving to localStorage as fallback");
-      
-      // Add booking to local storage 
-      const localAppointment = {
-        _id: localAppointmentId,
-        doctorId: formData.doctorId,
-        doctorName: appointmentData.Doctor,
-        specialty: formData.Speciality,
-        appointmentDate: formData.appointmentDate,
-        appointmentTime: formData.appointmentTime,
-        name: formData.fullName,
-        email: formData.email,
-        phone: formData.phone,
-        symptoms: formData.symptoms || 'Not specified',
-        status: 'Active',
-        createdAt: new Date().toISOString(),
-        hasDocuments: files.length > 0
-      };
-      
-      // Save to local storage
-      saveLocalBooking(localAppointment);
-      savePendingSync({...appointmentData, fileCount: files.length});
-      
-      // Show message
-      toast.warning("Could not connect to server. Appointment saved locally for now.");
-      
-      // Redirect to confirmation page
-      navigate('/appointment-confirmed', { 
+      // Redirect to payment page with the form data
+      navigate('/appointment-payment', {
         state: {
-          appointmentId: localAppointmentId,
-          doctorName: selectedDoctor?.Name || "Your doctor",
-          appointmentDate: formData.appointmentDate,
-          appointmentTime: formData.appointmentTime,
-          offlineMode: true,
-          pendingSync: true,
-          hasDocuments: files.length > 0
+          appointmentData: {
+            ...appointmentData,
+            fullName: formData.fullName,
+            email: formData.email,
+            phone: formData.phone,
+            appointmentDate: formData.appointmentDate,
+            appointmentTime: formData.appointmentTime,
+            symptoms: formData.symptoms
+          },
+          files: files
         }
       });
       
     } catch (error) {
-      console.error("ERROR DURING SUBMISSION:", error);
+      console.error("ERROR PREPARING DATA:", error);
       
       if (error.stack) {
         console.error("Stack trace:", error.stack);
       }
       
-      toast.error("Failed to book appointment. Please try again later.");
+      toast.error("Failed to prepare appointment data. Please try again later.");
       
     } finally {
       setSubmitting(false);
     }
   };
-  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
   // Helper function to upload files
   const uploadFiles = async (appointmentId, authToken) => {
     if (!appointmentId || files.length === 0) return;

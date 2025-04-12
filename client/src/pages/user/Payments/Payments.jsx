@@ -174,22 +174,21 @@ const CoinsTab = ({
                 value={coinsToBuy}
                 onChange={(e) => {
                   const val = e.target.value;
-              
+
                   // Allow empty string so user can type
-                  if (val === '') {
-                    setCoinsToBuy('');
+                  if (val === "") {
+                    setCoinsToBuy("");
                     return;
                   }
-              
+
                   // Convert to number
                   const num = Number(val);
-              
+
                   // Prevent zero or negative
                   if (num < 1) return;
-              
+
                   setCoinsToBuy(num);
                 }}
-              
                 className="w-24 px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-red-500 focus:border-red-500"
               />
               <p className="text-sm text-gray-500">
@@ -208,7 +207,7 @@ const CoinsTab = ({
 
           <button
             onClick={handleCoinPurchase}
-            disabled={loading || coinsToBuy == ''}
+            disabled={loading || coinsToBuy == ""}
             className={`hover:cursor-pointer w-full py-2 px-4 rounded-md font-medium text-white ${
               loading
                 ? "bg-red-300 cursor-not-allowed"
@@ -283,7 +282,7 @@ const PaymentHistory = ({ payments, loading, error }) => {
               <table className="w-full text-sm">
                 <thead>
                   <tr className="bg-gray-100 text-left">
-                    {["Date", "Amount", "Qty", "Status", "Method"].map(
+                    {["Date", "Amount", "Qty", "Status", "Method", "Type"].map(
                       (header) => (
                         <th
                           key={header}
@@ -308,10 +307,20 @@ const PaymentHistory = ({ payments, loading, error }) => {
                           year: "numeric",
                         })}
                       </td>
-                      <td className="p-2 text-green-600 whitespace-nowrap">
+                      <td
+                        className={`p-2 ${
+                          payment.amount < 0 ? "text-red-600" : "text-green-600"
+                        } whitespace-nowrap`}
+                      >
                         ${payment.amount.toFixed(2)}
                       </td>
-                      <td className="p-2 whitespace-nowrap">
+                      <td
+                        className={`p-2 ${
+                          payment.coinQuantity < 0
+                            ? "text-red-600"
+                            : "text-green-600"
+                        } whitespace-nowrap`}
+                      >
                         {payment.coinQuantity}
                       </td>
                       <td className="p-2 whitespace-nowrap">
@@ -320,6 +329,7 @@ const PaymentHistory = ({ payments, loading, error }) => {
                       <td className="p-2 whitespace-nowrap">
                         {payment.paymentMethod}
                       </td>
+                      <td className="p-2 whitespace-nowrap">{payment.type}</td>
                     </tr>
                   ))}
                 </tbody>

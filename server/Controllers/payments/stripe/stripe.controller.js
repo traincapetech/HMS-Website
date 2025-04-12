@@ -90,7 +90,7 @@ const StripePayment = async (req, res) => {
       coinQuantity: products.quantity,
       date: new Date(),
       status: "pending",
-      paymentMethod: "stripe",
+      paymentMethod: "Stripe",
       transactionId: transactionId,
       stripeSessionId: session.id,
       metadata: session.metadata // Store all metadata for reference

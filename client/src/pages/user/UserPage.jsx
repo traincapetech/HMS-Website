@@ -1,15 +1,18 @@
-import React, { useState,useEffect  } from "react";
+import React, { useState, useEffect } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
 import MyAppointments from "./Appointment/MyAppointments";
 import MyMedicalRecords from "./MedicalRecords/MyMedicalRecords";
 import MyFeedback from "./Feedback/MyFeedback";
 import Payments from "./Payments/Payments";
 import Profile from "./View-UpdateProfile/Profile";
+import { logoutUser } from "../../redux/userSlice";
+import { useSelector, useDispatch } from "react-redux";
 
 const UserPage = ({ user }) => {
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
   const [activePage, setActivePage] = useState("MyAppointments");
   const navigate = useNavigate();
+  const dispatch = useDispatch();
 
   const location = useLocation();
   const sidebarLinks = [
@@ -31,17 +34,17 @@ const UserPage = ({ user }) => {
   ];
   useEffect(() => {
     const hash = location.hash.split("/")[0].replace("#", "");
-    console.log("HASH ELECMENT IS--->",hash)
-    setActivePage(hash|| "MyAppointments");
+    console.log("HASH ELECMENT IS--->", hash);
+    setActivePage(hash || "MyAppointments");
   }, [location]);
   const handleLinkClick = (id) => {
     setActivePage(id);
     navigate(`#${id}`);
-    setIsSidebarOpen(false)
+    setIsSidebarOpen(false);
   };
 
   const handleLogout = () => {
-    // dispatch(logoutUser());
+    dispatch(logoutUser());
     navigate("/login");
   };
 
@@ -87,7 +90,7 @@ const UserPage = ({ user }) => {
       case "Profile":
         return (
           <div className="p-6">
-          <Profile/>
+            <Profile />
           </div>
         );
       case "Payments":

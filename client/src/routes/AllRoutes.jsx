@@ -67,7 +67,8 @@ import DoctorProfile from '../pages/DoctorProfile'
 import PaymentCancel from '../pages/stripe/Cancel'
 import PaymentSuccess from '../pages/stripe/Success'
 import UserPage from '../pages/user/UserPage'
-
+import AppointmentPayment from '../pages/appointment/AppointmentPayment'
+import AppointmentProcess from '../pages/appointment/ProcessAppointmen'
 // Component to prevent accessing auth pages when already logged in
 const RequireNotAuth = ({ children }) => {
   const isLoggedIn = localStorage.getItem("token") && localStorage.getItem("user");
@@ -153,6 +154,9 @@ const AllRoutes = () => {
       <Route path='/Dashboard' element={<Dashboard />} />
       <Route path='/VideoCallControls' element={<VideoCallControls />} />
       <Route path='/MyAppointments' element={<MyAppointments />} />
+      <Route path='/appointment-payment' element={<AppointmentPayment />} />
+      <Route path='/process-appointment' element={<AppointmentProcess />} />
+
       <Route path='/api-diagnostics' element={<ApiDiagnostics />} />
       <Route path='/MyFeedback' element={<MyFeedback />} />
       <Route path='/MyMedicalRecords' element={<MyMedicalRecords />} />

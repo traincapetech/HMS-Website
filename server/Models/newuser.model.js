@@ -47,10 +47,6 @@ const newuserSchema = new mongoose.Schema({
         data: Buffer,
         contentType: String
     },
-    walletBalance: {
-        type: Number,
-        default: 0
-    },
     coinQuantity: {
         type: Number,
         default: 0
