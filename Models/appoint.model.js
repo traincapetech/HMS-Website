@@ -20,6 +20,11 @@ const appointSchema = new mongoose.Schema({
     zoomMeetingLink: {type: String},
     zoomMeetingId: {type: String},
     zoomPassword: {type: String},
+    document:{
+        data: Buffer,
+        contentType: String,
+        filename: { type: String, required: true }, 
+    },
 
 });
 

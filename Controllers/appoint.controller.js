@@ -10,9 +10,32 @@ const createAppoint = async (req, res) => {
         if(!errors.isEmpty()) {
             return res.status(400).json({ errors: errors.array() });
         }
+        console.log('Received files:', req.files); // Debug
+
+        const document = req.files?.['document']?.[0];
+        if (!document) {
+            console.warn('No document uploaded with appointment');
+        }
         
+        //log the files to see their content
+        // console.log('uploaded files', req.files[');
+
+        //ensure the files are uploaded and exists in req.files
+        //const document = req.files['document'] && req.files['document'][0];
+
+        // if(!document){
+        //     return res.status(400).json({ message: "Document are required"});   
+        // }
+
+        //check if the files are uploaded
+        if(!req.files){
+            return res.status(400).json({ message: "Files are required"});
+        }
+
+      //  const {document} = req.files;
+
         //create a new appointment
-        const {Speciality, Doctor, Name, Email, AppointDate, AppointTime, Phone, Reason, DocEmail} = req.body;
+        const {Speciality, Doctor, Name, Email, AppointDate, AppointTime, Phone, Reason, DocEmail,} = req.body;
 
             const timeParts = AppointTime.split(' ');
         if(timeParts.length !==2 ){
@@ -49,7 +72,15 @@ const createAppoint = async (req, res) => {
             Speciality, Doctor, Name, Email, AppointDate, AppointTime, Phone, Reason, DocEmail, 
             zoomMeetingLink: zoomMeeting.join_url, 
             zoomMeetingId: zoomMeeting.id, 
-            zoomPassword: zoomMeeting.password });
+            zoomPassword: zoomMeeting.password,
+            ////added 
+            document:{
+                data: document.buffer,
+                contentType: document.mimetype,
+                filename: document.originalname
+            },
+         });
+         
         //save the new appointment
         await newAppoint.save();
 
@@ -214,6 +245,23 @@ const countAppointments = async(req, res) => {
     }
 };
 
-export {createAppoint, getAppointment, getAppointmentById, deleteAppointmentById, countAppointments};  
+
+//get document by id
+const getDocumentById = async(req, res) => {
+    try{
+        const appoint = await Appoint.findById(req.params.id);
+        if(!appoint || !appoint.document){
+            return res.status(404).json({ message: "Document not found"});
+        }
+        
+        res.set('Content-Type', appoint.document.contentType);
+        res.set(`Content-Disposition`, `inline; filename= "${appoint.document.filename}"`);
+        res.send(appoint.document.data);
+        } catch(error){
+            res.status(500).json({ message: error.message});
+        }
+};
+
+export {createAppoint, getAppointment, getAppointmentById, deleteAppointmentById, countAppointments, getDocumentById};  
 
 
