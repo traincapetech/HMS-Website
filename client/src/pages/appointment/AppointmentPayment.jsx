@@ -2,7 +2,7 @@ import React, { useState, useEffect } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 import axios from "axios";
 import { toast } from "react-toastify";
-
+import { loadStripe } from "@stripe/stripe-js";
 const PaymentPage = () => {
   const API_BASE_URL = "http://localhost:8080/api";
   const location = useLocation();
@@ -29,10 +29,13 @@ const PaymentPage = () => {
 
   const processPaymentWithStripe = async () => {
     try {
+
       const selectedDoctor = appointmentData.selectedDoctor;
 
       // Prepare payment data for Stripe
       const paymentData = {
+        ...appointmentData,
+        selectedDoctorname:appointmentData.selectedDoctor,
         amount: selectedDoctor?.ConsultationFee || 50,
         currency: "USD",
         description: `Appointment with Dr. ${
@@ -51,7 +54,9 @@ const PaymentPage = () => {
       };
 
       console.log("Processing Stripe payment...", paymentData);
-      return;
+      const stripe = await loadStripe(
+        "pk_test_51RA7gzR4IpVwwNdkSnaCFniqyAdSIFkPIcztaYVwuIlmUImYiPtSS2UEnDQjMS9GF2BddzsU75t1PjRqiWh0aa1E00bBEJqgio"
+      );
       // Make Stripe payment API call
       const paymentResponse = await axios({
         method: "post",
@@ -63,23 +68,21 @@ const PaymentPage = () => {
         },
         timeout: 15000,
       });
+      console.log("PAYMENT RESPONSE---->", paymentResponse);
+      if (paymentResponse.data.url) {
+        window.location.href = paymentResponse.data.url;
+        return { redirecting: true, sessionId: paymentResponse.data.sessionId };
+      } else {
+        // Fall back to redirectToCheckout if no URL
+        const result = await stripe.redirectToCheckout({
+          sessionId: paymentResponse.data.sessionId,
+        });
 
-      console.log("Stripe Payment API Response:", paymentResponse);
-
-      if (!paymentResponse.data.success) {
-        toast.error(
-          paymentResponse.data.message || "Payment failed. Please try again."
-        );
-        return false;
+        if (result.error) {
+          throw new Error(result.error.message);
+        }
+        return { redirecting: true, sessionId: response.data.sessionId };
       }
-
-      // Return payment information
-      return {
-        paymentId: paymentResponse.data.paymentId,
-        paymentStatus: "Completed",
-        paymentAmount: paymentData.amount,
-        paymentMethod: "stripe",
-      };
     } catch (error) {
       console.error("Stripe payment processing error:", error);
 
@@ -120,7 +123,7 @@ const PaymentPage = () => {
       };
 
       console.log("Processing TAMD payment...", paymentData);
-      
+
       // Make TAMD payment API call
       const paymentResponse = await axios({
         method: "post",
@@ -132,7 +135,7 @@ const PaymentPage = () => {
         },
         timeout: 15000,
       });
-      
+
       if (!paymentResponse.data.success) {
         console.log(
           paymentResponse.data.message ||
@@ -171,7 +174,8 @@ const PaymentPage = () => {
 
     // Process payment based on selected method
     if (paymentMethod === "stripe") {
-      // paymentResult = await processPaymentWithStripe();
+     await processPaymentWithStripe();
+     return;
     } else if (paymentMethod === "tamd") {
       paymentResult = await processPaymentWithTamd();
     }
@@ -189,7 +193,7 @@ const PaymentPage = () => {
       console.log(
         `${paymentMethod.toUpperCase()} payment successful. Proceeding with appointment creation...`
       );
-      console.log("Payment processed successfully!");
+      console.log("Payment processed successfully!", updatedAppointmentData);
 
       // Redirect to a function that will create the appointment
       navigate("/process-appointment", {

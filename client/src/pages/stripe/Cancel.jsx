@@ -34,7 +34,7 @@ const PaymentCancelPage = () => {
             
             <div className="flex flex-col space-y-3 mt-6">
               <button
-                onClick={() => navigate("/Payments")}
+                onClick={() => navigate("/UserProfile#Payments")}
                 className="flex items-center justify-center gap-2 py-2 px-4 bg-red-600 text-white rounded-md hover:bg-red-700 transition-colors"
               >
                 <ArrowLeft className="h-4 w-4" />

@@ -255,7 +255,7 @@ const AppointmentConfirmed = () => {
           
           <div className="mt-8 flex flex-col md:flex-row space-y-4 md:space-y-0 md:space-x-4">
             <Link 
-              to="/UserProfile#Payments" 
+              to="/UserProfile#MyAppointments" 
               className="flex items-center justify-center px-6 py-3 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition-colors focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2"
               onClick={() => {
                 // Add analytics event if needed

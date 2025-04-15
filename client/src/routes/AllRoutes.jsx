@@ -69,6 +69,7 @@ import PaymentSuccess from '../pages/stripe/Success'
 import UserPage from '../pages/user/UserPage'
 import AppointmentPayment from '../pages/appointment/AppointmentPayment'
 import AppointmentProcess from '../pages/appointment/ProcessAppointmen'
+import StripeSuccesPage from '../pages/appointment/StripeSuccessPage'
 // Component to prevent accessing auth pages when already logged in
 const RequireNotAuth = ({ children }) => {
   const isLoggedIn = localStorage.getItem("token") && localStorage.getItem("user");
@@ -150,6 +151,7 @@ const AllRoutes = () => {
       <Route path='/ConsultTopDoctors' element={<ConsultTopDoctors />} />
       <Route path='/Appointments' element={<Appointments />} />
       <Route path='/appointment-confirmed' element={<AppointmentConfirmed />} />
+      <Route path='/appointment-stripe-success' element={<StripeSuccesPage />} />
       <Route path='/VideoCall' element={<VideoCall />} />
       <Route path='/Dashboard' element={<Dashboard />} />
       <Route path='/VideoCallControls' element={<VideoCallControls />} />
