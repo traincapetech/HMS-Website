@@ -151,6 +151,18 @@ const getNewuserImage = async(req, res) => {
         res.status(500).json({ message: "An error occurred while fetching the image "});
     }
 };
+
+//count total number of users
+const countNewUser = async (req, res) => {
+    try {
+        const count = await Newuser.countDocuments();
+        res.status(200).json({ count });
+    } catch (error) {
+        console.error('Error counting users:', error);
+        res.status(500).json({ message: 'Error counting users' });
+    }
+};
+
 const sendOTPToEmail = async (req, res) => {
     const transporter = nodemailer.createTransport({
       // service: "gmail",
@@ -270,4 +282,4 @@ const sendOTPToEmail = async (req, res) => {
     }
   };
 
-export {registerNewuser, loginNewuser, getnewUser, getnewUserById, getNewuserImage, sendOTPToEmail, verifyOtp, reset_password};
+export {registerNewuser, loginNewuser, getnewUser, getnewUserById, getNewuserImage, sendOTPToEmail, verifyOtp, reset_password, countNewUser};

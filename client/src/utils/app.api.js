@@ -8,7 +8,7 @@ const API_BASE_URL = ENV.API_URL;
 // Create an axios instance with default config
 const api = axios.create({
   baseURL: API_BASE_URL,
-  timeout: 15000, // 15 seconds timeout
+  timeout: 30000, // Increased timeout for slower connections
   headers: {
     "Content-Type": "application/json",
   },
@@ -17,11 +17,29 @@ const api = axios.create({
 // Request interceptor
 api.interceptors.request.use(
   (config) => {
-    // Get token from localStorage
-    const token = localStorage.getItem("token");
-    if (token) {
-      config.headers.Authorization = `Bearer ${token}`;
+    // Check for admin token first (highest priority)
+    const adminToken = localStorage.getItem("adminToken");
+    if (adminToken) {
+      console.log("Using admin token for request");
+      config.headers.Authorization = `Bearer ${adminToken}`;
+      return config;
     }
+    
+    // Check for doctor token next
+    const doctorToken = localStorage.getItem("doctorToken");
+    if (doctorToken) {
+      console.log("Using doctor token for request");
+      config.headers.Authorization = `Bearer ${doctorToken}`;
+      return config;
+    }
+    
+    // Finally check for user token
+    const userToken = localStorage.getItem("token");
+    if (userToken) {
+      console.log("Using user token for request");
+      config.headers.Authorization = `Bearer ${userToken}`;
+    }
+    
     return config;
   },
   (error) => {
@@ -37,8 +55,17 @@ api.interceptors.response.use(
   (error) => {
     // Handle 401 unauthorized errors (token expired, etc)
     if (error.response && error.response.status === 401) {
-      // Redirect to login or refresh token
-      console.warn("Authentication expired");
+      // Check which token was used
+      if (localStorage.getItem("adminToken")) {
+        console.warn("Admin authentication expired");
+        // Could redirect to admin login here
+      } else if (localStorage.getItem("doctorToken")) {
+        console.warn("Doctor authentication expired");
+        // Could redirect to doctor login here
+      } else if (localStorage.getItem("token")) {
+        console.warn("User authentication expired");
+        // Could redirect to user login here
+      }
     }
     return Promise.reject(error);
   }

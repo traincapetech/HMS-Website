@@ -20,7 +20,7 @@ const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
 // Make sure PORT is defined and log it for debugging
-const port = process.env.PORT || 10000;
+const port = process.env.PORT || 8080;
 console.log(`Using port: ${port}`);
 
 const app = express();
@@ -30,25 +30,31 @@ connectdb()
 const corsOptions = {
   origin: [
     'https://tamd-website.onrender.com',
+    'https://tamdhealth.com',
+    'http://tamdhealth.com',
     'http://localhost:5173',
     'http://localhost:3000',
-    'http://localhost:8080'
+    'http://localhost:8080',
+    // Add development origins
+    'http://127.0.0.1:5173',
+    'http://127.0.0.1:3000', 
+    'http://127.0.0.1:8080'
   ],
   methods: ['GET', 'PUT', 'POST', 'DELETE', 'OPTIONS', 'PATCH'],
   credentials: true, 
   allowedHeaders: ['Content-Type', 'Authorization', 'X-Requested-With']
 };
 
-// app.use(cors(corsOptions));
-app.use(cors({
-  origin: true, // Allow all origins or specify specific origins
-  methods: ['GET', 'PUT', 'POST', 'DELETE', 'OPTIONS', 'PATCH'],
-  credentials: true,
-  allowedHeaders: ['Content-Type', 'Authorization', 'X-Requested-With'],
-  exposedHeaders: ['Content-Length', 'X-RateLimit-Limit', 'X-RateLimit-Remaining']
-}));
+// Use specific CORS options instead of allowing all origins
+app.use(cors(corsOptions));
 
-app.use(express.json());
+// Log all incoming requests to help with debugging
+app.use((req, res, next) => {
+  console.log(`${new Date().toISOString()} | ${req.method} ${req.originalUrl} | IP: ${req.ip}`);
+  next();
+});
+
+app.use(express.json({ limit: '10mb' }));
 
 // API Routes
 app.use('/api/newuser', newuserRouter);
@@ -58,6 +64,53 @@ app.use('/api/zoom', zoomRouter);
 app.use('/api/add_doc', add_docrouter);
 app.use('/api/add_patient', add_patientrouter);
 app.use('/api/payments', add_paymentrouter);
+
+// Add count endpoints for admin dashboard (if not defined in routers)
+// Example for doctor count if not already defined in doctorRouter
+app.get('/api/doctor/count', async (req, res, next) => {
+  try {
+    // Implement actual count logic here based on your database model
+    // This is just a placeholder
+    // const count = await YourDoctorModel.countDocuments();
+    const count = 24; // Temporary hardcoded value
+    res.json({ count });
+  } catch (err) {
+    next(err);
+  }
+});
+
+// Example for newuser count if not already defined
+app.get('/api/newuser/count', async (req, res, next) => {
+  try {
+    // Implement actual count logic here based on your database model
+    // const count = await YourUserModel.countDocuments();
+    const count = 156; // Temporary hardcoded value
+    res.json({ count });
+  } catch (err) {
+    next(err);
+  }
+});
+
+// Example for appointment count if not already defined
+app.get('/api/appoint/count', async (req, res, next) => {
+  try {
+    // Implement actual count logic here based on your database model
+    // const count = await YourAppointmentModel.countDocuments();
+    const count = 42; // Temporary hardcoded value
+    res.json({ count });
+  } catch (err) {
+    next(err);
+  }
+});
+
+// Root route for basic health checks
+app.get('/', (req, res) => {
+  res.status(200).json({
+    status: 'online',
+    message: 'HMS API is running',
+    timestamp: new Date().toISOString()
+  });
+});
 
 // API health check endpoint
 app.get('/api/health', (req, res) => {
@@ -97,8 +150,9 @@ app.use((err, req, res, next) => {
 });
 
 // Start the server with proper error handling
-const server = app.listen(port, '0.0.0.0', () => {
-    console.log(`Server is listening on port ${port}`);
+const server = app.listen(port, () => {
+    console.log(`Server is running on port ${port}`);
+    console.log(`API base URL: http://localhost:${port}/api`);
 });
 
 // Handle server errors

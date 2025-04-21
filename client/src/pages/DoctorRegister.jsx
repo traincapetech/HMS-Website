@@ -1,7 +1,8 @@
 import React, { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { useNavigate, Link } from "react-router-dom";
-import { registerDoctor, clearError } from "../redux/doctorSlice";
+import { registerDoctor, clearError, clearDoctorState } from "../redux/doctorSlice";
+import { logoutUser } from "../redux/userSlice";
 import {
   FaUserMd,
   FaLock,
@@ -17,6 +18,7 @@ import {
   FaGlobe,
   FaImage,
   FaFilePdf,
+  FaExclamationTriangle,
 } from "react-icons/fa";
 import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
@@ -50,10 +52,51 @@ const specialtiesList = [
   "Veterinary",
 ];
 
+// Role confirmation modal component
+const RoleConfirmationModal = ({ isOpen, onClose, onConfirm }) => {
+  if (!isOpen) return null;
+  
+  return (
+    <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+      <div className="bg-white rounded-lg max-w-md w-full p-6 shadow-xl">
+        <div className="flex items-center text-yellow-600 mb-4">
+          <FaExclamationTriangle className="h-6 w-6 mr-3" />
+          <h3 className="text-lg font-bold">Switching Roles</h3>
+        </div>
+        
+        <p className="mb-4 text-gray-700">
+          You are currently logged in as a patient. Registering as a doctor will log you out of your patient account.
+        </p>
+        
+        <p className="mb-6 text-gray-700">
+          Do you want to continue with doctor registration?
+        </p>
+        
+        <div className="flex justify-end space-x-3">
+          <button
+            onClick={onClose}
+            className="px-4 py-2 border border-gray-300 rounded-md text-gray-700 hover:bg-gray-50"
+          >
+            Cancel
+          </button>
+          <button
+            onClick={onConfirm}
+            className="px-4 py-2 bg-red-600 text-white rounded-md hover:bg-red-700"
+          >
+            Continue as Doctor
+          </button>
+        </div>
+      </div>
+    </div>
+  );
+};
+
 const DoctorRegister = () => {
   const dispatch = useDispatch();
   const navigate = useNavigate();
   const { loading, error } = useSelector((state) => state.doctor);
+  const { user: patientUser, token: patientToken } = useSelector((state) => state.user);
+  const [showRoleConfirmation, setShowRoleConfirmation] = useState(false);
   const [formData, setFormData] = useState({
     Name: "",
     Email: "",
@@ -229,6 +272,45 @@ const DoctorRegister = () => {
     return Object.keys(errors).length === 0;
   };
 
+  useEffect(() => {
+    // First, check if user is logged in as a patient
+    if (patientToken && patientUser) {
+      // Show the confirmation modal if user is logged in as patient
+      setShowRoleConfirmation(true);
+    }
+    
+    // Always clear any existing doctor state when visiting registration page
+    dispatch(clearDoctorState());
+    
+    // Also check local storage and clear any stale doctor data
+    if (localStorage.getItem('doctor') || localStorage.getItem('doctorToken')) {
+      localStorage.removeItem('doctor');
+      localStorage.removeItem('doctorToken');
+      localStorage.removeItem('doctorEmail');
+    }
+    
+    window.scrollTo(0, 0);
+  }, [dispatch, patientToken, patientUser]);
+  
+  // Handle modal confirmation - user wants to logout as patient and continue as doctor
+  const handleRoleChangeConfirm = () => {
+    // Log out the user from patient role
+    dispatch(logoutUser());
+    
+    // Close the modal
+    setShowRoleConfirmation(false);
+    
+    // Show toast notification about the logout
+    toast.info("You've been logged out as a patient. Continue with doctor registration.");
+  };
+  
+  // Handle modal close - user wants to stay as patient
+  const handleModalClose = () => {
+    setShowRoleConfirmation(false);
+    // Navigate back to home or patient dashboard
+    navigate('/');
+  };
+
   const handleSubmit = async (e) => {
     e.preventDefault();
     if (!validateForm()) {
@@ -251,6 +333,14 @@ const DoctorRegister = () => {
       
       // Show success message
       toast.success("Registration successful! Redirecting to login...");
+      
+      // Clear any doctor state to ensure a clean login
+      dispatch(clearDoctorState());
+      
+      // Clear any stored doctor data to prevent auto-login
+      localStorage.removeItem('doctor');
+      localStorage.removeItem('doctorToken'); 
+      localStorage.removeItem('doctorEmail');
       
       // Redirect after a short delay to let the user see the success message
       setTimeout(() => {
@@ -327,51 +417,17 @@ const DoctorRegister = () => {
     }
   };
 
-  const savePrescription = async (appointmentId, prescriptionData) => {
-    try {
-      await axios.post(`/api/prescriptions`, {
-        appointmentId,
-        doctorId,
-        patientId: currentPatient._id,
-        medications: prescriptionData.medications,
-        instructions: prescriptionData.instructions,
-        notes: prescriptionData.notes
-      });
-      
-      toast.success("Prescription saved successfully");
-      // Update UI or redirect
-    } catch (error) {
-      console.error('Error saving prescription:', error);
-      toast.error('Failed to save prescription');
-    }
-  };
-
-  const updateAppointmentStatus = async (appointmentId, newStatus) => {
-    try {
-      await axios.put(`/api/appointments/${appointmentId}/status`, { 
-        status: newStatus 
-      });
-      
-      // Update local state to reflect change
-      setAppointments(prevAppointments => 
-        prevAppointments.map(apt => 
-          apt._id === appointmentId ? {...apt, status: newStatus} : apt
-        )
-      );
-      
-      toast.success(`Appointment status updated to ${newStatus}`);
-    } catch (error) {
-      console.error('Error updating status:', error);
-      toast.error('Failed to update appointment status');
-    }
-  };
-
-  useEffect(() => {
-    window.scrollTo(0, 0);
-  }, []);
   return (
     <div className="min-h-screen bg-gray-100 flex flex-col justify-center py-12 sm:px-6 lg:px-8">
       <ToastContainer position="top-right" autoClose={5000} />
+      
+      {/* Role confirmation modal */}
+      <RoleConfirmationModal 
+        isOpen={showRoleConfirmation}
+        onClose={handleModalClose}
+        onConfirm={handleRoleChangeConfirm}
+      />
+      
       <div className="sm:mx-auto sm:w-full sm:max-w-md">
         <div className="flex justify-center">
           <FaUserMd className="h-12 w-12 text-red-600" />

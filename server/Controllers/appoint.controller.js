@@ -1,7 +1,7 @@
 //appoint.controller.js
 import Appoint from "../Models/appoint.model.js";
 import { validationResult } from "express-validator";
-import { generateZoomMeeting } from "../zoom.service.js";
+import {generateZoomMeeting, sendEmail} from "../zoom.service.js";
 
 const createAppoint = async (req, res) => {
     try{
@@ -10,62 +10,190 @@ const createAppoint = async (req, res) => {
         if(!errors.isEmpty()) {
             return res.status(400).json({ errors: errors.array() });
         }
-        
-        //create a new appointment
-        const {Speciality, Doctor, Name, Email, AppointDate, AppointTime, doctorEmail} = req.body;
+        console.log('Received files:', req.files); // Debug
 
-        // Validate required fields for Zoom meeting
-        if (!doctorEmail || !Email) {
-            return res.status(400).json({ 
-                message: "Doctor email and patient email are required for video consultation" 
-            });
+        const document = req.files?.['document']?.[0];
+        if (!document) {
+            console.warn('No document uploaded with appointment');
         }
+        
+        //log the files to see their content
+        // console.log('uploaded files', req.files[');
+
+        //ensure the files are uploaded and exists in req.files
+        //const document = req.files['document'] && req.files['document'][0];
+
+        // if(!document){
+        //     return res.status(400).json({ message: "Document are required"});   
+        // }
+
+        //check if the files are uploaded
+        if(!req.files){
+            return res.status(400).json({ message: "Files are required"});
+        }
+
+      //  const {document} = req.files;
+
+        //create a new appointment
+        const {Speciality, Doctor, Name, Email, AppointDate, AppointTime, Phone, Reason, DocEmail,} = req.body;
+
+            const timeParts = AppointTime.split(' ');
+        if(timeParts.length !==2 ){
+            return res.status(400).json({ message: "Invalid time format"});
+        }
+
+        const [time, modifier] = timeParts;
+        let [hours, minutes] = time.split(':').map(Number);
+
+        //convert 24 hour to format
+        if(modifier === 'PM' && hours !== 12){
+            hours += 12;
+        } else if (modifier === 'AM' && hours === 12){
+            hours = 0;
+        }
+
+        //create the zoomStartTime
+        const zoomStartTime = new Date(AppointDate);
+        zoomStartTime.setHours(hours, minutes, 0, 0);
+        const zoomStartTimeISO = zoomStartTime.toISOString();
+
+
+        // const newAppoint = new Appoint({
+        //      Speciality, Doctor, Name, Email, AppointDate, AppointTime, Phone, Reason, DocEmail, zoomMeetingLink, zoomMeetingId, zoomPassword });
+
+             //Generate zoom meeting with the patient's email
+             const zoomMeeting = await generateZoomMeeting({
+                patientEmail: Email,
+                startTime: zoomStartTime,
+                topic: 'Appointment Meeting'
+             });
 
         const newAppoint = new Appoint({
-             Speciality, 
-             Doctor, 
-             Name, 
-             Email, 
-             AppointDate, 
-             AppointTime,
-             Status: "Confirmed"
-        });
-        
+            Speciality, Doctor, Name, Email, AppointDate, AppointTime, Phone, Reason, DocEmail, 
+            zoomMeetingLink: zoomMeeting.join_url, 
+            zoomMeetingId: zoomMeeting.id, 
+            zoomPassword: zoomMeeting.password,
+            ////added 
+            document:{
+                data: document.buffer,
+                contentType: document.mimetype,
+                filename: document.originalname
+            },
+         });
+         
+        //save the new appointment
         await newAppoint.save();
 
-        // Generate Zoom meeting with doctor and patient emails
-        try {
-            const zoomMeeting = await generateZoomMeeting(doctorEmail, Email);
-            
-            // Update appointment with Zoom meeting details
-            newAppoint.zoomMeetingId = zoomMeeting.meetingId;
-            newAppoint.zoomMeetingUrl = zoomMeeting.joinUrl;
-            newAppoint.zoomMeetingPassword = zoomMeeting.password;
-            
-            await newAppoint.save();
-            
-            // Return success with meeting details
-            return res.status(201).json({
-                message: "Appointment created successfully with video consultation",
-                appointmentId: newAppoint._id,
-                zoomMeetingUrl: zoomMeeting.joinUrl,
-                zoomMeetingPassword: zoomMeeting.password
-            });
-        } catch (zoomError) {
-            console.error("Error creating Zoom meeting:", zoomError);
-            
-            // Still return success but note the Zoom meeting failed
-            return res.status(201).json({
-                message: "Appointment created but video consultation setup failed",
-                appointmentId: newAppoint._id,
-                error: zoomError.message
-            });
-        }
-    } catch (error){
-        console.error("Error creating appointment:", error);
-        res.status(400).json({ message: error.message });
-    }
+
+///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+//styling of patient email of meeting
+const patientEmailContent = `
+    <!DOCTYPE html>
+    <html>
+    <head>
+    <style>
+    body {font-family: Arial, sans-serif; line-height: 1.6; color: #333; max-width: 600px; margin: 0 auto; padding: 20px; }
+    .header{ background-color: #9f0712; color: white; padding: 20px; text-align: center; border-radius: 5px 5px 0 0;}
+    .content{ padding: 20px; border: 1px solid #ddd; border-radius: 0 0 5px 5px;}
+    .details{ margin: 15px 0;}
+    .detail-item{ margin-bottom: 10px;}
+    .detail-label{ font-weight: bold; color: #9f0712; }
+    .zoom-box{ background-color: #f9f9f9; padding: 15px; border-radius: 5px; margin: 20px 0;}
+    .footer{ margin-top: 20px; font-size: 12px; color: #777; text-align: center; }
+    .button{ background-color: #9f0712; color: white; padding: 10px 15px; text-decoration: none; border-radius: 5px; display: inline-block;}
+    </style>
+    </head>
+    <body>
+    <div class = "header">
+    <h2>Appointment Booked</h2>
+    </div>
+    <div class= "content">
+    <p> Dear ${Name},</p>
+    <div class ="details">
+    <div class ="detail-item"><span class = "detail-label">Doctor: </span>${Doctor}</div>
+    <div class ="detail-item"><span class = "detail-label">Date: </span>${new Date(AppointDate).toLocaleDateString()}</div>
+    <div class ="detail-item"><span class = "detail-label">Time: </span>${AppointTime}</div>
+    </div>
+
+    <div class = "zoom-box">
+    <h3>Zoom Meeting Details</h3>
+    <p><strong>Meeting Id</strong> ${zoomMeeting.id}</p>
+    <p><strong>Password</strong> ${zoomMeeting.password}</p>
+    <p style= "text-align: center; margin-top: 15px;">
+    <a href = "${zoomMeeting.join_url}" class = "button">Join Meeting</a>
+    </p>
+    </div>
+    
+    <p>Please join 5 minutes before your scheduled time.</p>
+</div>
+</body>
+</html>`;
+
+
+//styling of doctor email of meeting
+const doctorEmailContent = `
+    <!DOCTYPE html>
+    <html>
+    <head>
+    <style>
+    body {font-family: Arial, sans-serif; line-height: 1.6; color: #333; max-width: 600px; margin: 0 auto; padding: 20px; }
+    .header{ background-color: #9f0712; color: white; padding: 20px; text-align: center; border-radius: 5px 5px 0 0;}
+    .content{ padding: 20px; border: 1px solid #ddd; border-radius: 0 0 5px 5px;}
+    .details{ margin: 15px 0;}
+    .detail-item{ margin-bottom: 10px;}
+    .detail-label{ font-weight: bold; color: #9f0712; }
+    .zoom-box{ background-color: #f9f9f9; padding: 15px; border-radius: 5px; margin: 20px 0;}
+    .footer{ margin-top: 20px; font-size: 12px; color: #777; text-align: center; }
+    .button{ background-color: #9f0712; color: white; padding: 10px 15px; text-decoration: none; border-radius: 5px; display: inline-block;}
+    </style>
+    </head>
+    <body>
+    <div class = "header">
+    <h2>New Appointment</h2>
+    </div>
+    <div class= "content">
+    <p> Dear ${Doctor},</p>
+    <div class ="details">
+    <div class ="detail-item"><span class = "detail-label">Patient: </span>${Name}</div>
+    <div class ="detail-item"><span class = "detail-label">Date: </span>${new Date(AppointDate).toLocaleDateString()}</div>
+    <div class ="detail-item"><span class = "detail-label">Time: </span>${AppointTime}</div>
+    </div>
+
+    <div class = "zoom-box">
+    <h3>Zoom Meeting Details</h3>
+    <p><strong>Meeting Id</strong> ${zoomMeeting.id}</p>
+    <p><strong>Password</strong> ${zoomMeeting.password}</p>
+    <p style= "text-align: center; margin-top: 15px;">
+    <a href = "${zoomMeeting.join_url}" class = "button">Join Meeting</a>
+    </p>
+    </div>
+    
+    <p>Please join 5 minutes before your scheduled time.</p>
+</div>
+</body>
+</html>`;
+
+const Tamd='TAMD Appointment'
+await sendEmail({to:Email,subject: Tamd,html: patientEmailContent});
+await sendEmail({to:DocEmail,subject: Tamd,html: doctorEmailContent});
+
+res.status(201).json({
+    success: true,
+    message: 'Appointment created successfully and email sent',
+    appointment: newAppoint
+
+});
+
+} catch (error){
+    console.error("Appointment error", error);
+    res.status(500).json({
+    success: false,
+    message: 'Failed to create appointment',
+    error: error.message
+    });
+}
 };
+
 
 //get all appointment 
 const getAppointment = async(req, res) => {
@@ -105,4 +233,34 @@ const deleteAppointmentById = async(req, res) => {
 };
 
 
-export {createAppoint, getAppointment, getAppointmentById, deleteAppointmentById};
+// count appointments
+const countAppointments = async(req, res) => {
+    try{
+        const count = await Appoint.countDocuments();
+        res.status(200).json({ count });
+    }
+    catch(error){
+        console.error(error);
+        res.status(500).json({ message: "An error occurred while counting appointments"});
+    }
+};
+
+
+//get document by id
+const getDocumentById = async(req, res) => {
+    try{
+        const appoint = await Appoint.findById(req.params.id);
+        if(!appoint || !appoint.document){
+            return res.status(404).json({ message: "Document not found"});
+        }
+        
+        res.set('Content-Type', appoint.document.contentType);
+        res.set(`Content-Disposition`, `inline; filename= "${appoint.document.filename}"`);
+        res.send(appoint.document.data);
+        } catch(error){
+            res.status(500).json({ message: error.message});
+        }
+};
+
+export {createAppoint, getAppointment, getAppointmentById, deleteAppointmentById, countAppointments, getDocumentById};  
+

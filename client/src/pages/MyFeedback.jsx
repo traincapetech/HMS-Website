@@ -2,6 +2,7 @@ import React, { useEffect, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { useSelector, useDispatch } from "react-redux";
 import { logoutUser } from "../redux/userSlice";
+import api, { API_BASE_URL } from '../utils/app.api';
 
 const MyFeedback = () => {
   const { user, token } = useSelector((state) => state.user);
@@ -12,6 +13,7 @@ const MyFeedback = () => {
   const [selectedId, setSelectedId] = useState("");
   const [rating, setRating] = useState(5);
   const [comment, setComment] = useState("");
+  const [isSidebarOpen, setIsSidebarOpen] = useState(false); // Sidebar toggle state
   const dispatch = useDispatch();
   const navigate = useNavigate();
 
@@ -36,11 +38,8 @@ const MyFeedback = () => {
   useEffect(() => {
     const fetchDoctors = async () => {
       try {
-        const response = await fetch("https://hms-backend-1-pngp.onrender.com/api/doctors", {
-          headers: { Authorization: `Bearer ${token}` },
-        });
-        const data = await response.json();
-        setDoctors(data);
+        const response = await api.get("/doctor/all");
+        setDoctors(response.data);
       } catch (error) {
         console.error("Error fetching doctors:", error);
       }
@@ -48,11 +47,8 @@ const MyFeedback = () => {
 
     const fetchHospitals = async () => {
       try {
-        const response = await fetch("/api/hospitals", {
-          headers: { Authorization: `Bearer ${token}` },
-        });
-        const data = await response.json();
-        setHospitals(data);
+        const response = await api.get("/hospitals");
+        setHospitals(response.data);
       } catch (error) {
         console.error("Error fetching hospitals:", error);
       }
@@ -114,11 +110,31 @@ const MyFeedback = () => {
   useEffect(() => {
     window.scrollTo(0, 0);
   }, []);
+
   return (
-    <div className="flex h-screen">
+    <div className="flex flex-col md:flex-row h-screen bg-gray-100">
+      {/* Mobile Sidebar Toggle Button */}
+      <button
+        className="md:hidden p-3 bg-gray-200 w-full text-left text-xl"
+        onClick={() => setIsSidebarOpen(!isSidebarOpen)}
+      >
+        ☰ Menu
+      </button>
+
       {/* Sidebar */}
-      <div className="w-1/4 bg-gray-100 p-6">
-        <div className="flex items-center mb-6">
+      <div
+        className={`fixed inset-y-0 left-0 z-50 w-64 bg-gray-100 p-6 transform ${
+          isSidebarOpen ? "translate-x-0" : "-translate-x-full"
+        } md:relative md:translate-x-0 transition-transform duration-300 ease-in-out`}
+      >
+        <button
+          className="md:hidden text-right w-full text-gray-700 text-2xl"
+          onClick={() => setIsSidebarOpen(false)}
+        >
+          ✕
+        </button>
+
+        {/* <div className="flex items-center mb-6">
           <img
             src={user?.photo || "https://accounts.practo.com/profile_picture/22269865/medium_thumbnail"}
             alt="User"
@@ -128,7 +144,7 @@ const MyFeedback = () => {
             <p className="font-semibold">{user?.UserName || "User"}</p>
             <p className="text-sm text-gray-500">{user?.Mobile || "No Mobile Number"}</p>
           </div>
-        </div>
+        </div> */}
         <ul className="space-y-3">
           <li><Link to="/MyAppointments" className="block py-2 px-3 rounded-lg hover:bg-gray-200">My Appointments</Link></li>
           <li><Link to="/MyTests" className="block py-2 px-3 rounded-lg hover:bg-gray-200">My Tests</Link></li>
@@ -142,7 +158,7 @@ const MyFeedback = () => {
       </div>
 
       {/* Main Content */}
-      <div className="w-3/4 p-6">
+      <div className="flex-1 p-6">
         <h2 className="text-2xl font-bold mb-4">Provide Feedback</h2>
 
         {/* Feedback Form */}
@@ -154,7 +170,7 @@ const MyFeedback = () => {
             className="w-full p-2 border rounded-md mb-4"
           >
             <option value="doctor">Doctor</option>
-        </select>
+          </select>
 
           <label className="block mb-2">Select {selectedType === "doctor" ? "Doctor" : "Hospital"}:</label>
           <select
@@ -188,6 +204,24 @@ const MyFeedback = () => {
 
           <button type="submit" className="bg-blue-500 text-white px-4 py-2 rounded-md">Submit Feedback</button>
         </form>
+
+        {/* Feedback List */}
+        {/* <div className="bg-white p-4 rounded-lg shadow-md">
+          <h3 className="text-lg font-semibold mb-4">Your Feedback History</h3>
+          {feedbacks.length === 0 ? (
+            <p className="text-gray-600">No feedback submitted yet.</p>
+          ) : (
+            <div className="space-y-4">
+              {feedbacks.map((feedback) => (
+                <div key={feedback.id} className="border p-4 rounded-lg">
+                  <p className="font-semibold">{feedback.type === "doctor" ? "Doctor" : "Hospital"}: {feedback.entityId}</p>
+                  <p>Rating: {feedback.rating}/5</p>
+                  <p>Comment: {feedback.comment}</p>
+                </div>
+              ))}
+            </div>
+          )}
+        </div> */}
       </div>
     </div>
   );

@@ -3,6 +3,7 @@ import { useNavigate } from "react-router-dom";
 import { FaSearch, FaMapMarkerAlt, FaStar, FaCalendarAlt, FaUserMd, FaFilter, FaHospital, FaCity, FaMoneyBillWave, FaRegClock, FaLock } from "react-icons/fa";
 import api from "../utils/app.api";
 import { API_BASE_URL, getDoctorImageUrl } from "../utils/app.api";
+import axios from "axios";
 
 const FindDoctor = () => {
   const [searchQuery, setSearchQuery] = useState("");
@@ -94,7 +95,7 @@ const FindDoctor = () => {
     const fetchDoctors = async () => {
       setIsLoading(true);
       try {
-        const response = await api.get("/doctor/all");
+        const response = await axios.get("https://hms-backend-1-pngp.onrender.com/api/doctor/all");
         if (response.data && response.data.doctor) {
           setDoctors(response.data.doctor);
           setError(null);

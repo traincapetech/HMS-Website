@@ -177,7 +177,7 @@ const PaymentSuccess = () => {
             )}
             
             <button 
-              onClick={() => navigate('UserProfile#Payments')} 
+              onClick={() => navigate('/UserProfile#Payments')} 
               className="w-full py-2 mt-4 font-medium text-white transition-colors bg-green-600 rounded-md hover:bg-green-700"
             >
               Go to Payments

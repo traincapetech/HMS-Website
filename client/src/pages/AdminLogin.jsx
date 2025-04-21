@@ -46,8 +46,8 @@ const AdminLogin = () => {
                     isActive: true
                 };
                 
-                // Create a mock token
-                const mockToken = 'mock-jwt-token-for-testing-purposes';
+                // Create a more realistic jwt-like token
+                const mockToken = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6ImFkbWluIiwicm9sZSI6ImFkbWluIiwiaWF0IjoxNjE5NzEyMDAwLCJleHAiOjE5MTk3OTg0MDB9.QxeGmYaQXbTVgywLNljRfnMWwwE8vyn20RAzK4TJ16Q';
                 
                 // Store in localStorage
                 localStorage.setItem('adminToken', mockToken);

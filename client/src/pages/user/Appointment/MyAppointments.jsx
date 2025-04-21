@@ -5,9 +5,9 @@ import { logoutUser } from "../../../redux/userSlice";
 import axios from "axios";
 import { FaVideo, FaCalendarAlt, FaSpinner, FaExclamationTriangle, FaCheck, FaClock, FaTimes, FaSync, FaTools } from "react-icons/fa";
 import { ENV } from "../../../utils/envUtils";
-
-// Use API URL from environment utility
-const API_BASE_URL = ENV.API_URL;
+import api, { API_BASE_URL } from '../../../utils/app.api';
+import { toast } from 'react-toastify';
+import { format, parseISO } from 'date-fns';
 
 const MyAppointments = () => {
   const [appointments, setAppointments] = useState([]);

@@ -2,14 +2,60 @@ import React, { useState, useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { Link, useNavigate, useLocation } from "react-router-dom";
 import { loginDoctor, clearError } from "../redux/doctorSlice";
+import { logoutUser } from "../redux/userSlice";
 import { toast } from 'react-toastify';
-import { FaUserMd, FaLock, FaExclamationCircle, FaEye, FaEyeSlash } from "react-icons/fa";
+import { FaUserMd, FaLock, FaExclamationCircle, FaEye, FaEyeSlash, FaExclamationTriangle } from "react-icons/fa";
+
+// Role confirmation modal component
+const RoleConfirmationModal = ({ isOpen, onClose, onConfirm }) => {
+  if (!isOpen) return null;
+  
+  return (
+    <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+      <div className="bg-white rounded-lg max-w-md w-full p-6 shadow-xl">
+        <div className="flex items-center text-yellow-600 mb-4">
+          <FaExclamationTriangle className="h-6 w-6 mr-3" />
+          <h3 className="text-lg font-bold">Switching Roles</h3>
+        </div>
+        
+        <p className="mb-4 text-gray-700">
+          You are currently logged in as a patient. Logging in as a doctor will log you out of your patient account.
+        </p>
+        
+        <p className="mb-6 text-gray-700">
+          Do you want to continue with doctor login?
+        </p>
+        
+        <div className="flex justify-end space-x-3">
+          <button
+            onClick={onClose}
+            className="px-4 py-2 border border-gray-300 rounded-md text-gray-700 hover:bg-gray-50"
+          >
+            Cancel
+          </button>
+          <button
+            onClick={onConfirm}
+            className="px-4 py-2 bg-red-600 text-white rounded-md hover:bg-red-700"
+          >
+            Continue as Doctor
+          </button>
+        </div>
+      </div>
+    </div>
+  );
+};
 
 const DoctorLogin = () => {
   const dispatch = useDispatch();
   const navigate = useNavigate();
   const location = useLocation();
   const { doctor, isLoading, error, isAuthenticated } = useSelector((state) => state.doctor);
+  
+  // Get patient user state to check if user is already logged in as patient
+  const { user: patientUser, token: patientToken } = useSelector((state) => state.user);
+  
+  // State for confirmation modal
+  const [showRoleConfirmation, setShowRoleConfirmation] = useState(false);
   
   const [formData, setFormData] = useState({
     Email: "",
@@ -18,6 +64,40 @@ const DoctorLogin = () => {
   
   const [showPassword, setShowPassword] = useState(false);
   const [loginAttempted, setLoginAttempted] = useState(false);
+
+  // Check for patient login on component mount
+  useEffect(() => {
+    // First, check if user is logged in as a patient
+    if (patientToken && patientUser) {
+      // Show the confirmation modal if user is logged in as patient
+      setShowRoleConfirmation(true);
+    }
+    
+    // If doctor is already authenticated, redirect to dashboard
+    if (isAuthenticated && doctor) {
+      const from = location.state?.from?.pathname || "/doctor/dashboard";
+      navigate(from);
+    }
+  }, [isAuthenticated, doctor, navigate, location, patientToken, patientUser]);
+
+  // Handle modal confirmation - user wants to logout as patient and continue as doctor
+  const handleRoleChangeConfirm = () => {
+    // Log out the user from patient role
+    dispatch(logoutUser());
+    
+    // Close the modal
+    setShowRoleConfirmation(false);
+    
+    // Show toast notification about the logout
+    toast.info("You've been logged out as a patient. Continue with doctor login.");
+  };
+  
+  // Handle modal close - user wants to stay as patient
+  const handleModalClose = () => {
+    setShowRoleConfirmation(false);
+    // Navigate back to home or patient dashboard
+    navigate('/');
+  };
 
   const handleChange = (e) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
@@ -75,14 +155,6 @@ const DoctorLogin = () => {
     }
   };
 
-  // Redirect if already logged in
-  useEffect(() => {
-    if (isAuthenticated && doctor) {
-      const from = location.state?.from?.pathname || "/doctor/dashboard";
-      navigate(from);
-    }
-  }, [isAuthenticated, doctor, navigate, location]);
-
   // Display toast for error if login was attempted
   useEffect(() => {
     if (error && loginAttempted) {
@@ -93,6 +165,13 @@ const DoctorLogin = () => {
 
   return (
     <div className="min-h-screen bg-gray-100 flex flex-col justify-center py-12 sm:px-6 lg:px-8">
+      {/* Role confirmation modal */}
+      <RoleConfirmationModal 
+        isOpen={showRoleConfirmation}
+        onClose={handleModalClose}
+        onConfirm={handleRoleChangeConfirm}
+      />
+      
       <div className="sm:mx-auto sm:w-full sm:max-w-md">
         <div className="flex justify-center">
           <FaUserMd className="h-12 w-12 text-red-600" />

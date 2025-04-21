@@ -1,24 +1,26 @@
 {
-  "name": "hms-backend",
+  "name": "hms-website",
   "version": "1.0.0",
-  "description": "Backend for TAMD Health Management System",
+  "description": "Hospital Management System",
   "main": "index.js",
-  "type": "module",
   "scripts": {
-    "start": "node server/index.js",
-    "server": "nodemon server/index.js",
     "client": "cd client && npm run dev",
+    "server": "cd server && npm run server",
     "dev": "concurrently \"npm run server\" \"npm run client\"",
-    "build": "cd client && npm install && npm run build"
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/yourusername/HMS-Website.git"
   },
   "keywords": [
     "healthcare",
-    "management",
-    "api"
+    "hospital",
+    "management"
   ],
-  "engines": {
-    "node": ">=16.0.0"
-  },
-  "author": "TAMD Health",
-  "license": "ISC"
+  "author": "",
+  "license": "ISC",
+  "devDependencies": {
+    "concurrently": "^8.0.1"
+  }
 } 
